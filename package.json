@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "eas-build-post-install": "node -e \"if(process.platform==='linux'){require('child_process').execSync('npm install --no-save lightningcss-linux-x64-gnu@1.27.0',{stdio:'inherit'})}\""
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
