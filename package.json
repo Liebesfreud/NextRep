@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
+    "lightningcss-linux-x64-gnu": "1.27.0",
     "babel-preset-expo": "^55.0.10",
     "drizzle-orm": "^0.45.1",
     "expo": "~55.0.4",
