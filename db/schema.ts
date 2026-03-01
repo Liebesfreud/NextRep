@@ -61,9 +61,17 @@ export const userProfile = sqliteTable("UserProfile", {
     age: integer("age"),
     gender: text("gender"),
     goal: text("goal"),
-    aiBaseUrl: text("aiBaseUrl"),
-    aiApiKey: text("aiApiKey"),
-    aiModel: text("aiModel"),
+    aiBaseUrl: text("aiBaseUrl"), // Legacy
+    aiApiKey: text("aiApiKey"),     // Legacy
+    aiModel: text("aiModel"),       // Legacy
+
+    // Multi-AI Config fields
+    aiConfigs: text("aiConfigs"), // Stored as JSON string
+    activeAiConfigId: text("activeAiConfigId"),
+
+    aiTokensTotal: integer("aiTokensTotal").default(0),
+    aiTokensToday: integer("aiTokensToday").default(0),
+    aiTokensDate: text("aiTokensDate"), // YYYY-MM-DD to reset today's tokens
     updatedAt: integer("updatedAt", { mode: "timestamp" })
         .notNull()
         .default(sql`(unixepoch())`),

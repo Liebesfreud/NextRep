@@ -1,5 +1,43 @@
-import { getUserProfile } from "./profile";
+import { getUserProfile, recordAITokens } from "./profile";
 import type { WorkoutItem } from "./workout";
+
+// ─── AI Connection Testing ────────────────────────────────────────────────────
+
+export async function testAIConnection(baseUrl: string, apiKey: string, model: string): Promise<boolean> {
+    if (!apiKey) throw new Error("API Key 不能为空");
+
+    // Default values if empty
+    const testBaseUrl = baseUrl || "https://api.openai.com/v1";
+    const testModel = model || "gpt-4o";
+
+    const endpoint = testBaseUrl.endsWith("/")
+        ? `${testBaseUrl}chat/completions`
+        : `${testBaseUrl}/chat/completions`;
+
+    try {
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({
+                model: testModel,
+                messages: [{ role: "user", content: "hi" }],
+                max_tokens: 5,
+            }),
+        });
+
+        if (!response.ok) {
+            const err = await response.text();
+            throw new Error(`请求失败: ${response.status} ${response.statusText}`);
+        }
+
+        return true;
+    } catch (e: any) {
+        throw new Error(`连接测试失败: ${e.message}`);
+    }
+}
 
 // ─── AI Chat ──────────────────────────────────────────────────────────────────
 
@@ -11,12 +49,15 @@ export async function chatWithAI(
 ): Promise<string> {
     const profile = await getUserProfile();
 
-    if (!profile.aiApiKey) {
-        throw new Error("未配置 API Key，请先到设置页面配置。");
+    const activeConfig = profile.aiConfigs?.find(c => c.id === profile.activeAiConfigId);
+    const resolvedConfig = activeConfig || profile.aiConfigs?.[0];
+
+    if (!resolvedConfig || !resolvedConfig.apiKey) {
+        throw new Error("未配置 API Key，请先到设置页面添加 AI 配置。");
     }
 
-    const baseUrl = profile.aiBaseUrl || "https://api.openai.com/v1";
-    const model = profile.aiModel || "gpt-4o";
+    const baseUrl = resolvedConfig.baseUrl || "https://api.openai.com/v1";
+    const model = resolvedConfig.model || "gpt-4o";
     const endpoint = baseUrl.endsWith("/")
         ? `${baseUrl}chat/completions`
         : `${baseUrl}/chat/completions`;
@@ -77,6 +118,12 @@ ${metricsSummary || "暂无最新指标"}
     }
 
     const data = await response.json();
+
+    // Record token usage
+    if (data.usage?.total_tokens) {
+        await recordAITokens(data.usage.total_tokens).catch(console.error);
+    }
+
     return data.choices[0].message.content;
 }
 
@@ -88,10 +135,13 @@ export async function estimateDailyCaloriesWithAI(
     if (workouts.length === 0) return 0;
 
     const profile = await getUserProfile();
-    if (!profile.aiApiKey) return null;
+    const activeConfig = profile.aiConfigs?.find(c => c.id === profile.activeAiConfigId);
+    const resolvedConfig = activeConfig || profile.aiConfigs?.[0];
 
-    const baseUrl = profile.aiBaseUrl || "https://api.openai.com/v1";
-    const model = profile.aiModel || "gpt-4o";
+    if (!resolvedConfig || !resolvedConfig.apiKey) return null;
+
+    const baseUrl = resolvedConfig.baseUrl || "https://api.openai.com/v1";
+    const model = resolvedConfig.model || "gpt-4o";
     const endpoint = baseUrl.endsWith("/")
         ? `${baseUrl}chat/completions`
         : `${baseUrl}/chat/completions`;
@@ -141,6 +191,12 @@ export async function estimateDailyCaloriesWithAI(
         if (!response.ok) return null;
 
         const data = await response.json();
+
+        // Record token usage
+        if (data.usage?.total_tokens) {
+            await recordAITokens(data.usage.total_tokens).catch(console.error);
+        }
+
         const content = data.choices[0].message.content.trim();
         const parsed = parseInt(content.replace(/[^\d]/g, ""), 10);
         return isNaN(parsed) ? null : parsed;

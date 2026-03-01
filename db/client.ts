@@ -4,7 +4,7 @@ import * as schema from "./schema";
 
 // Open (or create) the database file once — reused as a singleton
 const expoDb = SQLite.openDatabaseSync("nextrep.db", {
-    enableChangeListener: true,
+  enableChangeListener: true,
 });
 
 export const db = drizzle(expoDb, { schema });
@@ -13,7 +13,7 @@ export const db = drizzle(expoDb, { schema });
 // Creates tables if they don't already exist.
 // Call this once at app startup (e.g., in _layout.tsx).
 export async function initDatabase(): Promise<void> {
-    await expoDb.execAsync(`
+  await expoDb.execAsync(`
     PRAGMA journal_mode = WAL;
 
     CREATE TABLE IF NOT EXISTS "Workout" (
@@ -60,7 +60,25 @@ export async function initDatabase(): Promise<void> {
       "aiBaseUrl" TEXT,
       "aiApiKey"  TEXT,
       "aiModel"   TEXT,
+      "aiConfigs" TEXT,
+      "activeAiConfigId" TEXT,
+      "aiTokensTotal" INTEGER DEFAULT 0,
+      "aiTokensToday" INTEGER DEFAULT 0,
+      "aiTokensDate" TEXT,
       "updatedAt" INTEGER NOT NULL DEFAULT (unixepoch())
     );
   `);
+
+  // Safe migrations for early adopters
+  try {
+    await expoDb.execAsync(`
+          ALTER TABLE "UserProfile" ADD COLUMN "aiConfigs" TEXT;
+          ALTER TABLE "UserProfile" ADD COLUMN "activeAiConfigId" TEXT;
+          ALTER TABLE "UserProfile" ADD COLUMN "aiTokensTotal" INTEGER DEFAULT 0;
+          ALTER TABLE "UserProfile" ADD COLUMN "aiTokensToday" INTEGER DEFAULT 0;
+          ALTER TABLE "UserProfile" ADD COLUMN "aiTokensDate" TEXT;
+      `);
+  } catch (e) {
+    // Columns likely already exist
+  }
 }
