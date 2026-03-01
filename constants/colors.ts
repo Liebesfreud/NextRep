@@ -15,13 +15,13 @@ export const Colors = {
         white: "#FFFFFF",       // --text-main
         black: "#000000",       // --text-inverse
         card: "#1C1C1E",
-        border: "rgba(255,255,255,0.10)",
+        border: "rgba(255,255,255,0.06)",
     },
     light: {
         bg: "#F2F2F7",
         bento: "#FFFFFF",
-        gray2: "#F2F2F7",      // Secondary fill (Apple System Gray 6)
-        gray3: "#E5E5EA",      // Tertiary fill (Apple System Gray 5)
+        gray2: "#F6F6F8",      // Lighter than System Gray 6, but not as white as previous iteration
+        gray3: "#F5F5F7",      // Even lighter gray for borders/panels
         gray4: "#8E8D93",
         blue: "#007AFF",
         green: "#34C759",
@@ -30,7 +30,7 @@ export const Colors = {
         white: "#000000",
         black: "#FFFFFF",
         card: "#FFFFFF",
-        border: "rgba(0,0,0,0.10)",
+        border: "rgba(0,0,0,0.05)",
     },
 } as const;
 

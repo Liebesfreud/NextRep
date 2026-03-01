@@ -383,7 +383,7 @@ export default function HomeScreen() {
 
                             {/* Strength */}
                             {strengthWorkouts.length > 0 && (
-                                <View style={{ backgroundColor: colors.gray3 }} className="rounded-bento-sm p-3 gap-2">
+                                <View style={{ backgroundColor: colors.gray2 }} className="rounded-bento-sm p-3 gap-2">
                                     <View className="flex-row justify-between items-center ml-1 mb-0.5">
                                         <Text style={{ color: colors.gray4, opacity: 0.7 }} className="text-xs font-extrabold tracking-widest uppercase">
                                             力量训练
@@ -437,7 +437,7 @@ export default function HomeScreen() {
                         )}
                         {strengthWorkouts.length === 0 && (
                             <Pressable onPress={handleOpenStrength}
-                                style={{ backgroundColor: colors.gray3, borderColor: colors.border, borderWidth: 1 }}
+                                style={{ backgroundColor: colors.gray2, borderColor: colors.border, borderWidth: 1 }}
                                 className="flex-1 py-3 rounded-bento-sm flex-row items-center justify-center gap-2">
                                 <Dumbbell size={16} color={colors.white} />
                                 <Text style={{ color: colors.white }} className="font-bold text-sm">力量训练</Text>
