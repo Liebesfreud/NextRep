@@ -73,14 +73,17 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
     const todayNum = (year === now.getFullYear() && month === now.getMonth()) ? now.getDate() : -1;
     const monthlyCheckinCount = Object.values(checkins).filter(Boolean).length;
 
+    // Compute week alignment (Monday = 0)
+    const firstDayIndex = firstDay === 0 ? 6 : firstDay - 1;
+
     // Allowed selection range
     const years = Array.from({ length: 5 }, (_, i) => now.getFullYear() - i);
     const months = Array.from({ length: 12 }, (_, i) => i);
 
     return (
-        <View className="flex-row justify-between w-full" {...panResponder.panHandlers}>
+        <View className="flex-row justify-between items-center w-full" {...panResponder.panHandlers}>
             {/* Left Panel: Summary */}
-            <View className="justify-between" style={{ paddingVertical: 2 }}>
+            <View className="justify-center" style={{ paddingVertical: 2 }}>
                 <View>
                     <Pressable onPress={() => setIsPickerVisible(true)}>
                         <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "700", letterSpacing: 1, marginBottom: 2 }}>
@@ -107,13 +110,13 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
             </View>
 
             {/* Right Panel: Minimalist Heatmap Grid */}
-            <Animated.View style={{ opacity: fadeAnim, gap: 4 }}>
-                {Array.from({ length: 5 }).map((_, r) => (
-                    <View key={r} style={{ flexDirection: "row", gap: 4 }}>
+            <Animated.View style={{ opacity: fadeAnim, gap: 3 }}>
+                {Array.from({ length: 6 }).map((_, r) => (
+                    <View key={r} style={{ flexDirection: "row", gap: 3 }}>
                         {Array.from({ length: 7 }).map((_, c) => {
                             const i = r * 7 + c;
-                            const dayNum = i + 1;
-                            const isValidDay = dayNum <= daysInMonth;
+                            const dayNum = i - firstDayIndex + 1;
+                            const isValidDay = dayNum >= 1 && dayNum <= daysInMonth;
                             const isCheckedIn = isValidDay && checkins[dayNum];
                             const isToday = isValidDay && dayNum === todayNum;
 
@@ -127,11 +130,15 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                                 <View
                                     key={i}
                                     style={{
-                                        width: 16,
-                                        height: 16,
+                                        width: 14,
+                                        height: 14,
+                                        minWidth: 14,
+                                        minHeight: 14,
+                                        flexShrink: 0,
                                         borderRadius: 4,
                                         backgroundColor: bg,
-                                    }}
+                                        borderCurve: "continuous",
+                                    } as any}
                                 />
                             );
                         })}
