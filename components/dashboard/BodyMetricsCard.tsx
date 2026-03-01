@@ -1,27 +1,6 @@
 import { View, Text, Pressable } from "react-native";
-import { Scale, TrendingUp, TrendingDown } from "lucide-react-native";
-import Svg, { Polyline, Defs, LinearGradient, Stop } from "react-native-svg";
+import { Scale, Sparkles } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
-
-function formatDaysAgo(days: number | null | undefined) {
-    if (days === null || days === undefined) return "暂无记录";
-    if (days === 0) return "今天";
-    if (days === 1) return "1天前";
-    return `${days}天前`;
-}
-
-function buildSparklinePoints(values: number[]) {
-    if (!values || values.length === 0) return "0,15 100,15";
-    if (values.length === 1) return "0,15 100,15";
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    const range = max - min || 1;
-    return values.map((v, i) => {
-        const x = (i / (values.length - 1)) * 100;
-        const y = 24 - ((v - min) / range) * 16;
-        return `${x},${y}`;
-    }).join(" ");
-}
 
 type Props = {
     data: any;
@@ -33,105 +12,184 @@ type Props = {
 export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetric }: Props) {
     const { colors } = useTheme();
 
+    const weightMetric = data?.bodyMetrics?.weight;
+    const bodyFatMetric = data?.bodyMetrics?.bodyFat;
+    const heightCm = data?.profileHeight;
+
+    const weightVal = weightMetric?.latestValue;
+    const bodyFatVal = bodyFatMetric?.latestValue;
+    const weightDelta = weightMetric?.deltaFromPrevious;
+
+    const isWeightDecrease = (weightDelta ?? 0) <= 0;
+    const trendColor = weightDelta === null ? colors.gray4 : (isWeightDecrease ? colors.green : colors.orange);
+    const trendBgColor = weightDelta === null ? colors.border : (isWeightDecrease ? `${colors.green}1A` : `${colors.orange}1A`);
+    const trendText = weightDelta === null ? "暂无数据" : `${isWeightDecrease ? "↓" : "↑"} ${Math.abs(weightDelta).toFixed(1)} kg 相比上次`;
+
+    // BMI logic based on Chinese standard
+    const bmiVal = (weightVal && heightCm) ? (weightVal / Math.pow(heightCm / 100, 2)).toFixed(1) : "-";
+
+    const getBmiStatus = (bmiStr: string) => {
+        if (bmiStr === "-") return { text: "未知", color: colors.gray4, bg: colors.border };
+        const val = parseFloat(bmiStr);
+        if (val < 18.5) return { text: "🟡 偏瘦", color: colors.orange, bg: `${colors.orange}1A` };
+        if (val < 24) return { text: "🟢 正常", color: colors.green, bg: `${colors.green}1A` };
+        if (val < 28) return { text: "🟠 超重", color: colors.orange, bg: `${colors.orange}1A` };
+        return { text: "🔴 肥胖", color: colors.red, bg: `${colors.red}1A` };
+    };
+
+    const bmiStatus = getBmiStatus(bmiVal);
+
+    // Body fat simple proxy logic to display badge
+    const bodyFatStatusText = bodyFatVal ? (bodyFatVal >= 25 ? "偏高" : bodyFatVal >= 15 ? "标准" : "偏低") : "";
+    const bodyFatStatusColor = bodyFatVal ? (bodyFatVal >= 25 ? colors.orange : bodyFatVal >= 15 ? colors.green : colors.orange) : colors.gray4;
+    const bodyFatStatusBg = bodyFatVal ? (bodyFatVal >= 25 ? `${colors.orange}1A` : bodyFatVal >= 15 ? `${colors.green}1A` : `${colors.orange}1A`) : colors.border;
+
     return (
-        <View style={{ backgroundColor: colors.bento, borderColor: colors.border, borderWidth: 1, padding: 14 }} className="rounded-bento-lg gap-3">
-            <View className="flex-row items-center px-0.5">
+        <View style={{ backgroundColor: colors.bento, borderColor: colors.border, borderWidth: 1, padding: 14, borderRadius: 16, flexDirection: "column", gap: 14 }}>
+            {/* Header */}
+            <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 2 }}>
                 <Scale size={16} color={colors.red} />
-                <Text style={{ color: colors.white, opacity: 0.9 }} className="font-bold text-xs tracking-wide ml-1.5">身体指标</Text>
+                <Text style={{ color: colors.white, opacity: 0.9, fontWeight: "bold", fontSize: 13, letterSpacing: 0.5, marginLeft: 6 }}>
+                    身体指标
+                </Text>
             </View>
 
-            <View className="flex-row gap-bento">
-                {(["weight", "bodyFat"] as const).map((metricType) => {
-                    const metric = data?.bodyMetrics?.[metricType];
-                    const isExpanded = expandedMetric === metricType;
-                    const delta = metric?.deltaFromPrevious;
-                    const isDecrease = (delta ?? 0) <= 0;
-                    const sparkPoints = buildSparklinePoints(metric?.recentPoints || []);
+            {/* 第一部分：顶部数据区 */}
+            <View style={{ flexDirection: "row", gap: 12 }}>
 
-                    return (
-                        <Pressable
-                            key={metricType}
-                            onPress={() => setExpandedMetric(expandedMetric === metricType ? null : metricType)}
-                            style={{
-                                flex: 1,
-                                backgroundColor: colors.gray3,
-                                padding: 12,
-                                borderWidth: 1,
-                                borderColor: isExpanded ? `${colors.red}80` : colors.border,
-                                minHeight: 80,
-                            }}
-                            className="rounded-bento-sm"
-                        >
-                            <View className="flex-row justify-between items-center mb-1">
-                                <Text style={{ color: colors.white, opacity: 0.9 }} className="font-semibold text-xs">
-                                    {metricType === "weight" ? "体重" : "体脂率"}
+                {/* 左侧核心卡片（体重） */}
+                <Pressable
+                    onPress={() => setExpandedMetric(expandedMetric === "weight" ? null : "weight")}
+                    style={{
+                        flex: 1.3,
+                        backgroundColor: colors.gray3,
+                        borderColor: expandedMetric === "weight" ? `${colors.red}80` : colors.border,
+                        borderWidth: 1,
+                        padding: 14,
+                        borderRadius: 12,
+                        justifyContent: "space-between",
+                        minHeight: 120,
+                    }}
+                >
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <Text style={{ color: colors.white, opacity: 0.8, fontWeight: "600", fontSize: 13 }}>
+                            体重
+                        </Text>
+                    </View>
+
+                    <View style={{ flexDirection: "row", alignItems: "baseline", marginTop: 8, marginBottom: 12 }}>
+                        <Text style={{ color: colors.white, fontSize: 32, fontWeight: "800", letterSpacing: -1 }}>
+                            {loading ? "-" : (weightVal ?? "-")}
+                        </Text>
+                        <Text style={{ color: colors.white, opacity: 0.5, fontSize: 14, marginLeft: 4, fontWeight: "600" }}>
+                            kg
+                        </Text>
+                    </View>
+
+                    {/* 趋势标签 */}
+                    <View style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        alignSelf: "flex-start",
+                        backgroundColor: trendBgColor,
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderRadius: 6,
+                        gap: 2
+                    }}>
+                        <Text style={{ color: trendColor, fontSize: 11, fontWeight: "700" }}>
+                            {trendText}
+                        </Text>
+                    </View>
+                </Pressable>
+
+                {/* 右侧辅助卡片区 */}
+                <View style={{ flex: 1, flexDirection: "column", gap: 12 }}>
+
+                    {/* 右上卡片（体脂率） */}
+                    <Pressable
+                        onPress={() => setExpandedMetric(expandedMetric === "bodyFat" ? null : "bodyFat")}
+                        style={{
+                            flex: 1,
+                            backgroundColor: colors.gray3,
+                            borderColor: expandedMetric === "bodyFat" ? `${colors.red}80` : colors.border,
+                            borderWidth: 1,
+                            padding: 10,
+                            borderRadius: 12,
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <Text style={{ color: colors.white, opacity: 0.8, fontSize: 12, fontWeight: "600" }}>
+                            体脂率
+                        </Text>
+                        <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginTop: 4 }}>
+                            <View style={{ flexDirection: "row", alignItems: "baseline" }}>
+                                <Text style={{ color: colors.white, fontSize: 18, fontWeight: "800" }}>
+                                    {loading ? "-" : (bodyFatVal ?? "-")}
                                 </Text>
-                                <View style={{ backgroundColor: colors.border }} className="px-2 py-0.5 rounded-md">
-                                    <Text style={{ color: colors.gray4 }} className="text-xs">
-                                        {formatDaysAgo(data?.bodyMetricDaysAgo?.[metricType])}
+                                <Text style={{ color: colors.white, opacity: 0.5, fontSize: 10, marginLeft: 2, fontWeight: "600" }}>%</Text>
+                            </View>
+                            {bodyFatVal && (
+                                <View style={{ backgroundColor: bodyFatStatusBg, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4 }}>
+                                    <Text style={{ fontSize: 9, color: bodyFatStatusColor, fontWeight: "700" }}>
+                                        {bodyFatStatusText}
                                     </Text>
                                 </View>
-                            </View>
+                            )}
+                        </View>
+                    </Pressable>
 
-                            <View className="flex-row justify-between items-end mb-2">
-                                <View className="flex-row items-baseline gap-0.5 mt-0.5">
-                                    <Text style={{ color: colors.white }} className="text-2xl font-bold tracking-tight">
-                                        {loading ? "-" : (metric?.latestValue ?? "-")}
-                                    </Text>
-                                    <Text style={{ color: colors.gray4 }} className="text-xs mb-0.5">
-                                        {metricType === "weight" ? "kg" : "%"}
-                                    </Text>
-                                </View>
-                                <View style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    gap: 2,
-                                    padding: 4,
-                                    paddingHorizontal: 6,
-                                    borderRadius: 4,
-                                    backgroundColor: delta === null || delta === undefined
-                                        ? colors.border
-                                        : isDecrease ? `${colors.green}1A` : `${colors.orange}1A`,
-                                }}>
-                                    {isDecrease
-                                        ? <TrendingDown size={12} color={delta === null ? colors.gray4 : colors.green} />
-                                        : <TrendingUp size={12} color={colors.orange} />
-                                    }
-                                    <Text style={{
-                                        fontSize: 11, fontWeight: "700",
-                                        color: delta === null || delta === undefined ? colors.gray4
-                                            : isDecrease ? colors.green : colors.orange,
-                                    }}>
-                                        {delta === null || delta === undefined
-                                            ? "--"
-                                            : `${delta > 0 ? "+" : ""}${delta.toFixed(1)}`}
-                                    </Text>
-                                </View>
+                    {/* 右下卡片（BMI） */}
+                    <View
+                        style={{
+                            flex: 1,
+                            backgroundColor: colors.gray3,
+                            borderColor: colors.border,
+                            borderWidth: 1,
+                            padding: 10,
+                            borderRadius: 12,
+                            justifyContent: "space-between"
+                        }}
+                    >
+                        <Text style={{ color: colors.white, opacity: 0.8, fontSize: 12, fontWeight: "600" }}>
+                            BMI
+                        </Text>
+                        <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginTop: 4 }}>
+                            <Text style={{ color: colors.white, fontSize: 18, fontWeight: "800" }}>
+                                {loading ? "-" : bmiVal}
+                            </Text>
+                            <View style={{ backgroundColor: bmiStatus.bg, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4 }}>
+                                <Text style={{ fontSize: 9, color: bmiStatus.color, fontWeight: "700" }}>
+                                    {bmiStatus.text}
+                                </Text>
                             </View>
+                        </View>
+                    </View>
 
-                            {/* Sparkline */}
-                            <View style={{ height: 32, opacity: 0.6 }}>
-                                <Svg viewBox="0 0 100 30" style={{ width: "100%", height: "100%" }} preserveAspectRatio="none">
-                                    <Defs>
-                                        <LinearGradient id={`grad${metricType}`} x1="0" y1="0" x2="0" y2="1">
-                                            <Stop offset="0%" stopColor={colors.green} stopOpacity="0.4" />
-                                            <Stop offset="100%" stopColor={colors.green} stopOpacity="0" />
-                                        </LinearGradient>
-                                    </Defs>
-                                    <Polyline
-                                        points={sparkPoints}
-                                        fill="none"
-                                        stroke={colors.green}
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </Svg>
-                            </View>
-                        </Pressable>
-                    );
-                })}
+                </View>
             </View>
+
+            {/* 第二部分：底部 AI 评估区 */}
+            <View
+                style={{
+                    backgroundColor: `${colors.green}14`, // 品牌绿 8% 透明度
+                    borderRadius: 12,
+                    padding: 12,
+                    borderWidth: 1,
+                    borderColor: `${colors.green}20`,
+                }}
+            >
+                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 6 }}>
+                    <Sparkles size={14} color={colors.green} />
+                    <Text style={{ color: colors.green, fontWeight: "800", marginLeft: 6, fontSize: 13 }}>
+                        AI 评估
+                    </Text>
+                </View>
+                <Text style={{ color: colors.white, opacity: 0.9, fontSize: 12, lineHeight: 18 }}>
+                    体重稳中有降，体脂率保持优良，继续保持当前的力量训练频率！
+                </Text>
+            </View>
+
         </View>
     );
 }

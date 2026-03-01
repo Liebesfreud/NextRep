@@ -9,6 +9,24 @@ function formatTime(iso: string) {
     }).format(new Date(iso));
 }
 
+function formatSets(setsStr: string | null) {
+    if (!setsStr) return null;
+    try {
+        if (setsStr.startsWith("[")) {
+            const parsed = JSON.parse(setsStr);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                const completedSets = parsed.filter((s: any) => s.isCompleted);
+                // 如果有完成的组，则显示完成的组数；如果都没有打勾但记录了，保底显示总行数
+                const count = completedSets.length > 0 ? completedSets.length : parsed.length;
+                return `${count} 组`;
+            }
+        }
+    } catch (e) {
+        // ignore
+    }
+    return setsStr;
+}
+
 type Props = {
     workouts: WorkoutItem[];
     cardioWorkouts: WorkoutItem[];
@@ -111,7 +129,7 @@ export function TodayWorkouts({
                                         <Text className="text-xs font-semibold mt-0.5">
                                             {w.weight && <Text style={{ color: colors.white, opacity: 0.9 }}>{w.weight}</Text>}
                                             {w.weight && w.sets && <Text style={{ color: colors.gray4 }}> • </Text>}
-                                            {w.sets && <Text style={{ color: colors.gray4 }}>{w.sets}</Text>}
+                                            {w.sets && <Text style={{ color: colors.gray4 }}>{formatSets(w.sets)}</Text>}
                                         </Text>
                                     </View>
                                 </Pressable>

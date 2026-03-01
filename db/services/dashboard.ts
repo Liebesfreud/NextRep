@@ -2,6 +2,7 @@ import { db } from "../client";
 import { workouts, dailyCheckins, bodyMetrics } from "../schema";
 import { gte, lt, and, asc, desc } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
+import { getUserProfile } from "./profile";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -273,6 +274,7 @@ export async function getDashboardData(year: number, month: number) {
         .slice(0, 5);
 
     const bm = await getBodyMetricsSummary();
+    const profile = await getUserProfile();
 
     return {
         streak,
@@ -285,5 +287,6 @@ export async function getDashboardData(year: number, month: number) {
             weight: daysSince(bm.weight.latestDateStr),
             bodyFat: daysSince(bm.bodyFat.latestDateStr),
         },
+        profileHeight: profile.height,
     };
 }

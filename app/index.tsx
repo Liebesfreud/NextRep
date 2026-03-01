@@ -23,6 +23,16 @@ import { getUserProfile } from "@/db/services/profile";
 
 function parseSetsCount(sets: string | null): number {
     if (!sets) return 0;
+    try {
+        if (sets.startsWith("[")) {
+            const parsed = JSON.parse(sets);
+            if (Array.isArray(parsed)) {
+                const completedSets = parsed.filter((s: any) => s.isCompleted);
+                return completedSets.length > 0 ? completedSets.length : parsed.length;
+            }
+        }
+    } catch (e) { }
+
     const match = sets.match(/(\d+)\s*[×x]/i);
     return match ? parseInt(match[1], 10) : 0;
 }
