@@ -206,26 +206,26 @@ export function StrengthModal({
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
                 <Pressable style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" }} onPress={onClose}>
                     <Pressable onPress={() => { }} style={{ backgroundColor: colors.bento, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: 48, height: "85%" }}>
-                        <View className="flex-row justify-between items-center mb-6">
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
                             {modalStep === "form" && !initialWorkout ? (
-                                <Pressable onPress={() => { setModalStep("select"); setSelectedExercise(""); }} className="flex-row items-center gap-1">
+                                <Pressable onPress={() => { setModalStep("select"); setSelectedExercise(""); }} style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                                     <ChevronLeft size={20} color={colors.green} />
-                                    <Text style={{ color: colors.green }} className="font-bold text-sm">返回</Text>
+                                    <Text style={{ color: colors.green, fontWeight: "bold", fontSize: 14 }}>返回</Text>
                                 </Pressable>
                             ) : (
-                                <Text style={{ color: colors.white }} className="text-2xl font-extrabold tracking-tight">
+                                <Text style={{ color: colors.white, fontSize: 24, fontWeight: "800", letterSpacing: -0.5 }}>
                                     {modalStep === "select" ? "选择动作" : (initialWorkout ? "修改力量训练" : "添加力量训练")}
                                 </Text>
                             )}
-                            <Pressable onPress={onClose} style={{ backgroundColor: colors.gray3 }} className="w-8 h-8 rounded-lg items-center justify-center">
+                            <Pressable onPress={onClose} style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}>
                                 <X size={20} color={colors.gray4} />
                             </Pressable>
                         </View>
 
                         {modalStep === "select" ? (
-                            <View className="flex-1">
+                            <View style={{ flex: 1 }}>
                                 {/* Modern Search Bar */}
-                                <View style={{ backgroundColor: colors.gray2 }} className="flex-row items-center px-4 py-3 rounded-2xl mb-4">
+                                <View style={{ backgroundColor: colors.gray2, flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingVertical: 12, borderRadius: 16, marginBottom: 16 }}>
                                     <Search size={18} color={colors.gray4} />
                                     <TextInput
                                         value={searchQuery}
@@ -242,9 +242,9 @@ export function StrengthModal({
                                 </View>
 
                                 {/* Filter Chips */}
-                                <View className="mb-4 -mx-6 px-6">
+                                <View style={{ marginBottom: 16, marginHorizontal: -24, paddingHorizontal: 24 }}>
                                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                        <View className="flex-row gap-2 pb-2 pr-6">
+                                        <View style={{ flexDirection: "row", gap: 8, paddingBottom: 8, paddingRight: 24 }}>
                                             {categories.map(cat => {
                                                 const isSelected = selectedCategory === cat;
                                                 return (
@@ -253,15 +253,17 @@ export function StrengthModal({
                                                         onPress={() => setSelectedCategory(cat)}
                                                         style={{
                                                             backgroundColor: isSelected ? colors.green : colors.gray2,
+                                                            paddingHorizontal: 16,
+                                                            paddingVertical: 8,
+                                                            borderRadius: 9999,
                                                         }}
-                                                        className="px-4 py-2 rounded-full"
                                                     >
                                                         <Text
                                                             style={{
                                                                 color: isSelected ? colors.white : colors.gray4,
-                                                                fontWeight: isSelected ? 'bold' : '600'
+                                                                fontWeight: isSelected ? 'bold' : '600',
+                                                                fontSize: 14,
                                                             }}
-                                                            className="text-sm"
                                                         >
                                                             {cat}
                                                         </Text>
@@ -273,7 +275,7 @@ export function StrengthModal({
                                 </View>
 
                                 {/* FlatList of Exercises */}
-                                <ScrollView showsVerticalScrollIndicator={false} className="flex-1 -mx-6 px-6">
+                                <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, marginHorizontal: -24, paddingHorizontal: 24 }}>
                                     {filteredPresets.length > 0 ? (
                                         filteredPresets.map((ex, i) => (
                                             <Pressable
@@ -282,23 +284,22 @@ export function StrengthModal({
                                                     setSelectedExercise(ex.name);
                                                     setModalStep("form");
                                                 }}
-                                                className="flex-row items-center py-3 border-b border-gray-800"
-                                                style={{ borderBottomColor: `${colors.gray3}4D` }}
+                                                style={{ flexDirection: "row", alignItems: "center", paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: `${colors.gray3}4D` }}
                                             >
-                                                <View style={{ backgroundColor: `${colors.green}1A` }} className="w-12 h-12 rounded-2xl items-center justify-center mr-4">
+                                                <View style={{ backgroundColor: `${colors.green}1A`, width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 16 }}>
                                                     <Dumbbell size={20} color={colors.green} />
                                                 </View>
-                                                <View className="flex-1 justify-center">
-                                                    <Text style={{ color: colors.white }} className="text-base font-bold mb-1">{ex.name}</Text>
-                                                    <Text style={{ color: colors.gray4 }} className="text-xs font-semibold">{ex.tag || "自定义动作"}</Text>
+                                                <View style={{ flex: 1, justifyContent: "center" }}>
+                                                    <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold", marginBottom: 4 }}>{ex.name}</Text>
+                                                    <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "600" }}>{ex.tag || "自定义动作"}</Text>
                                                 </View>
                                                 <Plus size={20} color={colors.gray4} style={{ opacity: 0.5 }} />
                                             </Pressable>
                                         ))
                                     ) : (
-                                        <View className="py-12 items-center justify-center opacity-60">
-                                            <Dumbbell size={40} color={colors.gray4} className="mb-4" />
-                                            <Text style={{ color: colors.gray4 }} className="text-sm font-bold text-center">
+                                        <View style={{ paddingVertical: 48, alignItems: "center", justifyContent: "center", opacity: 0.6 }}>
+                                            <Dumbbell size={40} color={colors.gray4} style={{ marginBottom: 16 }} />
+                                            <Text style={{ color: colors.gray4, fontSize: 14, fontWeight: "bold", textAlign: "center" }}>
                                                 没有找到相关动作
                                             </Text>
                                         </View>
@@ -308,9 +309,9 @@ export function StrengthModal({
 
                                 {/* Create New Exercise Modal inline/FAB interaction */}
                                 {isCreatingPreset ? (
-                                    <View style={{ backgroundColor: colors.gray2, borderColor: `${colors.green}80`, borderWidth: 1, position: 'absolute', bottom: 10, left: 0, right: 0 }} className="p-4 rounded-3xl shadow-xl">
-                                        <View className="flex-row justify-between items-center mb-3">
-                                            <Text style={{ color: colors.white }} className="font-bold text-lg">自定义新动作</Text>
+                                    <View style={{ backgroundColor: colors.gray2, borderColor: `${colors.green}80`, borderWidth: 1, position: 'absolute', bottom: 10, left: 0, right: 0, padding: 16, borderRadius: 24 }}>
+                                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                                            <Text style={{ color: colors.white, fontWeight: "bold", fontSize: 18 }}>自定义新动作</Text>
                                             <Pressable onPress={() => { setNewPresetName(""); setNewPresetTag(null); setIsCreatingPreset(false); }}>
                                                 <X size={20} color={colors.gray4} />
                                             </Pressable>
@@ -323,17 +324,19 @@ export function StrengthModal({
                                             style={{ color: colors.white, backgroundColor: "rgba(0,0,0,0.2)", padding: 14, borderRadius: 12, fontWeight: "bold", fontSize: 16, marginBottom: 12 }}
                                             autoFocus
                                         />
-                                        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-3 mb-4">
-                                            <View className="flex-row gap-2">
+                                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12, marginBottom: 16 }}>
+                                            <View style={{ flexDirection: "row", gap: 8 }}>
                                                 {categories.filter(c => c !== "全部").map(tag => (
                                                     <Pressable key={tag} onPress={() => setNewPresetTag(tag === newPresetTag ? null : tag)}
                                                         style={{
                                                             backgroundColor: tag === newPresetTag ? `${colors.green}33` : "rgba(255,255,255,0.05)",
                                                             borderColor: tag === newPresetTag ? `${colors.green}80` : "transparent",
                                                             borderWidth: 1,
-                                                        }}
-                                                        className="px-3 py-2 rounded-xl">
-                                                        <Text style={{ color: tag === newPresetTag ? colors.green : colors.gray4 }} className="text-sm font-bold">{tag}</Text>
+                                                            paddingHorizontal: 12,
+                                                            paddingVertical: 8,
+                                                            borderRadius: 12,
+                                                        }}>
+                                                        <Text style={{ color: tag === newPresetTag ? colors.green : colors.gray4, fontSize: 14, fontWeight: "bold" }}>{tag}</Text>
                                                     </Pressable>
                                                 ))}
                                             </View>
@@ -349,53 +352,51 @@ export function StrengthModal({
                                                 setNewPresetName(""); setNewPresetTag(null); setIsCreatingPreset(false);
                                             }}
                                             disabled={!newPresetName.trim()}
-                                            style={{ backgroundColor: colors.green, opacity: newPresetName.trim() ? 1 : 0.5 }}
-                                            className="py-3.5 rounded-xl items-center">
-                                            <Text style={{ color: colors.white }} className="font-bold text-base">保存并添加</Text>
+                                            style={{ backgroundColor: colors.green, opacity: newPresetName.trim() ? 1 : 0.5, paddingVertical: 14, borderRadius: 12, alignItems: "center" }}>
+                                            <Text style={{ color: colors.white, fontWeight: "bold", fontSize: 16 }}>保存并添加</Text>
                                         </Pressable>
                                     </View>
                                 ) : (
                                     <View style={{ position: 'absolute', bottom: 10, left: 0, right: 0 }}>
                                         <Pressable onPress={() => setIsCreatingPreset(true)}
-                                            style={{ backgroundColor: colors.bento, borderColor: colors.border, borderWidth: 1 }}
-                                            className="mx-4 py-4 rounded-2xl items-center justify-center flex-row gap-2 shadow-sm">
+                                            style={{ backgroundColor: colors.bento, borderColor: colors.border, borderWidth: 1, marginHorizontal: 16, paddingVertical: 16, borderRadius: 16, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 8 }}>
                                             <Plus size={20} color={colors.green} />
-                                            <Text style={{ color: colors.white }} className="font-bold text-base">自定义新动作</Text>
+                                            <Text style={{ color: colors.white, fontWeight: "bold", fontSize: 16 }}>自定义新动作</Text>
                                         </Pressable>
                                     </View>
                                 )}
                             </View>
                         ) : (
-                            <View className="flex-1">
-                                <View className="flex-row items-center gap-3 mb-6">
-                                    <View style={{ backgroundColor: `${colors.green}33` }} className="w-12 h-12 rounded-xl items-center justify-center">
+                            <View style={{ flex: 1 }}>
+                                <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 24 }}>
+                                    <View style={{ backgroundColor: `${colors.green}33`, width: 48, height: 48, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
                                         <Dumbbell size={24} color={colors.green} />
                                     </View>
-                                    <Text style={{ color: colors.white }} className="text-xl font-bold">{selectedExercise}</Text>
+                                    <Text style={{ color: colors.white, fontSize: 20, fontWeight: "bold" }}>{selectedExercise}</Text>
                                 </View>
 
                                 {/* Set-by-Set Header */}
-                                <View className="flex-row items-center mb-1 px-1">
-                                    <Text style={{ color: colors.gray4, width: 40 }} className="text-[10px] font-bold text-center uppercase tracking-wider">组次</Text>
-                                    <Text style={{ color: colors.gray4, flex: 1 }} className="text-[10px] font-bold text-center uppercase tracking-wider">重量 (kg)</Text>
-                                    <Text style={{ color: colors.gray4, flex: 1 }} className="text-[10px] font-bold text-center uppercase tracking-wider">次数</Text>
+                                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 4, paddingHorizontal: 4 }}>
+                                    <Text style={{ color: colors.gray4, width: 40, fontSize: 10, fontWeight: "bold", textAlign: "center", textTransform: "uppercase", letterSpacing: 1 }}>组次</Text>
+                                    <Text style={{ color: colors.gray4, flex: 1, fontSize: 10, fontWeight: "bold", textAlign: "center", textTransform: "uppercase", letterSpacing: 1 }}>重量 (kg)</Text>
+                                    <Text style={{ color: colors.gray4, flex: 1, fontSize: 10, fontWeight: "bold", textAlign: "center", textTransform: "uppercase", letterSpacing: 1 }}>次数</Text>
                                     <View style={{ width: 40 }} />
                                 </View>
 
                                 {/* Set-by-Set Rows */}
-                                <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+                                <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
                                     {sets.map((set) => (
                                         <Pressable key={set.id} onLongPress={() => deleteSet(set.id)} delayLongPress={500}>
-                                            <View style={{ backgroundColor: set.isCompleted ? 'rgba(255,255,255,0.03)' : 'transparent', borderRadius: 10 }} className="flex-row items-center py-1.5 px-1 mb-1">
+                                            <View style={{ backgroundColor: set.isCompleted ? 'rgba(255,255,255,0.03)' : 'transparent', borderRadius: 10, flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 4, marginBottom: 4 }}>
                                                 {/* Set Number */}
-                                                <View style={{ width: 40 }} className="items-center">
-                                                    <View style={{ backgroundColor: set.isCompleted ? 'transparent' : colors.gray2, borderColor: set.isCompleted ? colors.green : 'transparent', borderWidth: set.isCompleted ? 1 : 0, width: 24, height: 24 }} className="rounded-md items-center justify-center">
-                                                        <Text style={{ color: set.isCompleted ? colors.green : colors.gray4 }} className="font-bold text-xs">{set.setNumber}</Text>
+                                                <View style={{ width: 40, alignItems: "center" }}>
+                                                    <View style={{ backgroundColor: set.isCompleted ? 'transparent' : colors.gray2, borderColor: set.isCompleted ? colors.green : 'transparent', borderWidth: set.isCompleted ? 1 : 0, width: 24, height: 24, borderRadius: 6, alignItems: "center", justifyContent: "center" }}>
+                                                        <Text style={{ color: set.isCompleted ? colors.green : colors.gray4, fontWeight: "bold", fontSize: 12 }}>{set.setNumber}</Text>
                                                     </View>
                                                 </View>
 
                                                 {/* Weight Input */}
-                                                <View className="flex-1 px-1.5">
+                                                <View style={{ flex: 1, paddingHorizontal: 6 }}>
                                                     <TextInput
                                                         keyboardType="decimal-pad"
                                                         value={set.weight}
@@ -408,7 +409,7 @@ export function StrengthModal({
                                                 </View>
 
                                                 {/* Reps Input */}
-                                                <View className="flex-1 px-1.5">
+                                                <View style={{ flex: 1, paddingHorizontal: 6 }}>
                                                     <TextInput
                                                         keyboardType="number-pad"
                                                         value={set.reps}
@@ -421,8 +422,8 @@ export function StrengthModal({
                                                 </View>
 
                                                 {/* Complete Checkbox */}
-                                                <Pressable onPress={() => toggleSetComplete(set.id)} style={{ width: 40 }} className="items-center">
-                                                    <View style={{ backgroundColor: set.isCompleted ? colors.green : colors.gray2, width: 28, height: 28 }} className="rounded-lg items-center justify-center">
+                                                <Pressable onPress={() => toggleSetComplete(set.id)} style={{ width: 40, alignItems: "center" }}>
+                                                    <View style={{ backgroundColor: set.isCompleted ? colors.green : colors.gray2, width: 28, height: 28, borderRadius: 8, alignItems: "center", justifyContent: "center" }}>
                                                         {set.isCompleted ? (
                                                             <Check size={16} color={colors.white} strokeWidth={3} />
                                                         ) : (
@@ -435,21 +436,21 @@ export function StrengthModal({
                                     ))}
 
                                     {/* Add Set Button */}
-                                    <Pressable onPress={handleAddSet} style={{ backgroundColor: `${colors.gray2}80` }} className="w-full mt-3 py-3 rounded-lg items-center justify-center">
-                                        <Text style={{ color: colors.green }} className="font-bold text-sm">+ 添加下一组</Text>
+                                    <Pressable onPress={handleAddSet} style={{ backgroundColor: `${colors.gray2}80`, width: "100%", marginTop: 12, paddingVertical: 12, borderRadius: 8, alignItems: "center", justifyContent: "center" }}>
+                                        <Text style={{ color: colors.green, fontWeight: "bold", fontSize: 14 }}>+ 添加下一组</Text>
                                     </Pressable>
                                     <Text style={{ color: colors.gray4, textAlign: 'center', marginTop: 12, fontSize: 11, opacity: 0.6 }}>长按某组即可删除</Text>
                                     <View style={{ height: 24 }} />
                                 </ScrollView>
 
-                                <View className="flex-row gap-2 mt-4 pt-2 border-t border-gray-800" style={{ borderColor: `${colors.gray3}4D` }}>
+                                <View style={{ flexDirection: "row", gap: 8, marginTop: 16, paddingTop: 8, borderTopWidth: 1, borderTopColor: `${colors.gray3}4D` }}>
                                     {initialWorkout && (
-                                        <Pressable onPress={() => onDelete(initialWorkout.id)} disabled={isPending} style={{ backgroundColor: `${colors.red}1A`, width: 64, opacity: isPending ? 0.5 : 1 }} className="py-4 rounded-xl items-center justify-center">
+                                        <Pressable onPress={() => onDelete(initialWorkout.id)} disabled={isPending} style={{ backgroundColor: `${colors.red}1A`, width: 64, opacity: isPending ? 0.5 : 1, paddingVertical: 16, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
                                             <Trash2 size={20} color={colors.red} />
                                         </Pressable>
                                     )}
-                                    <Pressable onPress={handleSave} disabled={isPending || !selectedExercise} style={{ backgroundColor: colors.green, flex: 1, opacity: (isPending || !selectedExercise) ? 0.5 : 1 }} className="py-4 rounded-xl items-center">
-                                        <Text style={{ color: colors.white }} className="font-bold text-lg">
+                                    <Pressable onPress={handleSave} disabled={isPending || !selectedExercise} style={{ backgroundColor: colors.green, flex: 1, opacity: (isPending || !selectedExercise) ? 0.5 : 1, paddingVertical: 16, borderRadius: 12, alignItems: "center" }}>
+                                        <Text style={{ color: colors.white, fontWeight: "bold", fontSize: 18 }}>
                                             {isPending ? "保存中..." : "保存记录"}
                                         </Text>
                                     </Pressable>
@@ -462,4 +463,3 @@ export function StrengthModal({
         </Modal>
     );
 }
-

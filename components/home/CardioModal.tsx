@@ -60,52 +60,50 @@ export function CardioModal({
             <Pressable style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" }}
                 onPress={onClose}>
                 <Pressable onPress={() => { }} style={{ backgroundColor: colors.bento, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: 48, height: "75%" }}>
-                    <View className="flex-row justify-between items-center mb-6">
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
                         {modalStep === "form" && !initialWorkout ? (
                             <Pressable onPress={() => { setModalStep("select"); setSelectedExercise(""); }}
-                                className="flex-row items-center gap-1">
+                                style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                                 <ChevronLeft size={20} color={colors.orange} />
-                                <Text style={{ color: colors.orange }} className="font-bold text-sm">返回</Text>
+                                <Text style={{ color: colors.orange, fontWeight: "bold", fontSize: 14 }}>返回</Text>
                             </Pressable>
                         ) : (
-                            <Text style={{ color: colors.white }} className="text-2xl font-extrabold tracking-tight">
+                            <Text style={{ color: colors.white, fontSize: 24, fontWeight: "800", letterSpacing: -0.5 }}>
                                 {initialWorkout ? "修改有氧运动" : "添加有氧运动"}
                             </Text>
                         )}
                         <Pressable onPress={onClose}
-                            style={{ backgroundColor: colors.gray3 }}
-                            className="w-8 h-8 rounded-lg items-center justify-center">
+                            style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}>
                             <X size={20} color={colors.gray4} />
                         </Pressable>
                     </View>
 
                     {modalStep === "select" ? (
-                        <View className="gap-3">
+                        <View style={{ gap: 12 }}>
                             {CARDIO_EXERCISES.map((ex, i) => (
                                 <Pressable key={i} onPress={() => { setSelectedExercise(ex); setModalStep("form"); }}
-                                    style={{ backgroundColor: colors.gray2 }}
-                                    className="w-full p-5 rounded-2xl flex-row justify-between items-center">
-                                    <View className="flex-row items-center gap-3">
+                                    style={{ backgroundColor: colors.gray2, width: "100%", padding: 20, borderRadius: 16, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                    <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
                                         <Activity size={20} color={colors.orange} />
-                                        <Text style={{ color: colors.white }} className="font-bold text-lg">{ex}</Text>
+                                        <Text style={{ color: colors.white, fontWeight: "bold", fontSize: 18 }}>{ex}</Text>
                                     </View>
                                     <Plus size={20} color={colors.gray4} />
                                 </Pressable>
                             ))}
                         </View>
                     ) : (
-                        <View className="flex-1">
-                            <View className="flex-row items-center gap-3 mb-6">
-                                <View style={{ backgroundColor: `${colors.orange}33` }} className="w-12 h-12 rounded-xl items-center justify-center">
+                        <View style={{ flex: 1 }}>
+                            <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 24 }}>
+                                <View style={{ backgroundColor: `${colors.orange}33`, width: 48, height: 48, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
                                     <Activity size={24} color={colors.orange} />
                                 </View>
-                                <Text style={{ color: colors.white }} className="text-xl font-bold">{selectedExercise}</Text>
+                                <Text style={{ color: colors.white, fontSize: 20, fontWeight: "bold" }}>{selectedExercise}</Text>
                             </View>
-                            <View className="gap-4 flex-1">
+                            <View style={{ gap: 16, flex: 1 }}>
                                 <View>
-                                    <View className="flex-row items-center gap-1.5 mb-2">
+                                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8 }}>
                                         <Timer size={14} color={colors.gray4} />
-                                        <Text style={{ color: colors.gray4 }} className="text-xs font-bold tracking-wider">时长 (分钟)</Text>
+                                        <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "bold", letterSpacing: 1 }}>时长 (分钟)</Text>
                                     </View>
                                     <TextInput
                                         keyboardType="number-pad"
@@ -117,9 +115,9 @@ export function CardioModal({
                                     />
                                 </View>
                                 <View>
-                                    <View className="flex-row items-center gap-1.5 mb-2">
+                                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8 }}>
                                         <Flame size={14} color={colors.gray4} />
-                                        <Text style={{ color: colors.gray4 }} className="text-xs font-bold tracking-wider">消耗 (千卡)</Text>
+                                        <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "bold", letterSpacing: 1 }}>消耗 (千卡)</Text>
                                     </View>
                                     <TextInput
                                         keyboardType="number-pad"
@@ -131,18 +129,16 @@ export function CardioModal({
                                     />
                                 </View>
                             </View>
-                            <View className="flex-row gap-2 mt-6">
+                            <View style={{ flexDirection: "row", gap: 8, marginTop: 24 }}>
                                 {initialWorkout && (
                                     <Pressable onPress={() => onDelete(initialWorkout.id)} disabled={isPending}
-                                        style={{ backgroundColor: `${colors.red}1A`, width: 64, opacity: isPending ? 0.5 : 1 }}
-                                        className="py-4 rounded-xl items-center justify-center">
+                                        style={{ backgroundColor: `${colors.red}1A`, width: 64, opacity: isPending ? 0.5 : 1, paddingVertical: 16, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
                                         <Trash2 size={20} color={colors.red} />
                                     </Pressable>
                                 )}
                                 <Pressable onPress={handleSave} disabled={isPending || !selectedExercise}
-                                    style={{ backgroundColor: colors.orange, flex: 1, opacity: (isPending || !selectedExercise) ? 0.5 : 1 }}
-                                    className="py-4 rounded-xl items-center">
-                                    <Text className="font-bold text-lg text-black">
+                                    style={{ backgroundColor: colors.orange, flex: 1, opacity: (isPending || !selectedExercise) ? 0.5 : 1, paddingVertical: 16, borderRadius: 12, alignItems: "center" }}>
+                                    <Text style={{ fontWeight: "bold", fontSize: 18, color: "#000" }}>
                                         {isPending ? "保存中..." : "保存记录"}
                                     </Text>
                                 </Pressable>
