@@ -107,13 +107,47 @@ export async function getTodayWorkouts(): Promise<WorkoutItem[]> {
     return rows.map(toWorkoutItem);
 }
 
+/** 按任意日期字符串（YYYY-MM-DD）查询运动记录 */
+export async function getWorkoutsByDate(dateStr: string): Promise<WorkoutItem[]> {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    const startOfDay = new Date(y, m - 1, d);
+    const endOfDay = new Date(y, m - 1, d + 1);
+
+    const rows = await db
+        .select()
+        .from(workouts)
+        .where(
+            and(gte(workouts.createdAt, startOfDay), lt(workouts.createdAt, endOfDay))
+        )
+        .orderBy(workouts.createdAt);
+
+    return rows.map(toWorkoutItem);
+}
+
+/** 查询任意日期是否已打卡 */
+export async function isDateCheckedIn(dateStr: string): Promise<boolean> {
+    const rows = await db
+        .select()
+        .from(dailyCheckins)
+        .where(eq(dailyCheckins.dateStr, dateStr));
+    return rows.length > 0;
+}
+
 export async function addWorkout(data: {
     type: "strength" | "cardio";
     name: string;
     weight?: string;
     sets?: string;
     stats?: string;
+    /** 指定记录日期（YYYY-MM-DD），不传则使用当前时间 */
+    forDate?: string;
 }): Promise<void> {
+    let createdAt: Date | undefined;
+    if (data.forDate) {
+        const [y, m, d] = data.forDate.split("-").map(Number);
+        // 存为当天正午 12:00，确保落在日期区间内
+        createdAt = new Date(y, m - 1, d, 12, 0, 0);
+    }
     await db.insert(workouts).values({
         id: Crypto.randomUUID(),
         type: data.type,
@@ -121,8 +155,13 @@ export async function addWorkout(data: {
         weight: data.weight ?? null,
         sets: data.sets ?? null,
         stats: data.stats ?? null,
+        ...(createdAt ? { createdAt } : {}),
     });
-    await removeTodayCheckin();
+    // 仅当修改今天的记录时才重置打卡
+    const todayStr = getTodayDateStr();
+    if (!data.forDate || data.forDate === todayStr) {
+        await removeTodayCheckin();
+    }
 }
 
 export async function updateWorkout(

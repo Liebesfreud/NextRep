@@ -15,7 +15,7 @@ import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
 
 import {
     addWorkout, updateWorkout, deleteWorkout,
-    checkinToday, getTodayWorkouts, getStrengthPresets, isTodayCheckedIn,
+    checkinToday, getWorkoutsByDate, getStrengthPresets, isTodayCheckedIn, isDateCheckedIn,
     type WorkoutItem, type StrengthPresetItem,
 } from "@/db/services/workout";
 import { estimateDailyCaloriesWithAI } from "@/db/services/ai";
@@ -62,6 +62,14 @@ export default function HomeScreen() {
     const [activeModal, setActiveModal] = useState<"strength" | "cardio" | null>(null);
     const [editingWorkout, setEditingWorkout] = useState<WorkoutItem | null>(null);
 
+    // 日期选择
+    const todayStr = (() => {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    })();
+    const [selectedDate, setSelectedDate] = useState(todayStr);
+    const isToday = selectedDate === todayStr;
+
     // AI State
     const [aiEstimatedCal, setAiEstimatedCal] = useState<number | null>(null);
     const [isAiPredicting, setIsAiPredicting] = useState(false);
@@ -70,9 +78,9 @@ export default function HomeScreen() {
 
     const loadData = useCallback(async () => {
         const [ws, presets, checkedIn, profile] = await Promise.all([
-            getTodayWorkouts(),
+            getWorkoutsByDate(selectedDate),
             getStrengthPresets(),
-            isTodayCheckedIn(),
+            isDateCheckedIn(selectedDate),
             getUserProfile(),
         ]);
         setWorkouts(ws);
@@ -80,11 +88,16 @@ export default function HomeScreen() {
         setIsCheckedIn(checkedIn);
         setUserName(profile.name);
         SplashScreen.hideAsync().catch(() => { });
-    }, []);
+    }, [selectedDate]);
 
     useFocusEffect(useCallback(() => {
         loadData();
     }, [loadData]));
+
+    // 切换日期时重新加载
+    const handleDateChange = (dateStr: string) => {
+        setSelectedDate(dateStr);
+    };
 
     useEffect(() => {
         const h = new Date().getHours();
@@ -131,7 +144,7 @@ export default function HomeScreen() {
         setIsPending(true);
         try {
             if (editingWorkout) await updateWorkout(editingWorkout.id, payload);
-            else await addWorkout(payload);
+            else await addWorkout({ ...payload, forDate: selectedDate });
             closeModal();
             await loadData();
         } finally {
@@ -194,6 +207,9 @@ export default function HomeScreen() {
                         handleCheckin={handleCheckin}
                         isCheckedIn={isCheckedIn}
                         isPending={isPending}
+                        selectedDate={selectedDate}
+                        onDateChange={handleDateChange}
+                        isToday={isToday}
                     />
                 </AnimatedEnter>
             </ScrollView>
