@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, Text, Pressable, TextInput, Alert } from "react-native";
-import { Zap, Trash2, Activity, ShieldCheck } from "lucide-react-native";
+import { Zap, Trash2, Activity, ShieldCheck, Plus, Radio } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { type UserProfileData } from "@/db/services/profile";
 import { testAIConnection } from "@/db/services/ai";
@@ -20,11 +20,10 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
             Alert.alert("测试失败", "当前激活的配置缺少 API Key");
             return;
         }
-
         setIsTestingAI(true);
         try {
             await testAIConnection(activeConfig.baseUrl, activeConfig.apiKey, activeConfig.model);
-            Alert.alert(`🎉 测试成功`, `已成功连接到 [${activeConfig.name}]，可以正常与模型通信。`);
+            Alert.alert(`🎉 测试成功`, `已成功连接到 [${activeConfig.name}]`);
         } catch (e: any) {
             Alert.alert("测试失败", e.message);
         } finally {
@@ -32,148 +31,245 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
         }
     };
 
+    const addConfig = () => {
+        const newConfig = {
+            id: `config-${Date.now()}`,
+            name: "新配置",
+            baseUrl: "",
+            apiKey: "",
+            model: "",
+        };
+        setProfile(p => ({
+            ...p,
+            aiConfigs: [...p.aiConfigs, newConfig],
+            activeAiConfigId: p.activeAiConfigId || newConfig.id,
+        }));
+    };
+
+    const deleteConfig = (id: string, name: string) => {
+        Alert.alert("删除配置", `确定删除 "${name}" 吗？`, [
+            { text: "取消", style: "cancel" },
+            {
+                text: "删除", style: "destructive",
+                onPress: () => {
+                    const newConfigs = profile.aiConfigs.filter(c => c.id !== id);
+                    const newActive = profile.activeAiConfigId === id
+                        ? (newConfigs[0]?.id ?? null)
+                        : profile.activeAiConfigId;
+                    setProfile(p => ({ ...p, aiConfigs: newConfigs, activeAiConfigId: newActive }));
+                },
+            },
+        ]);
+    };
+
     return (
-        <View style={{ backgroundColor: colors.bento, borderColor: colors.border }} className="rounded-bento-lg border p-4 gap-4">
-            <View className="flex-row items-center gap-2 px-1 mb-1">
-                <Zap size={18} color={colors.orange} />
-                <Text style={{ color: colors.orange }} className="text-xs font-extrabold tracking-widest uppercase">AI 燃脂运算引擎</Text>
-            </View>
-
-            {/* Token Stats */}
-            <View className="flex-row gap-3">
-                <View style={{ backgroundColor: colors.gray2, borderColor: colors.border }} className="flex-1 p-3 rounded-bento-sm border items-center">
-                    <Text style={{ color: colors.gray4 }} className="text-xs font-bold mb-1">今日消耗 Token</Text>
-                    <Text style={{ color: colors.white }} className="text-xl font-extrabold font-mono">
-                        {profile.aiTokensToday.toLocaleString()}
+        <View style={{ gap: 12 }}>
+            {/* ── Token Stats ── */}
+            <View style={{
+                backgroundColor: colors.bento,
+                borderColor: colors.border,
+                borderWidth: 1,
+                borderRadius: 16,
+                overflow: "hidden",
+            }}>
+                <View style={{
+                    flexDirection: "row", alignItems: "center", gap: 8,
+                    paddingHorizontal: 14, paddingVertical: 12,
+                    borderBottomWidth: 1, borderBottomColor: colors.border,
+                }}>
+                    <Zap size={14} color={colors.orange} />
+                    <Text style={{ color: colors.orange, fontSize: 11, fontWeight: "800", letterSpacing: 1.5, textTransform: "uppercase" }}>
+                        AI 运算引擎
                     </Text>
                 </View>
-                <View style={{ backgroundColor: colors.gray2, borderColor: colors.border }} className="flex-1 p-3 rounded-bento-sm border items-center">
-                    <Text style={{ color: colors.gray4 }} className="text-xs font-bold mb-1">历史总计 Token</Text>
-                    <Text style={{ color: colors.white }} className="text-xl font-extrabold font-mono">
-                        {profile.aiTokensTotal.toLocaleString()}
-                    </Text>
-                </View>
-            </View>
 
-            <Text style={{ color: colors.gray4 }} className="text-xs font-bold mt-2 px-1">配置列表 (点击可切换勾选的提供商)</Text>
-
-            <View className="gap-2">
-                {profile.aiConfigs.map((config, index) => {
-                    const isActive = profile.activeAiConfigId === config.id;
-                    return (
-                        <View key={config.id} style={{ backgroundColor: isActive ? `${colors.orange}1A` : colors.gray2, borderColor: isActive ? colors.orange : colors.border }} className="rounded-bento-sm border overflow-hidden">
-                            <Pressable
-                                onPress={() => setProfile(p => ({ ...p, activeAiConfigId: config.id }))}
-                                className="flex-row items-center justify-between p-3"
-                            >
-                                <View className="flex-row items-center gap-2">
-                                    <View style={{ width: 18, height: 18, borderRadius: 9, borderWidth: 2, borderColor: isActive ? colors.orange : colors.gray4, alignItems: 'center', justifyContent: 'center' }}>
-                                        {isActive && <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.orange }} />}
-                                    </View>
-                                    <TextInput
-                                        value={config.name}
-                                        onChangeText={(val) => {
-                                            const newConfigs = [...profile.aiConfigs];
-                                            newConfigs[index].name = val;
-                                            setProfile(p => ({ ...p, aiConfigs: newConfigs }));
-                                        }}
-                                        placeholder="配置名称"
-                                        placeholderTextColor={`${colors.gray4}66`}
-                                        style={{ color: isActive ? colors.orange : colors.white }}
-                                        className="font-bold text-base w-32"
-                                    />
-                                </View>
-                                <Pressable
-                                    onPress={() => {
-                                        Alert.alert("删除配置", `确定删除 "${config.name}" 吗？`, [
-                                            { text: "取消", style: "cancel" },
-                                            {
-                                                text: "删除", style: "destructive",
-                                                onPress: () => {
-                                                    let newConfigs = profile.aiConfigs.filter(c => c.id !== config.id);
-                                                    let newActive = profile.activeAiConfigId;
-                                                    if (newActive === config.id) {
-                                                        newActive = newConfigs.length > 0 ? newConfigs[0].id : null;
-                                                    }
-                                                    setProfile(p => ({ ...p, aiConfigs: newConfigs, activeAiConfigId: newActive }));
-                                                }
-                                            }
-                                        ]);
-                                    }}
-                                >
-                                    <Trash2 size={16} color={colors.red} className="opacity-70" />
-                                </Pressable>
-                            </Pressable>
-
-                            {/* Editable Fields for each config */}
-                            <View className="px-3 pb-3 gap-2">
-                                {[
-                                    { label: "Base", key: "baseUrl" as const, placeholder: "https://api.openai...", secure: false },
-                                    { label: "Key", key: "apiKey" as const, placeholder: "sk-...", secure: true },
-                                    { label: "Model", key: "model" as const, placeholder: "gpt-4o", secure: false },
-                                ].map(({ label, key, placeholder, secure }) => (
-                                    <View key={key} className="flex-row items-center border-b border-white/5 pb-1">
-                                        <Text style={{ color: colors.gray4, width: 45 }} className="text-xs font-bold">{label}</Text>
-                                        <TextInput
-                                            value={config[key] || ""}
-                                            onChangeText={(v) => {
-                                                const newConfigs = [...profile.aiConfigs];
-                                                newConfigs[index][key] = v;
-                                                setProfile(p => ({ ...p, aiConfigs: newConfigs }));
-                                            }}
-                                            placeholder={placeholder}
-                                            placeholderTextColor={`${colors.gray4}55`}
-                                            secureTextEntry={secure}
-                                            autoCapitalize="none"
-                                            className="flex-1 text-xs font-medium"
-                                            style={{ color: colors.gray4 }}
-                                        />
-                                    </View>
-                                ))}
-                            </View>
+                {/* Token 统计行 */}
+                <View style={{ flexDirection: "row", borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                    <View style={{ flex: 1, paddingVertical: 13, paddingHorizontal: 14, borderRightWidth: 1, borderRightColor: colors.border }}>
+                        <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "600", marginBottom: 4 }}>今日消耗</Text>
+                        <View style={{ flexDirection: "row", alignItems: "baseline", gap: 4 }}>
+                            <Text style={{ color: colors.white, fontSize: 20, fontWeight: "800" }}>
+                                {profile.aiTokensToday.toLocaleString()}
+                            </Text>
+                            <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "600" }}>tokens</Text>
                         </View>
-                    )
-                })}
+                    </View>
+                    <View style={{ flex: 1, paddingVertical: 13, paddingHorizontal: 14 }}>
+                        <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "600", marginBottom: 4 }}>历史总计</Text>
+                        <View style={{ flexDirection: "row", alignItems: "baseline", gap: 4 }}>
+                            <Text style={{ color: colors.white, fontSize: 20, fontWeight: "800" }}>
+                                {profile.aiTokensTotal.toLocaleString()}
+                            </Text>
+                            <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "600" }}>tokens</Text>
+                        </View>
+                    </View>
+                </View>
 
+                {/* 测试连接按钮 */}
                 <Pressable
-                    onPress={() => {
-                        const newConfig = {
-                            id: `config-${Date.now()}`,
-                            name: "新配置",
-                            baseUrl: "",
-                            apiKey: "",
-                            model: ""
-                        };
-                        const newConfigs = [...profile.aiConfigs, newConfig];
-                        setProfile(p => ({
-                            ...p,
-                            aiConfigs: newConfigs,
-                            activeAiConfigId: p.activeAiConfigId || newConfig.id
-                        }));
+                    onPress={handleTestAI}
+                    disabled={isTestingAI || !profile.activeAiConfigId}
+                    style={{
+                        flexDirection: "row", alignItems: "center", justifyContent: "center",
+                        paddingVertical: 13, gap: 8,
+                        opacity: (!profile.activeAiConfigId || isTestingAI) ? 0.4 : 1,
                     }}
-                    style={{ backgroundColor: `transparent`, borderColor: colors.border, borderWidth: 1, borderStyle: 'dashed' }}
-                    className="flex-row items-center justify-center p-3 rounded-bento-sm"
                 >
-                    <Text style={{ color: colors.gray4 }} className="font-bold text-sm">+ 点击添加新的服务端配置</Text>
+                    {isTestingAI
+                        ? <Activity size={15} color={colors.orange} />
+                        : <ShieldCheck size={15} color={colors.orange} />}
+                    <Text style={{ color: colors.orange, fontSize: 13, fontWeight: "700" }}>
+                        {isTestingAI ? "连接测试中..." : "测试当前激活的 API 连接"}
+                    </Text>
                 </Pressable>
             </View>
 
-            {/* Test Connection Button */}
-            <Pressable
-                onPress={handleTestAI}
-                disabled={isTestingAI || !profile.activeAiConfigId}
-                style={{ backgroundColor: `${colors.orange}1A`, borderColor: `${colors.orange}33`, borderWidth: 1, opacity: (!profile.activeAiConfigId || isTestingAI) ? 0.5 : 1 }}
-                className="mt-2 flex-row items-center justify-center py-3.5 rounded-bento-sm gap-2"
-            >
-                {isTestingAI ? (
-                    <Activity size={18} color={colors.orange} />
-                ) : (
-                    <ShieldCheck size={18} color={colors.orange} />
-                )}
-                <Text style={{ color: colors.orange }} className="font-bold text-sm">
-                    {isTestingAI ? "连接测试中..." : "测试当前激活的 API 连接"}
-                </Text>
-            </Pressable>
+            {/* ── AI 配置列表 ── */}
+            <View style={{
+                backgroundColor: colors.bento,
+                borderColor: colors.border,
+                borderWidth: 1,
+                borderRadius: 16,
+                overflow: "hidden",
+            }}>
+                <View style={{
+                    flexDirection: "row", alignItems: "center", gap: 8,
+                    paddingHorizontal: 14, paddingVertical: 12,
+                    borderBottomWidth: 1, borderBottomColor: colors.border,
+                }}>
+                    <Radio size={14} color={colors.gray4} />
+                    <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "800", letterSpacing: 1.5, textTransform: "uppercase", flex: 1 }}>
+                        服务端配置
+                    </Text>
+                    <Text style={{ color: colors.gray4, fontSize: 10, fontWeight: "600", opacity: 0.6 }}>
+                        点击名称旁圆点切换激活
+                    </Text>
+                </View>
+
+                {profile.aiConfigs.map((config, index) => {
+                    const isActive = profile.activeAiConfigId === config.id;
+                    const isLast = index === profile.aiConfigs.length - 1;
+                    return (
+                        <View
+                            key={config.id}
+                            style={{
+                                borderBottomWidth: isLast ? 0 : 1,
+                                borderBottomColor: colors.border,
+                                backgroundColor: isActive ? `${colors.orange}0A` : "transparent",
+                            }}
+                        >
+                            {/* 配置头部行：激活指示 + 名称 + 删除 */}
+                            <View style={{
+                                flexDirection: "row", alignItems: "center",
+                                paddingHorizontal: 14, paddingTop: 12, paddingBottom: 8, gap: 10,
+                            }}>
+                                <Pressable
+                                    onPress={() => setProfile(p => ({ ...p, activeAiConfigId: config.id }))}
+                                    style={{
+                                        width: 18, height: 18, borderRadius: 9,
+                                        borderWidth: 2,
+                                        borderColor: isActive ? colors.orange : colors.gray4,
+                                        alignItems: "center", justifyContent: "center",
+                                    }}
+                                >
+                                    {isActive && (
+                                        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.orange }} />
+                                    )}
+                                </Pressable>
+                                <TextInput
+                                    value={config.name}
+                                    onChangeText={(val) => {
+                                        const newConfigs = [...profile.aiConfigs];
+                                        newConfigs[index] = { ...newConfigs[index], name: val };
+                                        setProfile(p => ({ ...p, aiConfigs: newConfigs }));
+                                    }}
+                                    placeholder="配置名称"
+                                    placeholderTextColor={`${colors.gray4}55`}
+                                    style={{
+                                        flex: 1,
+                                        color: isActive ? colors.orange : colors.white,
+                                        fontWeight: "700",
+                                        fontSize: 14,
+                                        padding: 0,
+                                    }}
+                                />
+                                {isActive && (
+                                    <View style={{
+                                        backgroundColor: `${colors.orange}1A`,
+                                        paddingHorizontal: 8, paddingVertical: 3,
+                                        borderRadius: 6,
+                                    }}>
+                                        <Text style={{ color: colors.orange, fontSize: 10, fontWeight: "800" }}>激活</Text>
+                                    </View>
+                                )}
+                                <Pressable
+                                    onPress={() => deleteConfig(config.id, config.name)}
+                                    style={{ padding: 4, opacity: 0.6 }}
+                                >
+                                    <Trash2 size={14} color={colors.red} />
+                                </Pressable>
+                            </View>
+
+                            {/* 字段：Base / Key / Model */}
+                            {([
+                                { label: "Base URL", key: "baseUrl" as const, placeholder: "https://api.openai.com/v1", secure: false },
+                                { label: "API Key", key: "apiKey" as const, placeholder: "sk-...", secure: true },
+                                { label: "Model", key: "model" as const, placeholder: "gpt-4o", secure: false },
+                            ]).map(({ label, key, placeholder, secure }, fi) => (
+                                <View
+                                    key={key}
+                                    style={{
+                                        flexDirection: "row", alignItems: "center",
+                                        paddingHorizontal: 14, paddingVertical: 8,
+                                        borderTopWidth: 1, borderTopColor: `${colors.border}66`,
+                                        gap: 10,
+                                    }}
+                                >
+                                    <Text style={{
+                                        color: colors.gray4, fontSize: 11, fontWeight: "700",
+                                        width: 56, letterSpacing: 0.5,
+                                    }}>
+                                        {label}
+                                    </Text>
+                                    <TextInput
+                                        value={config[key] || ""}
+                                        onChangeText={(v) => {
+                                            const newConfigs = [...profile.aiConfigs];
+                                            newConfigs[index] = { ...newConfigs[index], [key]: v };
+                                            setProfile(p => ({ ...p, aiConfigs: newConfigs }));
+                                        }}
+                                        placeholder={placeholder}
+                                        placeholderTextColor={`${colors.gray4}44`}
+                                        secureTextEntry={secure}
+                                        autoCapitalize="none"
+                                        style={{
+                                            flex: 1, color: colors.gray4,
+                                            fontSize: 12, fontWeight: "500",
+                                            padding: 0,
+                                        }}
+                                    />
+                                </View>
+                            ))}
+
+                            <View style={{ height: 8 }} />
+                        </View>
+                    );
+                })}
+
+                {/* 添加按钮 */}
+                <Pressable
+                    onPress={addConfig}
+                    style={{
+                        flexDirection: "row", alignItems: "center", justifyContent: "center",
+                        gap: 6, paddingVertical: 13,
+                        borderTopWidth: profile.aiConfigs.length > 0 ? 1 : 0,
+                        borderTopColor: colors.border,
+                    }}
+                >
+                    <Plus size={14} color={colors.green} strokeWidth={3} />
+                    <Text style={{ color: colors.green, fontSize: 13, fontWeight: "700" }}>添加新的服务端配置</Text>
+                </Pressable>
+            </View>
         </View>
     );
 }

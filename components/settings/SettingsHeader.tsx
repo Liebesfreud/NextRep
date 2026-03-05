@@ -13,25 +13,47 @@ export function SettingsHeader({ onSave, isPending, isSaved }: Props) {
     const { colors } = useTheme();
 
     return (
-        <View className="flex-row items-center justify-between">
-            <Text style={{ color: colors.white }} className="text-3xl font-extrabold tracking-tight">配置</Text>
+        <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between" }}>
+            <View>
+                <Text style={{
+                    color: colors.gray4,
+                    fontSize: 11, fontWeight: "800",
+                    letterSpacing: 1.5, textTransform: "uppercase",
+                    marginBottom: 4,
+                }}>
+                    NEXTREP
+                </Text>
+                <Text style={{
+                    color: colors.white,
+                    fontSize: 30, fontWeight: "800",
+                    letterSpacing: -0.5,
+                }}>
+                    个人配置
+                </Text>
+            </View>
+
             <AnimatedPressable
                 onPress={onSave}
                 disabled={isPending}
                 style={{
+                    flexDirection: "row", alignItems: "center", gap: 6,
+                    paddingHorizontal: 16, paddingVertical: 10,
+                    borderRadius: 12,
                     backgroundColor: isSaved ? `${colors.green}1A` : colors.green,
-                    opacity: isPending ? 0.5 : 1,
-                    borderColor: isSaved ? `${colors.green}33` : "transparent",
                     borderWidth: 1,
+                    borderColor: isSaved ? `${colors.green}44` : "transparent",
+                    opacity: isPending ? 0.5 : 1,
                 }}
-                className="flex-row items-center gap-1.5 px-4 py-2.5 rounded-xl"
             >
                 {isSaved
-                    ? <Check size={16} color={colors.green} strokeWidth={3} />
-                    : <Save size={16} color={colors.bg} strokeWidth={2.5} />
+                    ? <Check size={15} color={colors.green} strokeWidth={3} />
+                    : <Save size={15} color={colors.bg} strokeWidth={2.5} />
                 }
-                <Text style={{ color: isSaved ? colors.green : colors.bg }} className="font-bold">
-                    {isPending ? "保存中" : isSaved ? "已保存" : "保存所有配置"}
+                <Text style={{
+                    color: isSaved ? colors.green : colors.bg,
+                    fontWeight: "700", fontSize: 13,
+                }}>
+                    {isPending ? "保存中..." : isSaved ? "已保存" : "保存配置"}
                 </Text>
             </AnimatedPressable>
         </View>
