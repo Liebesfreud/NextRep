@@ -1,5 +1,6 @@
-import { View, Text, Pressable, Alert } from "react-native";
+import { View, Text, Alert } from "react-native";
 import { Database, Download, Upload, Trash2, ChevronRight } from "lucide-react-native";
+import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import * as DocumentPicker from "expo-document-picker";
@@ -67,7 +68,7 @@ export function DataManagementSettings() {
             </View>
 
             <View className="gap-3">
-                <Pressable onPress={handleExport}
+                <AnimatedPressable onPress={handleExport}
                     style={{ backgroundColor: colors.gray2, borderColor: colors.border }}
                     className="flex-row items-center justify-between p-4 rounded-bento-sm border">
                     <View className="flex-row items-center gap-3">
@@ -80,9 +81,9 @@ export function DataManagementSettings() {
                         </View>
                     </View>
                     <ChevronRight size={18} color={colors.gray4} />
-                </Pressable>
+                </AnimatedPressable>
 
-                <Pressable onPress={handleImport}
+                <AnimatedPressable onPress={handleImport}
                     style={{ backgroundColor: colors.gray2, borderColor: colors.border }}
                     className="flex-row items-center justify-between p-4 rounded-bento-sm border">
                     <View className="flex-row items-center gap-3">
@@ -95,9 +96,9 @@ export function DataManagementSettings() {
                         </View>
                     </View>
                     <ChevronRight size={18} color={colors.gray4} />
-                </Pressable>
+                </AnimatedPressable>
 
-                <Pressable onPress={handleClear}
+                <AnimatedPressable onPress={handleClear}
                     style={{ backgroundColor: `${colors.red}0D`, borderColor: `${colors.red}1A` }}
                     className="flex-row items-center justify-between p-4 rounded-bento-sm border mt-1">
                     <View className="flex-row items-center gap-3">
@@ -110,7 +111,7 @@ export function DataManagementSettings() {
                         </View>
                     </View>
                     <ChevronRight size={18} color={`${colors.red}66`} />
-                </Pressable>
+                </AnimatedPressable>
             </View>
         </View>
     );

@@ -1,5 +1,6 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import { Plus, Dumbbell, Activity, CheckCircle } from "lucide-react-native";
+import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem } from "@/db/services/workout";
 
@@ -74,14 +75,14 @@ export function TodayWorkouts({
                                 <Text style={{ color: colors.orange }} className="text-xs font-extrabold tracking-widest uppercase opacity-90">
                                     有氧训练
                                 </Text>
-                                <Pressable onPress={handleOpenCardio}
+                                <AnimatedPressable onPress={handleOpenCardio}
                                     style={{ backgroundColor: `${colors.orange}33` }}
                                     className="w-6 h-6 rounded-md items-center justify-center">
                                     <Plus size={14} color={colors.orange} strokeWidth={3} />
-                                </Pressable>
+                                </AnimatedPressable>
                             </View>
                             {cardioWorkouts.map((w) => (
-                                <Pressable key={w.id} onPress={() => openEditModal(w)}
+                                <AnimatedPressable key={w.id} onPress={() => openEditModal(w)}
                                     className="flex-row items-center gap-2.5 p-1.5 -mx-1.5 rounded-lg">
                                     <View style={{ backgroundColor: `${colors.orange}33` }} className="w-9 h-9 rounded-lg items-center justify-center">
                                         <Activity size={16} color={colors.orange} />
@@ -95,7 +96,7 @@ export function TodayWorkouts({
                                         </View>
                                         {w.stats && <Text style={{ color: colors.white, opacity: 0.9 }} className="text-xs font-semibold mt-0.5">{w.stats}</Text>}
                                     </View>
-                                </Pressable>
+                                </AnimatedPressable>
                             ))}
                         </View>
                     )}
@@ -107,14 +108,14 @@ export function TodayWorkouts({
                                 <Text style={{ color: colors.gray4, opacity: 0.7 }} className="text-xs font-extrabold tracking-widest uppercase">
                                     力量训练
                                 </Text>
-                                <Pressable onPress={handleOpenStrength}
+                                <AnimatedPressable onPress={handleOpenStrength}
                                     style={{ backgroundColor: colors.gray2, borderColor: colors.border, borderWidth: 1 }}
                                     className="w-6 h-6 rounded-md items-center justify-center">
                                     <Plus size={14} color={colors.white} strokeWidth={3} />
-                                </Pressable>
+                                </AnimatedPressable>
                             </View>
                             {strengthWorkouts.map((w) => (
-                                <Pressable key={w.id} onPress={() => openEditModal(w)}
+                                <AnimatedPressable key={w.id} onPress={() => openEditModal(w)}
                                     className="flex-row items-center gap-2.5 p-1.5 -mx-1.5 rounded-lg">
                                     <View style={{ backgroundColor: colors.gray3 }} className="w-9 h-9 rounded-lg items-center justify-center">
                                         <Dumbbell size={16} color={colors.gray4} />
@@ -132,7 +133,7 @@ export function TodayWorkouts({
                                             {w.sets && <Text style={{ color: colors.gray4 }}>{formatSets(w.sets)}</Text>}
                                         </Text>
                                     </View>
-                                </Pressable>
+                                </AnimatedPressable>
                             ))}
                         </View>
                     )}
@@ -147,26 +148,26 @@ export function TodayWorkouts({
             {/* Quick-add buttons */}
             <View className="flex-row gap-bento">
                 {cardioWorkouts.length === 0 && (
-                    <Pressable onPress={handleOpenCardio}
+                    <AnimatedPressable onPress={handleOpenCardio}
                         style={{ backgroundColor: `${colors.orange}26`, borderColor: `${colors.orange}33`, borderWidth: 1 }}
                         className="flex-1 py-3 rounded-bento-sm flex-row items-center justify-center gap-2">
                         <Activity size={16} color={colors.orange} />
                         <Text style={{ color: colors.orange }} className="font-bold text-sm">有氧运动</Text>
-                    </Pressable>
+                    </AnimatedPressable>
                 )}
                 {strengthWorkouts.length === 0 && (
-                    <Pressable onPress={handleOpenStrength}
+                    <AnimatedPressable onPress={handleOpenStrength}
                         style={{ backgroundColor: colors.gray2, borderColor: colors.border, borderWidth: 1 }}
                         className="flex-1 py-3 rounded-bento-sm flex-row items-center justify-center gap-2">
                         <Dumbbell size={16} color={colors.white} />
                         <Text style={{ color: colors.white }} className="font-bold text-sm">力量训练</Text>
-                    </Pressable>
+                    </AnimatedPressable>
                 )}
             </View>
 
             {/* Check-in Button */}
             {workouts.length > 0 && !isCheckedIn && (
-                <Pressable
+                <AnimatedPressable
                     onPress={handleCheckin}
                     disabled={isPending}
                     style={{ backgroundColor: colors.green, opacity: isPending ? 0.5 : 1 }}
@@ -176,7 +177,7 @@ export function TodayWorkouts({
                     <Text className="font-extrabold text-base tracking-widest text-black">
                         {isPending ? "打卡中..." : "完成今日打卡"}
                     </Text>
-                </Pressable>
+                </AnimatedPressable>
             )}
             {isCheckedIn && (
                 <View

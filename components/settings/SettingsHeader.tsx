@@ -1,5 +1,6 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import { Check, Save } from "lucide-react-native";
+import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import { useTheme } from "@/hooks/useTheme";
 
 type Props = {
@@ -14,7 +15,7 @@ export function SettingsHeader({ onSave, isPending, isSaved }: Props) {
     return (
         <View className="flex-row items-center justify-between">
             <Text style={{ color: colors.white }} className="text-3xl font-extrabold tracking-tight">配置</Text>
-            <Pressable
+            <AnimatedPressable
                 onPress={onSave}
                 disabled={isPending}
                 style={{
@@ -32,7 +33,7 @@ export function SettingsHeader({ onSave, isPending, isSaved }: Props) {
                 <Text style={{ color: isSaved ? colors.green : colors.bg }} className="font-bold">
                     {isPending ? "保存中" : isSaved ? "已保存" : "保存所有配置"}
                 </Text>
-            </Pressable>
+            </AnimatedPressable>
         </View>
     );
 }

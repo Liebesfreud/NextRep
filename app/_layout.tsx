@@ -1,21 +1,34 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Home, LayoutDashboard, Bot, Settings } from "lucide-react-native";
 import { View, Text, StyleSheet } from "react-native";
 import { ThemeProvider, useTheme } from "@/hooks/useTheme";
 import { initDatabase } from "@/db/client";
+import * as SplashScreen from "expo-splash-screen";
+import { ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from "@react-navigation/native";
 import "../global.css";
+
+// Prevent auto hide
+SplashScreen.preventAutoHideAsync().catch(() => { });
 
 // ─── Inner Layout (has access to theme) ──────────────────────────────────────
 
 function TabLayout() {
     const { colors, theme } = useTheme();
+    const [dbInitialized, setDbInitialized] = useState(false);
 
     useEffect(() => {
         // Initialize SQLite tables on first launch
-        initDatabase().catch(console.error);
+        initDatabase()
+            .then(() => {
+                setDbInitialized(true);
+                SplashScreen.hideAsync().catch(console.warn);
+            })
+            .catch(console.error);
     }, []);
+
+    if (!dbInitialized) return null;
 
     return (
         <>
@@ -92,6 +105,12 @@ function TabLayout() {
                         ),
                     }}
                 />
+                <Tabs.Screen
+                    name="settings/exercises"
+                    options={{
+                        href: null,
+                    }}
+                />
             </Tabs>
         </>
     );
@@ -99,10 +118,19 @@ function TabLayout() {
 
 // ─── Root Layout (wraps ThemeProvider) ────────────────────────────────────────
 
+function RootNavigationWrapper() {
+    const { theme } = useTheme();
+    return (
+        <NavigationThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
+            <TabLayout />
+        </NavigationThemeProvider>
+    );
+}
+
 export default function RootLayout() {
     return (
         <ThemeProvider>
-            <TabLayout />
+            <RootNavigationWrapper />
         </ThemeProvider>
     );
 }

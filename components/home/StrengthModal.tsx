@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Pressable, Modal, ScrollView, TextInput, Alert, KeyboardAvoidingView, Platform } from "react-native";
-import { X, ChevronLeft, Dumbbell, Trash2, Plus, Check, Search } from "lucide-react-native";
+import { X, ChevronLeft, Dumbbell, Trash2, Plus, Check, Search, Library } from "lucide-react-native";
+import { useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem, type StrengthPresetItem, removeStrengthPreset, addStrengthPreset } from "@/db/services/workout";
 
@@ -29,6 +30,7 @@ export function StrengthModal({
     onSave, onDelete, isPending
 }: Props) {
     const { colors } = useTheme();
+    const router = useRouter();
 
     const [modalStep, setModalStep] = useState<"select" | "form">("select");
     const [selectedExercise, setSelectedExercise] = useState("");
@@ -39,10 +41,6 @@ export function StrengthModal({
         reps: "",
         isCompleted: false,
     }]);
-
-    const [isCreatingPreset, setIsCreatingPreset] = useState(false);
-    const [newPresetName, setNewPresetName] = useState("");
-    const [newPresetTag, setNewPresetTag] = useState<string | null>(null);
 
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("全部");
@@ -121,9 +119,6 @@ export function StrengthModal({
                 reps: "",
                 isCompleted: false,
             }]);
-            setIsCreatingPreset(false);
-            setNewPresetName("");
-            setNewPresetTag(null);
         }
     }, [visible, initialWorkout]);
 
@@ -217,9 +212,22 @@ export function StrengthModal({
                                     {modalStep === "select" ? "选择动作" : (initialWorkout ? "修改力量训练" : "添加力量训练")}
                                 </Text>
                             )}
-                            <Pressable onPress={onClose} style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}>
-                                <X size={20} color={colors.gray4} />
-                            </Pressable>
+                            <View style={{ flexDirection: "row", gap: 8 }}>
+                                {modalStep === "select" && (
+                                    <Pressable
+                                        onPress={() => {
+                                            onClose();
+                                            setTimeout(() => router.push("/settings/exercises" as any), 100);
+                                        }}
+                                        style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
+                                    >
+                                        <Library size={18} color={colors.gray4} />
+                                    </Pressable>
+                                )}
+                                <Pressable onPress={onClose} style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}>
+                                    <X size={20} color={colors.gray4} />
+                                </Pressable>
+                            </View>
                         </View>
 
                         {modalStep === "select" ? (
@@ -275,96 +283,40 @@ export function StrengthModal({
                                 </View>
 
                                 {/* FlatList of Exercises */}
-                                <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, marginHorizontal: -24, paddingHorizontal: 24 }}>
-                                    {filteredPresets.length > 0 ? (
-                                        filteredPresets.map((ex, i) => (
-                                            <Pressable
-                                                key={i}
-                                                onPress={() => {
-                                                    setSelectedExercise(ex.name);
-                                                    setModalStep("form");
-                                                }}
-                                                style={{ flexDirection: "row", alignItems: "center", paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: `${colors.gray3}4D` }}
-                                            >
-                                                <View style={{ backgroundColor: `${colors.green}1A`, width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 16 }}>
-                                                    <Dumbbell size={20} color={colors.green} />
-                                                </View>
-                                                <View style={{ flex: 1, justifyContent: "center" }}>
-                                                    <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold", marginBottom: 4 }}>{ex.name}</Text>
-                                                    <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "600" }}>{ex.tag || "自定义动作"}</Text>
-                                                </View>
-                                                <Plus size={20} color={colors.gray4} style={{ opacity: 0.5 }} />
-                                            </Pressable>
-                                        ))
-                                    ) : (
+                                <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, marginHorizontal: -24, paddingHorizontal: 24 }} keyboardShouldPersistTaps="handled">
+                                    {filteredPresets.map((ex, i) => (
+                                        <Pressable
+                                            key={i}
+                                            onPress={() => {
+                                                setSelectedExercise(ex.name);
+                                                setModalStep("form");
+                                            }}
+                                            style={{ flexDirection: "row", alignItems: "center", paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: `${colors.gray3}4D` }}
+                                        >
+                                            <View style={{ backgroundColor: `${colors.green}1A`, width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 16 }}>
+                                                <Dumbbell size={20} color={colors.green} />
+                                            </View>
+                                            <View style={{ flex: 1, justifyContent: "center" }}>
+                                                <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold", marginBottom: 4 }}>{ex.name}</Text>
+                                                <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "600" }}>{ex.tag || "自定义动作"}</Text>
+                                            </View>
+                                            <Plus size={20} color={colors.gray4} style={{ opacity: 0.5 }} />
+                                        </Pressable>
+                                    ))}
+
+                                    {filteredPresets.length === 0 && (
                                         <View style={{ paddingVertical: 48, alignItems: "center", justifyContent: "center", opacity: 0.6 }}>
                                             <Dumbbell size={40} color={colors.gray4} style={{ marginBottom: 16 }} />
-                                            <Text style={{ color: colors.gray4, fontSize: 14, fontWeight: "bold", textAlign: "center" }}>
+                                            <Text style={{ color: colors.gray4, fontSize: 14, fontWeight: "bold", textAlign: "center", marginBottom: 8 }}>
                                                 没有找到相关动作
+                                            </Text>
+                                            <Text style={{ color: colors.gray4, fontSize: 12, textAlign: "center" }}>
+                                                请前往“设置 {'->'} 数据与备份”新增你的自定义动作库
                                             </Text>
                                         </View>
                                     )}
                                     <View style={{ height: 100 }} />
                                 </ScrollView>
-
-                                {/* Create New Exercise Modal inline/FAB interaction */}
-                                {isCreatingPreset ? (
-                                    <View style={{ backgroundColor: colors.gray2, borderColor: `${colors.green}80`, borderWidth: 1, position: 'absolute', bottom: 10, left: 0, right: 0, padding: 16, borderRadius: 24 }}>
-                                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                                            <Text style={{ color: colors.white, fontWeight: "bold", fontSize: 18 }}>自定义新动作</Text>
-                                            <Pressable onPress={() => { setNewPresetName(""); setNewPresetTag(null); setIsCreatingPreset(false); }}>
-                                                <X size={20} color={colors.gray4} />
-                                            </Pressable>
-                                        </View>
-                                        <TextInput
-                                            value={newPresetName}
-                                            onChangeText={setNewPresetName}
-                                            placeholder="例如：杠铃区卧推"
-                                            placeholderTextColor={`${colors.gray4}66`}
-                                            style={{ color: colors.white, backgroundColor: "rgba(0,0,0,0.2)", padding: 14, borderRadius: 12, fontWeight: "bold", fontSize: 16, marginBottom: 12 }}
-                                            autoFocus
-                                        />
-                                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12, marginBottom: 16 }}>
-                                            <View style={{ flexDirection: "row", gap: 8 }}>
-                                                {categories.filter(c => c !== "全部").map(tag => (
-                                                    <Pressable key={tag} onPress={() => setNewPresetTag(tag === newPresetTag ? null : tag)}
-                                                        style={{
-                                                            backgroundColor: tag === newPresetTag ? `${colors.green}33` : "rgba(255,255,255,0.05)",
-                                                            borderColor: tag === newPresetTag ? `${colors.green}80` : "transparent",
-                                                            borderWidth: 1,
-                                                            paddingHorizontal: 12,
-                                                            paddingVertical: 8,
-                                                            borderRadius: 12,
-                                                        }}>
-                                                        <Text style={{ color: tag === newPresetTag ? colors.green : colors.gray4, fontSize: 14, fontWeight: "bold" }}>{tag}</Text>
-                                                    </Pressable>
-                                                ))}
-                                            </View>
-                                        </ScrollView>
-                                        <Pressable
-                                            onPress={async () => {
-                                                const name = newPresetName.trim();
-                                                if (name && !presets.find(p => p.name === name)) {
-                                                    const tag = newPresetTag || "全身训练";
-                                                    onPresetsChange(prev => [{ name, tag }, ...prev]);
-                                                    await addStrengthPreset(name, tag);
-                                                }
-                                                setNewPresetName(""); setNewPresetTag(null); setIsCreatingPreset(false);
-                                            }}
-                                            disabled={!newPresetName.trim()}
-                                            style={{ backgroundColor: colors.green, opacity: newPresetName.trim() ? 1 : 0.5, paddingVertical: 14, borderRadius: 12, alignItems: "center" }}>
-                                            <Text style={{ color: colors.white, fontWeight: "bold", fontSize: 16 }}>保存并添加</Text>
-                                        </Pressable>
-                                    </View>
-                                ) : (
-                                    <View style={{ position: 'absolute', bottom: 10, left: 0, right: 0 }}>
-                                        <Pressable onPress={() => setIsCreatingPreset(true)}
-                                            style={{ backgroundColor: colors.bento, borderColor: colors.border, borderWidth: 1, marginHorizontal: 16, paddingVertical: 16, borderRadius: 16, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 8 }}>
-                                            <Plus size={20} color={colors.green} />
-                                            <Text style={{ color: colors.white, fontWeight: "bold", fontSize: 16 }}>自定义新动作</Text>
-                                        </Pressable>
-                                    </View>
-                                )}
                             </View>
                         ) : (
                             <View style={{ flex: 1 }}>

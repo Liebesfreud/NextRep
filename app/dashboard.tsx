@@ -3,6 +3,7 @@ import { View, ScrollView } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
 import { getDashboardData, addBodyMetric } from "@/db/services/dashboard";
+import * as SplashScreen from "expo-splash-screen";
 
 // Dashboard Components
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -10,6 +11,7 @@ import { TrainingOverview } from "@/components/dashboard/TrainingOverview";
 import { BodyMetricsCard } from "@/components/dashboard/BodyMetricsCard";
 import { ExerciseAnalytics } from "@/components/dashboard/ExerciseAnalytics";
 import { BodyMetricModal } from "@/components/dashboard/BodyMetricModal";
+import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
 
 type DashboardData = Awaited<ReturnType<typeof getDashboardData>>;
 
@@ -32,6 +34,7 @@ export default function DashboardScreen() {
             setData(res);
         } finally {
             setLoading(false);
+            SplashScreen.hideAsync().catch(() => { });
         }
     }, [currentYear, currentMonth]);
 
@@ -50,28 +53,36 @@ export default function DashboardScreen() {
                 contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 60, paddingBottom: 100, gap: 16 }}
                 showsVerticalScrollIndicator={false}
             >
-                <DashboardHeader />
+                <AnimatedEnter delay={0} distance={10}>
+                    <DashboardHeader />
+                </AnimatedEnter>
 
-                <TrainingOverview
-                    data={data}
-                    loading={loading}
-                    currentYear={currentYear}
-                    currentMonth={currentMonth}
-                    calendarExpanded={calendarExpanded}
-                    setCalendarExpanded={setCalendarExpanded}
-                    selectedDay={selectedDay}
-                    setSelectedDay={setSelectedDay}
-                    todayNum={todayNum}
-                />
+                <AnimatedEnter delay={50} distance={15}>
+                    <TrainingOverview
+                        data={data}
+                        loading={loading}
+                        currentYear={currentYear}
+                        currentMonth={currentMonth}
+                        calendarExpanded={calendarExpanded}
+                        setCalendarExpanded={setCalendarExpanded}
+                        selectedDay={selectedDay}
+                        setSelectedDay={setSelectedDay}
+                        todayNum={todayNum}
+                    />
+                </AnimatedEnter>
 
-                <BodyMetricsCard
-                    data={data}
-                    loading={loading}
-                    expandedMetric={expandedMetric}
-                    setExpandedMetric={setExpandedMetric}
-                />
+                <AnimatedEnter delay={100} distance={15}>
+                    <BodyMetricsCard
+                        data={data}
+                        loading={loading}
+                        expandedMetric={expandedMetric}
+                        setExpandedMetric={setExpandedMetric}
+                    />
+                </AnimatedEnter>
 
-                <ExerciseAnalytics data={data} />
+                <AnimatedEnter delay={150} distance={15}>
+                    <ExerciseAnalytics data={data} />
+                </AnimatedEnter>
             </ScrollView>
 
             <BodyMetricModal

@@ -3,6 +3,7 @@ import { View, ScrollView } from "react-native";
 import { useFocusEffect } from "expo-router";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { useTheme } from "@/hooks/useTheme";
+import * as SplashScreen from "expo-splash-screen";
 
 import { HomeHeader } from "@/components/home/HomeHeader";
 import { HomeStatsCard } from "@/components/home/HomeStatsCard";
@@ -10,6 +11,7 @@ import { MonthlyHeatmap } from "@/components/home/MonthlyHeatmap";
 import { TodayWorkouts } from "@/components/home/TodayWorkouts";
 import { StrengthModal } from "@/components/home/StrengthModal";
 import { CardioModal } from "@/components/home/CardioModal";
+import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
 
 import {
     addWorkout, updateWorkout, deleteWorkout,
@@ -77,6 +79,7 @@ export default function HomeScreen() {
         setStrengthPresets(presets);
         setIsCheckedIn(checkedIn);
         setUserName(profile.name);
+        SplashScreen.hideAsync().catch(() => { });
     }, []);
 
     useFocusEffect(useCallback(() => {
@@ -167,26 +170,32 @@ export default function HomeScreen() {
                 contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 60, paddingBottom: 100, gap: 16 }}
                 showsVerticalScrollIndicator={false}
             >
-                <HomeHeader greeting={greeting} userName={userName} isCheckedIn={isCheckedIn} />
+                <AnimatedEnter delay={0} distance={10}>
+                    <HomeHeader greeting={greeting} userName={userName} isCheckedIn={isCheckedIn} />
+                </AnimatedEnter>
 
-                <View className="flex-row gap-bento">
-                    <HomeStatsCard displayCal={displayCal} totalSets={totalSets} isAiPredicting={isAiPredicting} />
-                    <View style={{ backgroundColor: colors.bento, borderColor: colors.border, flex: 2 }} className="rounded-bento-lg border p-3.5">
-                        <MonthlyHeatmap refreshKey={`${workouts.length}-${isCheckedIn}`} />
+                <AnimatedEnter delay={50} distance={15}>
+                    <View className="flex-row gap-bento">
+                        <HomeStatsCard displayCal={displayCal} totalSets={totalSets} isAiPredicting={isAiPredicting} />
+                        <View style={{ backgroundColor: colors.bento, borderColor: colors.border, flex: 2 }} className="rounded-bento-lg border p-3.5">
+                            <MonthlyHeatmap refreshKey={`${workouts.length}-${isCheckedIn}`} />
+                        </View>
                     </View>
-                </View>
+                </AnimatedEnter>
 
-                <TodayWorkouts
-                    workouts={workouts}
-                    cardioWorkouts={cardioWorkouts}
-                    strengthWorkouts={strengthWorkouts}
-                    handleOpenCardio={() => { setEditingWorkout(null); setActiveModal("cardio"); }}
-                    handleOpenStrength={() => { setEditingWorkout(null); setActiveModal("strength"); }}
-                    openEditModal={(w) => { setEditingWorkout(w); setActiveModal(w.type as "strength" | "cardio"); }}
-                    handleCheckin={handleCheckin}
-                    isCheckedIn={isCheckedIn}
-                    isPending={isPending}
-                />
+                <AnimatedEnter delay={100} distance={15}>
+                    <TodayWorkouts
+                        workouts={workouts}
+                        cardioWorkouts={cardioWorkouts}
+                        strengthWorkouts={strengthWorkouts}
+                        handleOpenCardio={() => { setEditingWorkout(null); setActiveModal("cardio"); }}
+                        handleOpenStrength={() => { setEditingWorkout(null); setActiveModal("strength"); }}
+                        openEditModal={(w) => { setEditingWorkout(w); setActiveModal(w.type as "strength" | "cardio"); }}
+                        handleCheckin={handleCheckin}
+                        isCheckedIn={isCheckedIn}
+                        isPending={isPending}
+                    />
+                </AnimatedEnter>
             </ScrollView>
 
             <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999 }}>

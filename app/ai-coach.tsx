@@ -11,6 +11,7 @@ import { chatWithAI } from "@/db/services/ai";
 import { db } from "@/db/client";
 import { workouts, bodyMetrics } from "@/db/schema";
 import { desc } from "drizzle-orm";
+import * as SplashScreen from "expo-splash-screen";
 
 export default function AiCoachScreen() {
     const { colors } = useTheme();
@@ -46,6 +47,7 @@ export default function AiCoachScreen() {
                     value: m.value,
                 })),
             });
+            SplashScreen.hideAsync().catch(() => { });
         });
     }, []));
 

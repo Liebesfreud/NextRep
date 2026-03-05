@@ -1,6 +1,6 @@
 import { db } from "../client";
 import { workouts, dailyCheckins, bodyMetrics } from "../schema";
-import { gte, lt, and, asc, desc } from "drizzle-orm";
+import { gte, lt, and, asc, desc, sql } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
 import { getUserProfile } from "./profile";
 
@@ -180,12 +180,63 @@ function calculateVolume(weight: string | null, sets: string | null): number {
 }
 
 export async function getDashboardData(year: number, month: number) {
-    // 1. Streak
-    const allCheckins = await db
-        .select()
-        .from(dailyCheckins)
-        .orderBy(desc(dailyCheckins.dateStr));
+    const today = new Date();
 
+    // Limits checkins to recent ones (e.g., past 100 days to find streak)
+    const checkDateLimit = new Date();
+    checkDateLimit.setDate(checkDateLimit.getDate() - 100);
+
+    const startOfWeek = new Date(today);
+    const dayOfWeek = startOfWeek.getDay() || 7;
+    startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek + 1);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const startOfMonth = new Date(year, month, 1);
+    const endOfMonth = new Date(year, month + 1, 1);
+
+    // Parallel fetch independent metrics
+    const [
+        allCheckins,
+        weekWorkouts,
+        monthWorkouts,
+        analyticsRows,
+        bm,
+        profile,
+    ] = await Promise.all([
+        // 1. Checkins for streak (limited to 100)
+        db.select({ dateStr: dailyCheckins.dateStr })
+            .from(dailyCheckins)
+            .where(gte(dailyCheckins.dateStr, normalizeDate(checkDateLimit)))
+            .orderBy(desc(dailyCheckins.dateStr)),
+
+        // 2. Workouts this week
+        db.select({ id: workouts.id })
+            .from(workouts)
+            .where(gte(workouts.createdAt, startOfWeek)),
+
+        // 3. Monthly data
+        db.select()
+            .from(workouts)
+            .where(and(gte(workouts.createdAt, startOfMonth), lt(workouts.createdAt, endOfMonth))),
+
+        // 4. Content Analytics - Uses SQLite group by instead of JS memory aggregation
+        db.select({
+            name: workouts.name,
+            sessions: sql<number>`cast(count(${workouts.id}) as integer)`,
+            // We'll calculate volume post-query since it relies on JS logic (calculateVolume), 
+            // but doing it grouped by name limits the result set massively.
+        })
+            .from(workouts)
+            .groupBy(workouts.name),
+
+        // 5. Body Metrics
+        getBodyMetricsSummary(),
+
+        // 6. User Profile
+        getUserProfile(),
+    ]);
+
+    // Calculate Streak
     let streak = 0;
     const checkDate = new Date();
     const todayStr = normalizeDate(checkDate);
@@ -200,33 +251,9 @@ export async function getDashboardData(year: number, month: number) {
         } else break;
     }
 
-    // 2. Workouts this week
-    const today = new Date();
-    const startOfWeek = new Date(today);
-    const dayOfWeek = startOfWeek.getDay() || 7;
-    startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek + 1);
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    const weekWorkouts = await db
-        .select()
-        .from(workouts)
-        .where(gte(workouts.createdAt, startOfWeek));
     const workoutsThisWeek = weekWorkouts.length;
 
-    // 3. Monthly data
-    const startOfMonth = new Date(year, month, 1);
-    const endOfMonth = new Date(year, month + 1, 1);
-
-    const monthWorkouts = await db
-        .select()
-        .from(workouts)
-        .where(
-            and(
-                gte(workouts.createdAt, startOfMonth),
-                lt(workouts.createdAt, endOfMonth)
-            )
-        );
-
+    // Monthly Volume & Daily Splitting
     let monthlyVolumeKg = 0;
     const dailyData: Record<number, DailySummary> = {};
 
@@ -238,7 +265,7 @@ export async function getDashboardData(year: number, month: number) {
                 isWorkout: true,
                 workouts: [],
                 volume: 0,
-                duration: Math.floor(Math.random() * 30) + 30,
+                duration: Math.floor(Math.random() * 30) + 30, // Mock duration
             };
         }
         const vol = calculateVolume(w.weight, w.sets);
@@ -253,13 +280,24 @@ export async function getDashboardData(year: number, month: number) {
         });
     });
 
-    // 4. Analytics
-    const allWorkouts = await db.select().from(workouts);
+    // We still have to run through all workouts to compute accurate volume 
+    // due to the custom logic of calculateVolume, but we pull ONLY what's needed for the 5 biggest grouped sessions.
+    // To do this fully in SQL requires a complex string sum on weight and sets, which is unreliable across databases,
+    // so we will query only the rows matching the top groups if necessary, or just query all like before but ONLY map the volume
+    // But since `analyticsRows` has all unique names + session counts, let's just query to calculate volumes for them 
+    // Wait, the previous logic parsed everything. Let's do a more robust approach to volume calculation.
+
+    const allRelevantWorkouts = await db.select({ name: workouts.name, weight: workouts.weight, sets: workouts.sets }).from(workouts);
     const analyticsMap: Record<string, { sessions: number; volume: number }> = {};
-    allWorkouts.forEach((w) => {
-        if (!analyticsMap[w.name]) analyticsMap[w.name] = { sessions: 0, volume: 0 };
-        analyticsMap[w.name].sessions += 1;
-        analyticsMap[w.name].volume += calculateVolume(w.weight, w.sets);
+
+    analyticsRows.forEach(row => {
+        analyticsMap[row.name] = { sessions: row.sessions, volume: 0 };
+    });
+
+    allRelevantWorkouts.forEach(w => {
+        if (analyticsMap[w.name]) {
+            analyticsMap[w.name].volume += calculateVolume(w.weight, w.sets);
+        }
     });
 
     const analytics = Object.entries(analyticsMap)
@@ -272,9 +310,6 @@ export async function getDashboardData(year: number, month: number) {
         }))
         .sort((a, b) => parseFloat(b.volume) - parseFloat(a.volume))
         .slice(0, 5);
-
-    const bm = await getBodyMetricsSummary();
-    const profile = await getUserProfile();
 
     return {
         streak,
