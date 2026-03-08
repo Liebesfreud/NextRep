@@ -81,4 +81,13 @@ export async function initDatabase(): Promise<void> {
   } catch (e) {
     // Columns likely already exist
   }
+
+  // Migrate DailyCheckin: add aiEstimatedCal column
+  try {
+    await expoDb.execAsync(`
+      ALTER TABLE "DailyCheckin" ADD COLUMN "aiEstimatedCal" INTEGER;
+    `);
+  } catch (e) {
+    // Column likely already exists
+  }
 }

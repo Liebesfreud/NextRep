@@ -31,10 +31,10 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
     const getBmiStatus = (bmiStr: string) => {
         if (bmiStr === "-") return { text: "未知", color: colors.gray4, bg: colors.border };
         const val = parseFloat(bmiStr);
-        if (val < 18.5) return { text: "🟡 偏瘦", color: colors.orange, bg: `${colors.orange}1A` };
-        if (val < 24) return { text: "🟢 正常", color: colors.green, bg: `${colors.green}1A` };
-        if (val < 28) return { text: "🟠 超重", color: colors.orange, bg: `${colors.orange}1A` };
-        return { text: "🔴 肥胖", color: colors.red, bg: `${colors.red}1A` };
+        if (val < 18.5) return { text: "偏瘦", color: colors.orange, bg: `${colors.orange}1A` };
+        if (val < 24) return { text: "正常", color: colors.green, bg: `${colors.green}1A` };
+        if (val < 28) return { text: "超重", color: colors.orange, bg: `${colors.orange}1A` };
+        return { text: "肥胖", color: colors.red, bg: `${colors.red}1A` };
     };
 
     const bmiStatus = getBmiStatus(bmiVal);

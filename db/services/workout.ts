@@ -53,12 +53,19 @@ export async function isTodayCheckedIn(): Promise<boolean> {
     return rows.length > 0;
 }
 
-export async function checkinToday(): Promise<void> {
-    const dateStr = getTodayDateStr();
+export async function checkinDate(dateStr: string, aiEstimatedCal?: number | null): Promise<void> {
     await db
         .insert(dailyCheckins)
-        .values({ id: Crypto.randomUUID(), dateStr })
-        .onConflictDoNothing();
+        .values({ id: Crypto.randomUUID(), dateStr, aiEstimatedCal: aiEstimatedCal ?? null })
+        .onConflictDoUpdate({
+            target: dailyCheckins.dateStr,
+            set: { aiEstimatedCal: aiEstimatedCal ?? null },
+        });
+}
+
+export async function checkinToday(aiEstimatedCal?: number | null): Promise<void> {
+    const dateStr = getTodayDateStr();
+    return checkinDate(dateStr, aiEstimatedCal);
 }
 
 export async function removeTodayCheckin(): Promise<void> {
@@ -131,6 +138,15 @@ export async function isDateCheckedIn(dateStr: string): Promise<boolean> {
         .from(dailyCheckins)
         .where(eq(dailyCheckins.dateStr, dateStr));
     return rows.length > 0;
+}
+
+/** 查询任意日期的打卡记录信息 */
+export async function getCheckinByDate(dateStr: string) {
+    const rows = await db
+        .select()
+        .from(dailyCheckins)
+        .where(eq(dailyCheckins.dateStr, dateStr));
+    return rows.length > 0 ? rows[0] : null;
 }
 
 export async function addWorkout(data: {

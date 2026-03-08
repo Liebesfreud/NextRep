@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import { Check, Save } from "lucide-react-native";
+import { Check, Save, Settings } from "lucide-react-native";
 import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -13,23 +13,17 @@ export function SettingsHeader({ onSave, isPending, isSaved }: Props) {
     const { colors } = useTheme();
 
     return (
-        <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between" }}>
-            <View>
-                <Text style={{
-                    color: colors.gray4,
-                    fontSize: 11, fontWeight: "800",
-                    letterSpacing: 1.5, textTransform: "uppercase",
-                    marginBottom: 4,
-                }}>
-                    NEXTREP
-                </Text>
-                <Text style={{
-                    color: colors.white,
-                    fontSize: 30, fontWeight: "800",
-                    letterSpacing: -0.5,
-                }}>
-                    个人配置
-                </Text>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <View className="flex-row items-center gap-3">
+                <View style={{ backgroundColor: `${colors.green}22` }} className="w-10 h-10 rounded-full items-center justify-center">
+                    <Settings size={20} color={colors.green} />
+                </View>
+                <View>
+                    <Text style={{ color: colors.white }} className="text-2xl font-black leading-none">个人配置</Text>
+                    <Text style={{ color: colors.gray4, opacity: 0.8 }} className="text-[10px] font-bold tracking-widest mt-1 uppercase">
+                        Settings
+                    </Text>
+                </View>
             </View>
 
             <AnimatedPressable

@@ -35,6 +35,7 @@ export const dailyCheckins = sqliteTable("DailyCheckin", {
         .primaryKey()
         .$defaultFn(() => Crypto.randomUUID()),
     dateStr: text("dateStr").notNull().unique(), // YYYY-MM-DD
+    aiEstimatedCal: integer("aiEstimatedCal"), // 预测的总耗能
     createdAt: integer("createdAt", { mode: "timestamp" })
         .notNull()
         .default(sql`(unixepoch())`),

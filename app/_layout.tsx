@@ -34,22 +34,67 @@ function TabLayout() {
         <>
             <StatusBar style={theme === "dark" ? "light" : "dark"} />
             <Tabs
+                safeAreaInsets={{ bottom: 0 }}
                 screenOptions={{
                     headerShown: false,
                     tabBarStyle: {
-                        backgroundColor: colors.bento,
+                        position: 'absolute',
+                        bottom: 32,
+                        marginHorizontal: 20,
+                        left: 0,
+                        right: 0,
+                        backgroundColor: 'transparent',
+                        borderColor: colors.border,
                         borderTopColor: colors.border,
-                        borderTopWidth: 0.5,
-                        height: 80,
-                        paddingBottom: 20,
-                        paddingTop: 8,
+                        borderWidth: 1,
+                        borderTopWidth: 1,
+                        borderRadius: 16, // match rounded-bento-lg (16px)
+                        height: 70,
+                        paddingBottom: 0,
+                        paddingTop: 0,
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 16 },
+                        shadowOpacity: 0.08, // 降低阴影突兀感
+                        shadowRadius: 32,    // 极大的模糊半径让阴影更柔和
+                        elevation: 8,
                     },
+                    tabBarBackground: () => (
+                        <View style={{ 
+                            ...StyleSheet.absoluteFillObject, 
+                            backgroundColor: colors.bento, 
+                            borderRadius: 16, 
+                            overflow: 'hidden' 
+                        }}>
+                            {/* 1. 全局极弱环境光 (3% opacity) - 贴近物理材质 */}
+                            <View style={{
+                                position: 'absolute',
+                                top: 0, left: 0, right: 0, bottom: 0,
+                                backgroundColor: '#FFFFFF',
+                                opacity: 0.03,
+                            }} />
+                            {/* 2. 顶部柔软弥散高光 (8% opacity, 极大的模糊) */}
+                            <View style={{
+                                position: 'absolute',
+                                top: -50,
+                                left: '10%',
+                                right: '10%',
+                                height: 50,
+                                backgroundColor: '#FFFFFF',
+                                shadowColor: '#FFFFFF',
+                                shadowOffset: { width: 0, height: 25 },
+                                shadowOpacity: 0.08,
+                                shadowRadius: 40, 
+                                borderRadius: 100,
+                                elevation: 0,
+                            }} />
+                        </View>
+                    ),
+                    tabBarShowLabel: false,
+                    tabBarLabelPosition: 'beside-icon',
                     tabBarActiveTintColor: colors.white,
                     tabBarInactiveTintColor: colors.gray4,
-                    tabBarLabelStyle: {
-                        fontSize: 10,
-                        fontWeight: "600",
-                        letterSpacing: 0.5,
+                    tabBarItemStyle: {
+                        height: 70,
                     },
                 }}
             >

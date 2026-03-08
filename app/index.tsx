@@ -15,7 +15,7 @@ import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
 
 import {
     addWorkout, updateWorkout, deleteWorkout,
-    checkinToday, getWorkoutsByDate, getStrengthPresets, isTodayCheckedIn, isDateCheckedIn,
+    checkinToday, checkinDate, getWorkoutsByDate, getStrengthPresets, isTodayCheckedIn, isDateCheckedIn, getCheckinByDate,
     type WorkoutItem, type StrengthPresetItem,
 } from "@/db/services/workout";
 import { estimateDailyCaloriesWithAI } from "@/db/services/ai";
@@ -77,16 +77,18 @@ export default function HomeScreen() {
     // ─── Load Data ─────────────────────────────────────────────────────────────
 
     const loadData = useCallback(async () => {
-        const [ws, presets, checkedIn, profile] = await Promise.all([
+        const [ws, presets, checkedIn, profile, checkinData] = await Promise.all([
             getWorkoutsByDate(selectedDate),
             getStrengthPresets(),
             isDateCheckedIn(selectedDate),
             getUserProfile(),
+            getCheckinByDate(selectedDate),
         ]);
         setWorkouts(ws);
         setStrengthPresets(presets);
         setIsCheckedIn(checkedIn);
         setUserName(profile.name);
+        setAiEstimatedCal(checkinData?.aiEstimatedCal ?? null);
         SplashScreen.hideAsync().catch(() => { });
     }, [selectedDate]);
 
@@ -107,22 +109,7 @@ export default function HomeScreen() {
         else setGreeting("晚上好");
     }, []);
 
-    useEffect(() => {
-        if (workouts.length === 0) { setAiEstimatedCal(0); return; }
-        let cancelled = false;
-        (async () => {
-            setIsAiPredicting(true);
-            try {
-                const res = await estimateDailyCaloriesWithAI(workouts);
-                if (!cancelled) setAiEstimatedCal(res);
-            } catch {
-                if (!cancelled) setAiEstimatedCal(null);
-            } finally {
-                if (!cancelled) setIsAiPredicting(false);
-            }
-        })();
-        return () => { cancelled = true; };
-    }, [workouts]);
+
 
     // ─── Computed ──────────────────────────────────────────────────────────────
 
@@ -166,7 +153,18 @@ export default function HomeScreen() {
     const handleCheckin = async () => {
         setIsPending(true);
         try {
-            await checkinToday();
+            let aiCal = null;
+            if (workouts.length > 0) {
+                setIsAiPredicting(true);
+                try {
+                    aiCal = await estimateDailyCaloriesWithAI(workouts);
+                } catch {
+                    // fall through
+                } finally {
+                    setIsAiPredicting(false);
+                }
+            }
+            await checkinDate(selectedDate, aiCal);
             confettiRef.current?.start();
             await loadData();
         } finally {

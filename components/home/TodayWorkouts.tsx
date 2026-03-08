@@ -2,6 +2,7 @@ import { useState } from "react";
 import { View, Text, Modal, Pressable } from "react-native";
 import { Plus, Dumbbell, Activity, CheckCircle, Calendar, ChevronLeft, ChevronRight, X } from "lucide-react-native";
 import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
+import { LightEffect } from "@/components/ui/LightEffect";
 import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem } from "@/db/services/workout";
 
@@ -218,9 +219,16 @@ export function TodayWorkouts({
 
     return (
         <View
-            style={{ backgroundColor: colors.bento, borderColor: colors.border }}
+            style={{ backgroundColor: colors.bento, borderColor: colors.border, overflow: 'hidden' }}
             className="rounded-bento-lg border p-4 gap-bento"
         >
+            <LightEffect 
+                color={colors.green} 
+                opacity={0.05} 
+                size={300} 
+                position={{ top: -120, right: -100 }} 
+            />
+
             <View className="flex-row justify-between items-center px-1">
                 <View className="flex-row items-center gap-2">
                     {/* 标题 / 已选日期 */}

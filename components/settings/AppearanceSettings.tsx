@@ -1,9 +1,9 @@
-import { View, Text, Switch } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { Moon, Sun } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 
 export function AppearanceSettings() {
-    const { colors, theme, toggleTheme } = useTheme();
+    const { colors, theme, preference, setTheme } = useTheme();
     const isDark = theme === "dark";
 
     return (
@@ -43,15 +43,26 @@ export function AppearanceSettings() {
                 <View style={{ flex: 1 }}>
                     <Text style={{ color: colors.white, fontWeight: "700", fontSize: 14 }}>深色模式</Text>
                     <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "600", marginTop: 1 }}>
-                        {isDark ? "当前: 暗夜模式" : "当前: 日间模式"}
+                        {preference === "system" ? `跟随系统 (${isDark ? "暗夜" : "日间"})` : (isDark ? "当前: 暗夜模式" : "当前: 日间模式")}
                     </Text>
                 </View>
-                <Switch
-                    value={isDark}
-                    onValueChange={() => toggleTheme()}
-                    trackColor={{ false: colors.gray3, true: `${colors.green}99` }}
-                    thumbColor={isDark ? colors.green : colors.gray4}
-                />
+                <View style={{ flexDirection: "row", backgroundColor: `${colors.gray3}80`, borderRadius: 8, padding: 2 }}>
+                    {(["light", "dark", "system"] as const).map(p => (
+                        <Pressable 
+                            key={p} 
+                            onPress={() => setTheme(p)}
+                            style={{ 
+                                paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6,
+                                backgroundColor: preference === p ? colors.bento : "transparent",
+                                shadowColor: preference === p ? "#000" : "transparent", shadowOpacity: 0.1, shadowRadius: 2, shadowOffset: {width:0,height:1}
+                            }}
+                        >
+                            <Text style={{ color: preference === p ? colors.white : colors.gray4, fontSize: 12, fontWeight: preference === p ? "700" : "500" }}>
+                                {p === "light" ? "日间" : p === "dark" ? "暗夜" : "系统"}
+                            </Text>
+                        </Pressable>
+                    ))}
+                </View>
             </View>
         </View>
     );

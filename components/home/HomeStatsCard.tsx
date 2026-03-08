@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import { Flame, Layers } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
-
+import { LightEffect } from "@/components/ui/LightEffect";
 type Props = {
     displayCal: number;
     totalSets: number;
@@ -13,9 +13,16 @@ export function HomeStatsCard({ displayCal, totalSets, isAiPredicting }: Props) 
 
     return (
         <View
-            style={{ backgroundColor: colors.bento, borderColor: colors.border, flex: 1 }}
+            style={{ backgroundColor: colors.bento, borderColor: colors.border, flex: 1, overflow: 'hidden' }}
             className="rounded-bento-lg border p-3 justify-around"
         >
+            <LightEffect 
+                color={colors.orange} 
+                opacity={0.07} 
+                size={250} 
+                position={{ top: -100, left: -60 }} 
+            />
+            
             <View className="mb-3">
                 <View className="flex-row items-center gap-1 mb-1">
                     <Flame size={14} color={colors.orange} />
