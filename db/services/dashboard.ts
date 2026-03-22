@@ -57,6 +57,14 @@ function daysSince(dateStr: string | null): number | null {
     return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
 }
 
+function normalizeMetricType(metricType: string | null | undefined): BodyMetricType | null {
+    if (!metricType) return null;
+    const normalized = metricType.trim().toLowerCase();
+    if (["weight", "体重"].includes(normalized)) return "weight";
+    if (["bodyfat", "body_fat", "body-fat", "fat", "体脂", "体脂率"].includes(normalized)) return "bodyFat";
+    return null;
+}
+
 function buildMetricSummary(rows: BodyMetricPoint[]): BodyMetricSummary {
     const sorted = [...rows].sort((a, b) => {
         if (a.dateStr === b.dateStr)
@@ -123,13 +131,18 @@ async function getBodyMetricsSummary(): Promise<DashboardBodyMetrics> {
         .orderBy(desc(bodyMetrics.dateStr), desc(bodyMetrics.createdAt))
         .limit(400);
 
-    const points: BodyMetricPoint[] = rows.map((r) => ({
-        id: r.id,
-        metricType: r.metricType === "bodyFat" ? "bodyFat" : "weight",
-        value: Number(r.value),
-        dateStr: r.dateStr,
-        createdAt: new Date(r.createdAt).toISOString(),
-    }));
+    const points: BodyMetricPoint[] = rows.flatMap((r) => {
+        const metricType = normalizeMetricType(r.metricType);
+        if (!metricType) return [];
+
+        return [{
+            id: r.id,
+            metricType,
+            value: Number(r.value),
+            dateStr: r.dateStr,
+            createdAt: new Date(r.createdAt).toISOString(),
+        }];
+    });
 
     const weightRows = points.filter((p) => p.metricType === "weight");
     const bodyFatRows = points.filter((p) => p.metricType === "bodyFat");
@@ -166,16 +179,40 @@ export async function addBodyMetric(input: {
 
 function calculateVolume(weight: string | null, sets: string | null): number {
     if (!weight || !sets) return 0;
+
     const wMatch = weight.match(/[\d.]+/);
     if (!wMatch) return 0;
     const w = parseFloat(wMatch[0]);
-    const parts = sets.split("x").map((s: string) => s.trim());
+    if (Number.isNaN(w)) return 0;
+
+    try {
+        if (sets.trim().startsWith("[")) {
+            const parsed = JSON.parse(sets) as Array<{ reps?: number | string; isCompleted?: boolean }>;
+            if (Array.isArray(parsed)) {
+                const effectiveSets = parsed.some((set) => set?.isCompleted)
+                    ? parsed.filter((set) => set?.isCompleted)
+                    : parsed;
+                const totalReps = effectiveSets.reduce((sum, set) => {
+                    const reps = typeof set?.reps === "number"
+                        ? set.reps
+                        : parseInt(String(set?.reps ?? "0"), 10);
+                    return sum + (Number.isFinite(reps) ? reps : 0);
+                }, 0);
+                return totalReps > 0 ? w * totalReps : 0;
+            }
+        }
+    } catch {
+        // Fallback to legacy text parsing below.
+    }
+
+    const normalizedSets = sets.replace(/×/g, "x");
+    const parts = normalizedSets.split("x").map((s: string) => s.trim());
     let totalReps = 0;
     if (parts.length === 2)
-        totalReps = parseInt(parts[0]) * parseInt(parts[1]);
+        totalReps = parseInt(parts[0], 10) * parseInt(parts[1], 10);
     else if (parts.length === 1)
-        totalReps = parseInt(parts[0]);
-    if (isNaN(totalReps) || isNaN(w)) return 0;
+        totalReps = parseInt(parts[0], 10);
+    if (Number.isNaN(totalReps)) return 0;
     return w * totalReps;
 }
 

@@ -1,5 +1,6 @@
 import { db } from "../client";
 import { workouts, strengthPresets, dailyCheckins, bodyMetrics, userProfile } from "../schema";
+import { getUserProfile, type AIConfigItem, type UserProfileData } from "./profile";
 
 // ─── Export All Data ──────────────────────────────────────────────────────────
 
@@ -9,17 +10,17 @@ export async function exportAllData() {
         presetRows,
         checkinRows,
         metricRows,
-        profileRows,
+        normalizedProfile,
     ] = await Promise.all([
         db.select().from(workouts),
         db.select().from(strengthPresets),
         db.select().from(dailyCheckins),
         db.select().from(bodyMetrics),
-        db.select().from(userProfile),
+        getUserProfile(),
     ]);
 
     return {
-        version: 1,
+        version: 2,
         exportedAt: new Date().toISOString(),
         workouts: workoutRows.map((w) => ({
             ...w,
@@ -37,13 +38,77 @@ export async function exportAllData() {
             ...m,
             createdAt: new Date(m.createdAt).toISOString(),
         })),
-        userProfile: profileRows[0] ?? null,
+        userProfile: normalizedProfile,
+        apiConfig: {
+            legacy: {
+                baseUrl: normalizedProfile.aiBaseUrl,
+                apiKey: normalizedProfile.aiApiKey,
+                model: normalizedProfile.aiModel,
+            },
+            configs: normalizedProfile.aiConfigs,
+            activeConfigId: normalizedProfile.activeAiConfigId,
+        },
     };
 }
 
 // ─── Import All Data ──────────────────────────────────────────────────────────
 
-export async function importAllData(data: ReturnType<typeof exportAllData> extends Promise<infer T> ? T : never): Promise<void> {
+type ExportedApiConfig = {
+    legacy?: {
+        baseUrl?: string | null;
+        apiKey?: string | null;
+        model?: string | null;
+    } | null;
+    configs?: AIConfigItem[] | null;
+    activeConfigId?: string | null;
+};
+
+type ExportedUserProfile = Partial<UserProfileData> & {
+    aiConfigs?: AIConfigItem[] | string | null;
+};
+
+type ImportPayload = Awaited<ReturnType<typeof exportAllData>> & {
+    apiConfig?: ExportedApiConfig;
+    userProfile?: ExportedUserProfile | null;
+};
+
+function normalizeImportedAiConfigs(value: ExportedUserProfile["aiConfigs"]): AIConfigItem[] {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+
+    try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+}
+
+function buildImportedProfile(data: ImportPayload): UserProfileData | null {
+    if (!data.userProfile && !data.apiConfig) return null;
+
+    const rawProfile = data.userProfile ?? {};
+    const apiConfig = data.apiConfig;
+    const normalizedAiConfigs = normalizeImportedAiConfigs(rawProfile.aiConfigs) || apiConfig?.configs || [];
+
+    return {
+        name: rawProfile.name ?? "健身达人",
+        height: rawProfile.height ?? null,
+        age: rawProfile.age ?? null,
+        gender: rawProfile.gender ?? null,
+        goal: rawProfile.goal ?? null,
+        aiBaseUrl: rawProfile.aiBaseUrl ?? apiConfig?.legacy?.baseUrl ?? null,
+        aiApiKey: rawProfile.aiApiKey ?? apiConfig?.legacy?.apiKey ?? null,
+        aiModel: rawProfile.aiModel ?? apiConfig?.legacy?.model ?? null,
+        aiConfigs: normalizedAiConfigs,
+        activeAiConfigId: rawProfile.activeAiConfigId ?? apiConfig?.activeConfigId ?? normalizedAiConfigs[0]?.id ?? null,
+        aiTokensTotal: rawProfile.aiTokensTotal ?? 0,
+        aiTokensToday: rawProfile.aiTokensToday ?? 0,
+        aiTokensDate: rawProfile.aiTokensDate ?? null,
+    };
+}
+
+export async function importAllData(data: ImportPayload): Promise<void> {
     // Clear all existing data first
     await db.delete(workouts);
     await db.delete(strengthPresets);
@@ -84,10 +149,42 @@ export async function importAllData(data: ReturnType<typeof exportAllData> exten
             }).onConflictDoNothing();
         }
     }
-    if (data.userProfile) {
-        await db.insert(userProfile).values(data.userProfile).onConflictDoUpdate({
+
+    const importedProfile = buildImportedProfile(data);
+    if (importedProfile) {
+        const aiConfigsStr = JSON.stringify(importedProfile.aiConfigs);
+        await db.insert(userProfile).values({
+            id: "me",
+            name: importedProfile.name,
+            height: importedProfile.height,
+            age: importedProfile.age,
+            gender: importedProfile.gender,
+            goal: importedProfile.goal,
+            aiBaseUrl: importedProfile.aiBaseUrl,
+            aiApiKey: importedProfile.aiApiKey,
+            aiModel: importedProfile.aiModel,
+            aiConfigs: aiConfigsStr,
+            activeAiConfigId: importedProfile.activeAiConfigId,
+            aiTokensTotal: importedProfile.aiTokensTotal,
+            aiTokensToday: importedProfile.aiTokensToday,
+            aiTokensDate: importedProfile.aiTokensDate,
+        }).onConflictDoUpdate({
             target: userProfile.id,
-            set: data.userProfile,
+            set: {
+                name: importedProfile.name,
+                height: importedProfile.height,
+                age: importedProfile.age,
+                gender: importedProfile.gender,
+                goal: importedProfile.goal,
+                aiBaseUrl: importedProfile.aiBaseUrl,
+                aiApiKey: importedProfile.aiApiKey,
+                aiModel: importedProfile.aiModel,
+                aiConfigs: aiConfigsStr,
+                activeAiConfigId: importedProfile.activeAiConfigId,
+                aiTokensTotal: importedProfile.aiTokensTotal,
+                aiTokensToday: importedProfile.aiTokensToday,
+                aiTokensDate: importedProfile.aiTokensDate,
+            },
         });
     }
 }
