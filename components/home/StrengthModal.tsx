@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, ScrollView, TextInput, Alert } from "react-native";
+import { View, Text, Pressable, ScrollView, TextInput, Alert, Keyboard } from "react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, Dumbbell, Trash2, Plus, Check, Search, Library } from "lucide-react-native";
 import { useRouter } from "expo-router";
@@ -171,6 +171,11 @@ export function StrengthModal({
         setSets(prev => prev.map(s => s.id === id ? { ...s, isCompleted: !s.isCompleted } : s));
     };
 
+    const dismissKeyboardAndRun = (callback: () => void, delay = 80) => {
+        Keyboard.dismiss();
+        setTimeout(callback, delay);
+    };
+
     const deleteSet = (id: string) => {
         if (sets.length === 1) {
             // If it's the last set, just clear it
@@ -208,7 +213,13 @@ export function StrengthModal({
             <Pressable onPress={() => { }} style={{ flex: 1 }}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
                     {modalStep === "form" && !initialWorkout ? (
-                        <Pressable onPress={() => { setModalStep("select"); setSelectedExercise(""); }} style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                        <Pressable
+                            onPress={() => dismissKeyboardAndRun(() => {
+                                setModalStep("select");
+                                setSelectedExercise("");
+                            })}
+                            style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+                        >
                             <ChevronLeft size={20} color={colors.green} />
                             <Text style={{ color: colors.green, fontWeight: "bold", fontSize: 14 }}>返回</Text>
                         </Pressable>
@@ -220,16 +231,19 @@ export function StrengthModal({
                     <View style={{ flexDirection: "row", gap: 8 }}>
                         {modalStep === "select" && (
                             <Pressable
-                                onPress={() => {
+                                onPress={() => dismissKeyboardAndRun(() => {
                                     onClose();
-                                    setTimeout(() => router.push("/settings/exercises" as any), 100);
-                                }}
+                                    setTimeout(() => router.push("/settings/exercises"), 120);
+                                })}
                                 style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
                             >
                                 <Library size={18} color={colors.gray4} />
                             </Pressable>
                         )}
-                        <Pressable onPress={onClose} style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}>
+                        <Pressable
+                            onPress={() => dismissKeyboardAndRun(onClose)}
+                            style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
+                        >
                             <X size={20} color={colors.gray4} />
                         </Pressable>
                     </View>

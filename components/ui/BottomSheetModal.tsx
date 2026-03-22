@@ -6,6 +6,7 @@ import {
     Animated,
     StyleSheet,
     KeyboardAvoidingView,
+    Keyboard,
     Platform,
     StatusBar,
     Dimensions,
@@ -80,7 +81,12 @@ export function BottomSheetModal({
             ? { height: sheetHeight as any }
             : { height: sheetHeight };
 
-    const sheetContent = (
+    const handleRequestClose = () => {
+        Keyboard.dismiss();
+        onClose();
+    };
+
+    const modalBody = (
         <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
             {/* 深色遮罩 —— 固定整屏，不参与 slide 动画 */}
             <Animated.View
@@ -89,7 +95,7 @@ export function BottomSheetModal({
                 {/* disabled 控制触摸穿透，不触发布局重算 */}
                 <Pressable
                     style={StyleSheet.absoluteFill}
-                    onPress={onClose}
+                    onPress={handleRequestClose}
                     disabled={!visible}
                 />
             </Animated.View>
@@ -102,7 +108,17 @@ export function BottomSheetModal({
                     { backgroundColor, transform: [{ translateY: sheetTranslateY }] },
                 ]}
             >
-                {children}
+                {avoidKeyboard ? (
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === "ios" ? "position" : "height"}
+                        keyboardVerticalOffset={Platform.OS === "ios" ? 12 : 0}
+                        style={styles.sheetKeyboardAvoider}
+                    >
+                        {children}
+                    </KeyboardAvoidingView>
+                ) : (
+                    children
+                )}
             </Animated.View>
         </View>
     );
@@ -113,24 +129,14 @@ export function BottomSheetModal({
             transparent
             animationType="none"
             statusBarTranslucent
-            onRequestClose={onClose}
+            onRequestClose={handleRequestClose}
         >
             <StatusBar
                 translucent
                 backgroundColor="transparent"
                 barStyle="light-content"
             />
-            {avoidKeyboard ? (
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    style={StyleSheet.absoluteFill}
-                    pointerEvents="box-none"
-                >
-                    {sheetContent}
-                </KeyboardAvoidingView>
-            ) : (
-                sheetContent
-            )}
+            {modalBody}
         </Modal>
     );
 }
@@ -149,5 +155,8 @@ const styles = StyleSheet.create({
         padding: 24,
         paddingBottom: 48,
         overflow: "hidden",
+    },
+    sheetKeyboardAvoider: {
+        flex: 1,
     },
 });

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, Pressable, TextInput } from "react-native";
+import { View, Text, Pressable, TextInput, Keyboard } from "react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, Activity, Plus, Timer, Flame, Trash2 } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
@@ -43,6 +43,11 @@ export function CardioModal({
         }
     }, [visible, initialWorkout]);
 
+    const dismissKeyboardAndRun = (callback: () => void, delay = 80) => {
+        Keyboard.dismiss();
+        setTimeout(callback, delay);
+    };
+
     const handleSave = () => {
         if (!selectedExercise) return;
         const parts: string[] = [];
@@ -66,8 +71,13 @@ export function CardioModal({
         >
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
                 {modalStep === "form" && !initialWorkout ? (
-                    <Pressable onPress={() => { setModalStep("select"); setSelectedExercise(""); }}
-                        style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                    <Pressable
+                        onPress={() => dismissKeyboardAndRun(() => {
+                            setModalStep("select");
+                            setSelectedExercise("");
+                        })}
+                        style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+                    >
                         <ChevronLeft size={20} color={colors.orange} />
                         <Text style={{ color: colors.orange, fontWeight: "bold", fontSize: 14 }}>返回</Text>
                     </Pressable>
@@ -76,8 +86,10 @@ export function CardioModal({
                         {initialWorkout ? "修改有氧运动" : "添加有氧运动"}
                     </Text>
                 )}
-                <Pressable onPress={onClose}
-                    style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}>
+                <Pressable
+                    onPress={() => dismissKeyboardAndRun(onClose)}
+                    style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
+                >
                     <X size={20} color={colors.gray4} />
                 </Pressable>
             </View>
