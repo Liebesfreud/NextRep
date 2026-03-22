@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem, type StrengthPresetItem, removeStrengthPreset, addStrengthPreset } from "@/db/services/workout";
 import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
+import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 
 export interface WorkoutSet {
     id: string;
@@ -231,15 +232,17 @@ export function StrengthModal({
                     )}
                     <View style={{ flexDirection: "row", gap: 8 }}>
                         {modalStep === "select" && (
-                            <Pressable
+                            <AnimatedPressable
                                 onPress={() => dismissKeyboardAndRun(() => {
                                     onClose();
                                     setTimeout(() => router.push("/settings/exercises"), 120);
                                 })}
+                                activeScale={0.92}
+                                activeOpacity={0.75}
                                 style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
                             >
                                 <Library size={18} color={colors.gray4} />
-                            </Pressable>
+                            </AnimatedPressable>
                         )}
                         <Pressable
                             onPress={() => dismissKeyboardAndRun(onClose)}
