@@ -4,8 +4,7 @@ import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, Activity, Plus, Timer, Flame, Trash2 } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem } from "@/db/services/workout";
-
-const CARDIO_EXERCISES = ["跑步机", "椭圆机", "爬楼机"];
+import { CARDIO_EXERCISES, getCardioExerciseVisual } from "@/constants/exerciseVisuals";
 
 type Props = {
     visible: boolean;
@@ -96,25 +95,58 @@ export function CardioModal({
 
             {modalStep === "select" ? (
                 <View style={{ gap: 12 }}>
-                    {CARDIO_EXERCISES.map((ex, i) => (
-                        <Pressable key={i} onPress={() => { setSelectedExercise(ex); setModalStep("form"); }}
-                            style={{ backgroundColor: colors.gray2, width: "100%", padding: 20, borderRadius: 16, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                            <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                                <Activity size={20} color={colors.orange} />
-                                <Text style={{ color: colors.white, fontWeight: "bold", fontSize: 18 }}>{ex}</Text>
-                            </View>
-                            <Plus size={20} color={colors.gray4} />
-                        </Pressable>
-                    ))}
+                    {CARDIO_EXERCISES.map((ex, i) => {
+                        const visual = getCardioExerciseVisual(ex, colors);
+                        const Icon = visual.icon;
+
+                        return (
+                            <Pressable
+                                key={i}
+                                onPress={() => { setSelectedExercise(ex); setModalStep("form"); }}
+                                style={{
+                                    backgroundColor: visual.cardBg ?? colors.gray2,
+                                    borderWidth: 0.75,
+                                    borderColor: `${visual.accent}26`,
+                                    width: "100%",
+                                    padding: 18,
+                                    borderRadius: 18,
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    alignItems: "center"
+                                }}
+                            >
+                                <View style={{ flexDirection: "row", alignItems: "center", gap: 12, flex: 1 }}>
+                                    <View style={{ backgroundColor: visual.iconBg, width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" }}>
+                                        <Icon size={20} color={visual.accent} />
+                                    </View>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{ color: colors.white, fontWeight: "bold", fontSize: 18, marginBottom: 6 }}>{ex}</Text>
+                                        <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>{visual.label}</Text>
+                                    </View>
+                                </View>
+                                <Plus size={20} color={visual.accent} />
+                            </Pressable>
+                        );
+                    })}
                 </View>
             ) : (
                 <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 24 }}>
-                        <View style={{ backgroundColor: `${colors.orange}33`, width: 48, height: 48, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
-                            <Activity size={24} color={colors.orange} />
-                        </View>
-                        <Text style={{ color: colors.white, fontSize: 20, fontWeight: "bold" }}>{selectedExercise}</Text>
-                    </View>
+                    {(() => {
+                        const visual = getCardioExerciseVisual(selectedExercise, colors);
+                        const Icon = visual.icon;
+
+                        return (
+                            <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 24 }}>
+                                <View style={{ backgroundColor: visual.iconBg, width: 48, height: 48, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
+                                    <Icon size={24} color={visual.accent} />
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={{ color: colors.white, fontSize: 20, fontWeight: "bold", marginBottom: 4 }}>{selectedExercise}</Text>
+                                    <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>{visual.label}</Text>
+                                </View>
+                            </View>
+                        );
+                    })()}
                     <View style={{ gap: 16, flex: 1 }}>
                         <View>
                             <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8 }}>

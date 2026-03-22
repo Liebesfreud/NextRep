@@ -4,6 +4,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { Dumbbell, Plus, Trash2, ChevronLeft, Search } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { getStrengthPresets, addStrengthPreset, removeStrengthPreset, type StrengthPresetItem } from "@/db/services/workout";
+import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
 
 export default function ExerciseManagementScreen() {
     const { colors } = useTheme();
@@ -15,7 +16,7 @@ export default function ExerciseManagementScreen() {
     const [newName, setNewName] = useState("");
     const [newTag, setNewTag] = useState<string | null>(null);
 
-    const categories = ["胸部训练", "肩部训练", "背部训练", "腿部训练", "手臂训练", "核心训练", "全身训练"];
+    const categories = [...STRENGTH_CATEGORIES];
 
     useEffect(() => {
         loadPresets();
@@ -101,19 +102,27 @@ export default function ExerciseManagementScreen() {
                             />
                             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
                                 <View style={{ flexDirection: "row", gap: 8 }}>
-                                    {categories.map(tag => (
-                                        <Pressable key={tag} onPress={() => setNewTag(tag === newTag ? null : tag)}
-                                            style={{
-                                                backgroundColor: tag === newTag ? `${colors.green}33` : "rgba(255,255,255,0.05)",
-                                                borderColor: tag === newTag ? `${colors.green}80` : "transparent",
-                                                borderWidth: 1,
-                                                paddingHorizontal: 12,
-                                                paddingVertical: 8,
-                                                borderRadius: 12,
-                                            }}>
-                                            <Text style={{ color: tag === newTag ? colors.green : colors.gray4, fontSize: 14, fontWeight: "bold" }}>{tag}</Text>
-                                        </Pressable>
-                                    ))}
+                                    {categories.map(tag => {
+                                        const visual = getStrengthCategoryVisual(tag, colors);
+                                        const isSelected = tag === newTag;
+
+                                        return (
+                                            <Pressable
+                                                key={tag}
+                                                onPress={() => setNewTag(isSelected ? null : tag)}
+                                                style={{
+                                                    backgroundColor: isSelected ? visual.iconBg : visual.chipBg,
+                                                    borderColor: isSelected ? visual.accent : `${visual.accent}40`,
+                                                    borderWidth: 0.75,
+                                                    paddingHorizontal: 12,
+                                                    paddingVertical: 8,
+                                                    borderRadius: 12,
+                                                }}
+                                            >
+                                                <Text style={{ color: colors.white, fontSize: 14, fontWeight: "bold" }}>{tag}</Text>
+                                            </Pressable>
+                                        );
+                                    })}
                                 </View>
                             </ScrollView>
                             <Pressable
@@ -128,20 +137,40 @@ export default function ExerciseManagementScreen() {
 
                 {/* List */}
                 <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}>
-                    {filteredPresets.map((p, i) => (
-                        <View key={i} style={{ flexDirection: "row", alignItems: "center", paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: `${colors.gray3}4D` }}>
-                            <View style={{ backgroundColor: `${colors.green}1A`, width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 16 }}>
-                                <Dumbbell size={20} color={colors.green} />
+                    {filteredPresets.map((p, i) => {
+                        const visual = getStrengthCategoryVisual(p.tag, colors);
+                        const Icon = visual.icon;
+
+                        return (
+                            <View
+                                key={i}
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    paddingVertical: 16,
+                                    paddingHorizontal: 14,
+                                    borderWidth: 0.75,
+                                    borderColor: `${visual.accent}26`,
+                                    borderRadius: 18,
+                                    backgroundColor: visual.cardBg ?? colors.gray2,
+                                    marginBottom: 10,
+                                }}
+                            >
+                                <View style={{ backgroundColor: visual.iconBg, width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 16 }}>
+                                    <Icon size={20} color={visual.accent} />
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold", marginBottom: 6 }}>{p.name}</Text>
+                                    <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>
+                                        {p.tag || "力量训练"}
+                                    </Text>
+                                </View>
+                                <Pressable onPress={() => handleDelete(p.name)} style={{ padding: 8, marginLeft: 8 }}>
+                                    <Trash2 size={20} color={`${colors.red}99`} />
+                                </Pressable>
                             </View>
-                            <View style={{ flex: 1 }}>
-                                <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold", marginBottom: 4 }}>{p.name}</Text>
-                                <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "600" }}>{p.tag || "自定义动作"}</Text>
-                            </View>
-                            <Pressable onPress={() => handleDelete(p.name)} style={{ padding: 8 }}>
-                                <Trash2 size={20} color={`${colors.red}99`} />
-                            </Pressable>
-                        </View>
-                    ))}
+                        );
+                    })}
                     {filteredPresets.length === 0 && (
                         <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40, opacity: 0.5 }}>
                             <Dumbbell size={40} color={colors.gray4} style={{ marginBottom: 12 }} />

@@ -5,6 +5,7 @@ import { X, ChevronLeft, Dumbbell, Trash2, Plus, Check, Search, Library } from "
 import { useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem, type StrengthPresetItem, removeStrengthPreset, addStrengthPreset } from "@/db/services/workout";
+import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
 
 export interface WorkoutSet {
     id: string;
@@ -46,7 +47,7 @@ export function StrengthModal({
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("全部");
 
-    const categories = ["全部", "胸部训练", "肩部训练", "背部训练", "腿部训练", "手臂训练", "核心训练", "全身训练"];
+    const categories = ["全部", ...STRENGTH_CATEGORIES];
 
     const filteredPresets = presets.filter(p => {
         const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -274,12 +275,17 @@ export function StrengthModal({
                                 <View style={{ flexDirection: "row", gap: 8, paddingBottom: 8, paddingRight: 24 }}>
                                     {categories.map(cat => {
                                         const isSelected = selectedCategory === cat;
+                                        const visual = cat === "全部" ? null : getStrengthCategoryVisual(cat, colors);
+                                        const accent = visual?.accent ?? colors.blue;
+                                        const backgroundColor = isSelected ? (visual?.iconBg ?? `${colors.blue}08`) : (visual?.chipBg ?? `${colors.blue}06`);
                                         return (
                                             <Pressable
                                                 key={cat}
                                                 onPress={() => setSelectedCategory(cat)}
                                                 style={{
-                                                    backgroundColor: isSelected ? colors.green : colors.gray2,
+                                                    backgroundColor,
+                                                    borderColor: isSelected ? accent : `${accent}40`,
+                                                    borderWidth: 0.75,
                                                     paddingHorizontal: 16,
                                                     paddingVertical: 8,
                                                     borderRadius: 9999,
@@ -287,8 +293,8 @@ export function StrengthModal({
                                             >
                                                 <Text
                                                     style={{
-                                                        color: isSelected ? colors.white : colors.gray4,
-                                                        fontWeight: isSelected ? 'bold' : '600',
+                                                        color: colors.white,
+                                                        fontWeight: isSelected ? '800' : '700',
                                                         fontSize: 14,
                                                     }}
                                                 >
@@ -303,25 +309,42 @@ export function StrengthModal({
 
                         {/* FlatList of Exercises */}
                         <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, marginHorizontal: -24, paddingHorizontal: 24 }} keyboardShouldPersistTaps="handled">
-                            {filteredPresets.map((ex, i) => (
-                                <Pressable
-                                    key={i}
-                                    onPress={() => {
-                                        setSelectedExercise(ex.name);
-                                        setModalStep("form");
-                                    }}
-                                    style={{ flexDirection: "row", alignItems: "center", paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: `${colors.gray3}4D` }}
-                                >
-                                    <View style={{ backgroundColor: `${colors.green}1A`, width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 16 }}>
-                                        <Dumbbell size={20} color={colors.green} />
-                                    </View>
-                                    <View style={{ flex: 1, justifyContent: "center" }}>
-                                        <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold", marginBottom: 4 }}>{ex.name}</Text>
-                                        <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "600" }}>{ex.tag || "自定义动作"}</Text>
-                                    </View>
-                                    <Plus size={20} color={colors.gray4} style={{ opacity: 0.5 }} />
-                                </Pressable>
-                            ))}
+                            {filteredPresets.map((ex, i) => {
+                                const visual = getStrengthCategoryVisual(ex.tag, colors);
+                                const Icon = visual.icon;
+
+                                return (
+                                    <Pressable
+                                        key={i}
+                                        onPress={() => {
+                                            setSelectedExercise(ex.name);
+                                            setModalStep("form");
+                                        }}
+                                        style={{
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            paddingVertical: 12,
+                                            paddingHorizontal: 12,
+                                            borderWidth: 0.75,
+                                            borderColor: `${visual.accent}26`,
+                                            backgroundColor: visual.cardBg ?? colors.gray2,
+                                            borderRadius: 18,
+                                            marginBottom: 10,
+                                        }}
+                                    >
+                                        <View style={{ backgroundColor: visual.iconBg, width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 16 }}>
+                                            <Icon size={20} color={visual.accent} />
+                                        </View>
+                                        <View style={{ flex: 1, justifyContent: "center" }}>
+                                            <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold", marginBottom: 6 }}>{ex.name}</Text>
+                                            <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>
+                                                {ex.tag || "力量训练"}
+                                            </Text>
+                                        </View>
+                                        <Plus size={20} color={visual.accent} style={{ opacity: 0.7, marginLeft: 8 }} />
+                                    </Pressable>
+                                );
+                            })}
 
                             {filteredPresets.length === 0 && (
                                 <View style={{ paddingVertical: 48, alignItems: "center", justifyContent: "center", opacity: 0.6 }}>
