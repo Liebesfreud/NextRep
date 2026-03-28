@@ -76,7 +76,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Current Value */}
-                <View style={{ backgroundColor: "rgba(0,0,0,0.2)", borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: colors.border }}>
+                <View style={{ backgroundColor: colors.gray2, borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: `${colors.gray3}4D` }}>
                     <Text style={{ color: colors.gray4 }} className="text-xs font-bold tracking-wider mb-1 uppercase">
                         当前{metricType === "weight" ? "体重" : "体脂率"}
                     </Text>
