@@ -1,6 +1,8 @@
+import { useMemo, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Scale, Sparkles } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
+import Svg, { Circle, Path } from "react-native-svg";
 
 type Props = {
     data: any;
@@ -11,6 +13,7 @@ type Props = {
 
 export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetric }: Props) {
     const { colors } = useTheme();
+    const [chartMetric, setChartMetric] = useState<"weight" | "bodyFat">("weight");
 
     const weightMetric = data?.bodyMetrics?.weight;
     const bodyFatMetric = data?.bodyMetrics?.bodyFat;
@@ -43,6 +46,50 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
     const bodyFatStatusText = bodyFatVal ? (bodyFatVal >= 25 ? "偏高" : bodyFatVal >= 15 ? "标准" : "偏低") : "";
     const bodyFatStatusColor = bodyFatVal ? (bodyFatVal >= 25 ? colors.orange : bodyFatVal >= 15 ? colors.green : colors.orange) : colors.gray4;
     const bodyFatStatusBg = bodyFatVal ? (bodyFatVal >= 25 ? `${colors.orange}1A` : bodyFatVal >= 15 ? `${colors.green}1A` : `${colors.orange}1A`) : colors.border;
+
+    const chartSummary = chartMetric === "weight" ? weightMetric : bodyFatMetric;
+    const chartUnit = chartMetric === "weight" ? "kg" : "%";
+    const chartColor = chartMetric === "weight" ? colors.green : colors.orange;
+
+    const chartRecords = useMemo(() => {
+        const records = chartSummary?.recentRecords ?? [];
+        return [...records].slice(0, 7).reverse();
+    }, [chartSummary]);
+
+    const chartData = useMemo(() => {
+        if (!chartRecords.length) return [] as Array<{ x: number; y: number; value: number; label: string }>;
+
+        const width = 280;
+        const height = 92;
+        const paddingX = 10;
+        const paddingY = 10;
+        const values = chartRecords.map((item) => item.value);
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const range = Math.max(max - min, 1);
+
+        return chartRecords.map((item, index) => {
+            const x = chartRecords.length === 1
+                ? width / 2
+                : paddingX + (index * (width - paddingX * 2)) / (chartRecords.length - 1);
+            const y = height - paddingY - ((item.value - min) / range) * (height - paddingY * 2);
+            return {
+                x,
+                y,
+                value: item.value,
+                label: item.dateStr.slice(5).replace("-", "/"),
+            };
+        });
+    }, [chartRecords]);
+
+    const chartPath = useMemo(() => {
+        if (!chartData.length) return "";
+        return chartData.map((point, index) => `${index === 0 ? "M" : "L"}${point.x} ${point.y}`).join(" ");
+    }, [chartData]);
+
+    const chartDelta = chartRecords.length >= 2
+        ? chartRecords[chartRecords.length - 1].value - chartRecords[0].value
+        : null;
 
     return (
         <View style={{ backgroundColor: colors.bento, borderColor: colors.border, borderWidth: 1, padding: 14, borderRadius: 16, flexDirection: "column", gap: 14 }}>
@@ -167,6 +214,66 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                     </View>
 
                 </View>
+            </View>
+
+            <View style={{ backgroundColor: colors.gray3, borderColor: colors.border, borderWidth: 1, borderRadius: 12, padding: 12 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                    <View>
+                        <Text style={{ color: colors.white, fontSize: 13, fontWeight: "700" }}>{"趋势图"}</Text>
+                        <Text style={{ color: colors.gray4, fontSize: 11, marginTop: 2 }}>
+                            {`最近 ${chartRecords.length || 0} 次记录${chartDelta !== null ? ` · ${chartDelta > 0 ? "+" : ""}${chartDelta.toFixed(1)} ${chartUnit}` : ""}`}
+                        </Text>
+                    </View>
+                    <View style={{ flexDirection: "row", backgroundColor: colors.gray2, borderRadius: 10, padding: 3, gap: 4 }}>
+                        {([
+                            ["weight", "\u4f53\u91cd"],
+                            ["bodyFat", "\u4f53\u8102\u7387"],
+                        ] as const).map(([key, label]) => {
+                            const active = chartMetric === key;
+                            return (
+                                <Pressable
+                                    key={key}
+                                    onPress={() => setChartMetric(key)}
+                                    style={{
+                                        paddingHorizontal: 10,
+                                        paddingVertical: 6,
+                                        borderRadius: 8,
+                                        backgroundColor: active ? colors.border : "transparent",
+                                    }}
+                                >
+                                    <Text style={{ color: active ? colors.white : colors.gray4, fontSize: 11, fontWeight: active ? "700" : "600" }}>
+                                        {label}
+                                    </Text>
+                                </Pressable>
+                            );
+                        })}
+                    </View>
+                </View>
+
+                {chartData.length >= 2 ? (
+                    <>
+                        <View style={{ height: 92, marginBottom: 8 }}>
+                            <Svg width="100%" height="92" viewBox="0 0 280 92">
+                                <Path d={chartPath} stroke={chartColor} strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                                {chartData.map((point, index) => (
+                                    <Circle key={index} cx={point.x} cy={point.y} r={index === chartData.length - 1 ? 4 : 3} fill={chartColor} />
+                                ))}
+                            </Svg>
+                        </View>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                            {chartData.map((point, index) => (
+                                <View key={index} style={{ alignItems: index === 0 ? "flex-start" : index === chartData.length - 1 ? "flex-end" : "center", flex: 1 }}>
+                                    <Text style={{ color: colors.white, fontSize: 11, fontWeight: "700" }}>{point.value}</Text>
+                                    <Text style={{ color: colors.gray4, fontSize: 10, marginTop: 2 }}>{point.label}</Text>
+                                </View>
+                            ))}
+                        </View>
+                    </>
+                ) : (
+                    <View style={{ backgroundColor: colors.gray2, borderRadius: 10, paddingVertical: 18, alignItems: "center" }}>
+                        <Text style={{ color: colors.gray4, fontSize: 12 }}>{"至少两条记录后显示趋势图"}</Text>
+                    </View>
+                )}
             </View>
 
             {/* 第二部分：底部 AI 评估区 */}

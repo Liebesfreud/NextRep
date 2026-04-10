@@ -196,8 +196,13 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                                             >
                                                 {!isPad && (
                                                     <View style={{
-                                                        flex: 1, borderRadius: 8, alignItems: "center", justifyContent: "center",
-                                                        backgroundColor: val ? `${colors.green}33` : "transparent",
+                                                        flex: 1,
+                                                        borderRadius: 8,
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        backgroundColor: val ? `${colors.green}33` : colors.border,
+                                                        borderWidth: 1,
+                                                        borderColor: val ? `${colors.green}40` : `${colors.gray3}33`,
                                                     }}>
                                                         <Text style={{ color: val ? colors.green : colors.white, fontSize: 11, fontWeight: val ? "700" : "400", opacity: val ? 1 : 0.8 }}>
                                                             {dayN}
