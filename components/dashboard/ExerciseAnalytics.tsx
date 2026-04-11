@@ -10,7 +10,7 @@ export function ExerciseAnalytics({ data }: Props) {
     const { colors } = useTheme();
 
     return (
-        <View style={{ backgroundColor: colors.bento, borderColor: colors.border, borderWidth: 1, padding: 14 }} className="rounded-bento-lg gap-3">
+        <View style={{ backgroundColor: colors.bento, borderColor: colors.border, borderWidth: 1, padding: 14, borderRadius: 16 }} className="gap-3">
             <View className="flex-row items-center justify-between px-0.5">
                 <View className="flex-row items-center gap-1.5">
                     <Target size={16} color={colors.orange} />
@@ -18,13 +18,13 @@ export function ExerciseAnalytics({ data }: Props) {
                 </View>
             </View>
 
-            <View style={{ backgroundColor: colors.gray3, borderWidth: 1, borderColor: colors.border, padding: 8, minHeight: 100 }} className="rounded-bento-sm">
+            <View style={{ backgroundColor: colors.gray3, borderWidth: 1, borderColor: colors.border, padding: 8, minHeight: 100, borderRadius: 16 }}>
                 {!data?.analytics || data.analytics.length === 0 ? (
                     <View className="items-center justify-center p-4">
-                        <Text style={{ color: colors.gray4 }} className="text-sm italic">暂无运动数据</Text>
+                        <Text style={{ color: colors.gray4 }} className="text-sm italic">暂无动作分析数据</Text>
                     </View>
                 ) : data.analytics.map((exercise: any, idx: number) => (
-                    <View key={idx} className="flex-row items-center justify-between p-2.5 rounded-lg">
+                    <View key={idx} style={{ borderRadius: 16 }} className="flex-row items-center justify-between p-2.5">
                         <View className="flex-row items-center gap-2.5">
                             <View style={{ width: 4, height: 24, backgroundColor: `${colors.orange}CC`, borderRadius: 2 }} />
                             <View>

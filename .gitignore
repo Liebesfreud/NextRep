@@ -36,6 +36,11 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# local tooling/state
+.claude/
+.omc/
+release/
+
 # generated native folders
 /ios
 /android

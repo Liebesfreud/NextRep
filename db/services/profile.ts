@@ -18,6 +18,8 @@ export type UserProfileData = {
     age: number | null;
     gender: string | null;
     goal: string | null;
+    targetWeight: number | null;
+    targetBodyFat: number | null;
     aiBaseUrl: string | null; // Legacy
     aiApiKey: string | null;  // Legacy
     aiModel: string | null;   // Legacy
@@ -36,6 +38,8 @@ const DEFAULT_PROFILE: UserProfileData = {
     age: null,
     gender: null,
     goal: null,
+    targetWeight: null,
+    targetBodyFat: null,
     aiBaseUrl: null,
     aiApiKey: null,
     aiModel: null,
@@ -90,6 +94,8 @@ export async function getUserProfile(): Promise<UserProfileData> {
         age: p.age,
         gender: p.gender,
         goal: p.goal,
+        targetWeight: p.targetWeight,
+        targetBodyFat: p.targetBodyFat,
         aiBaseUrl: p.aiBaseUrl,
         aiApiKey: p.aiApiKey,
         aiModel: p.aiModel,
@@ -114,6 +120,8 @@ export async function updateUserProfile(data: UserProfileData): Promise<void> {
             age: data.age,
             gender: data.gender,
             goal: data.goal,
+            targetWeight: data.targetWeight,
+            targetBodyFat: data.targetBodyFat,
             aiBaseUrl: data.aiBaseUrl,
             aiApiKey: data.aiApiKey,
             aiModel: data.aiModel,
@@ -132,6 +140,8 @@ export async function updateUserProfile(data: UserProfileData): Promise<void> {
                 age: data.age,
                 gender: data.gender,
                 goal: data.goal,
+                targetWeight: data.targetWeight,
+                targetBodyFat: data.targetBodyFat,
                 aiBaseUrl: data.aiBaseUrl,
                 aiApiKey: data.aiApiKey,
                 aiModel: data.aiModel,

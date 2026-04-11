@@ -23,6 +23,8 @@ export default function SettingsScreen() {
         age: null,
         gender: null,
         goal: null,
+        targetWeight: null,
+        targetBodyFat: null,
         aiBaseUrl: null,
         aiApiKey: null,
         aiModel: null,

@@ -57,6 +57,8 @@ export async function initDatabase(): Promise<void> {
       "age"       INTEGER,
       "gender"    TEXT,
       "goal"      TEXT,
+      "targetWeight" REAL,
+      "targetBodyFat" REAL,
       "aiBaseUrl" TEXT,
       "aiApiKey"  TEXT,
       "aiModel"   TEXT,
@@ -80,6 +82,22 @@ export async function initDatabase(): Promise<void> {
       `);
   } catch (e) {
     // Columns likely already exist
+  }
+
+  try {
+    await expoDb.execAsync(`
+      ALTER TABLE "UserProfile" ADD COLUMN "targetWeight" REAL;
+    `);
+  } catch (e) {
+    // Column likely already exists
+  }
+
+  try {
+    await expoDb.execAsync(`
+      ALTER TABLE "UserProfile" ADD COLUMN "targetBodyFat" REAL;
+    `);
+  } catch (e) {
+    // Column likely already exists
   }
 
   // Migrate DailyCheckin: add aiEstimatedCal column

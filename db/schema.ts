@@ -62,6 +62,8 @@ export const userProfile = sqliteTable("UserProfile", {
     age: integer("age"),
     gender: text("gender"),
     goal: text("goal"),
+    targetWeight: real("targetWeight"),
+    targetBodyFat: real("targetBodyFat"),
     aiBaseUrl: text("aiBaseUrl"), // Legacy
     aiApiKey: text("aiApiKey"),     // Legacy
     aiModel: text("aiModel"),       // Legacy

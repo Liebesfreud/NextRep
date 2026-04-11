@@ -18,7 +18,6 @@ export function DashboardHeader() {
                     </Text>
                 </View>
             </View>
-
         </View>
     );
 }

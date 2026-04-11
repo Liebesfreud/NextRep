@@ -23,6 +23,7 @@ export default function DashboardScreen() {
 
     const [selectedDay, setSelectedDay] = useState(todayNum);
     const [calendarExpanded, setCalendarExpanded] = useState(false);
+    const [reviewExpanded, setReviewExpanded] = useState(false);
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [expandedMetric, setExpandedMetric] = useState<"weight" | "bodyFat" | null>(null);
@@ -65,6 +66,8 @@ export default function DashboardScreen() {
                         currentMonth={currentMonth}
                         calendarExpanded={calendarExpanded}
                         setCalendarExpanded={setCalendarExpanded}
+                        reviewExpanded={reviewExpanded}
+                        setReviewExpanded={setReviewExpanded}
                         selectedDay={selectedDay}
                         setSelectedDay={setSelectedDay}
                         todayNum={todayNum}

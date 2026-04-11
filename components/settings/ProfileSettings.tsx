@@ -201,6 +201,36 @@ export function ProfileSettings({ profile, setProfile }: Props) {
                 />
             </RowField>
 
+            <View style={{ flexDirection: "row", borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                <View style={{ flex: 1, flexDirection: "row", alignItems: "center", paddingVertical: 11, paddingHorizontal: 14, gap: 8 }}>
+                    <Target size={15} color={colors.gray4} strokeWidth={2} />
+                    <Text style={{ color: colors.gray4, fontSize: 13, fontWeight: "600", flex: 1 }}>目标体重</Text>
+                    <NumericInput
+                        value={profile.targetWeight ? String(profile.targetWeight) : ""}
+                        onChange={(v) => setProfile(p => ({ ...p, targetWeight: v ? parseFloat(v) : null }))}
+                        placeholder="--"
+                        unit="kg"
+                        color={colors.green}
+                        colors={colors}
+                    />
+                </View>
+
+                <View style={{ width: 1, backgroundColor: colors.border, marginVertical: 8 }} />
+
+                <View style={{ flex: 1, flexDirection: "row", alignItems: "center", paddingVertical: 11, paddingHorizontal: 14, gap: 8 }}>
+                    <Target size={15} color={colors.gray4} strokeWidth={2} />
+                    <Text style={{ color: colors.gray4, fontSize: 13, fontWeight: "600", flex: 1 }}>目标体脂</Text>
+                    <NumericInput
+                        value={profile.targetBodyFat ? String(profile.targetBodyFat) : ""}
+                        onChange={(v) => setProfile(p => ({ ...p, targetBodyFat: v ? parseFloat(v) : null }))}
+                        placeholder="--"
+                        unit="%"
+                        color={colors.orange}
+                        colors={colors}
+                    />
+                </View>
+            </View>
+
             {/* 目标 —— 最后一行无下边框 */}
             <View style={{ flexDirection: "row", alignItems: "center", paddingVertical: 11, paddingHorizontal: 14 }}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flex: 1 }}>

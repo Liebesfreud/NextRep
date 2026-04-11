@@ -29,6 +29,7 @@ type BodyMetricSummary = {
     latestDateStr: string | null;
     deltaFromPrevious: number | null;
     deltaFrom30Days: number | null;
+    deltaFrom90Days: number | null;
     deltaFrom365Days: number | null;
     recentPoints: number[];
     recentRecords: BodyMetricPoint[];
@@ -37,6 +38,18 @@ type BodyMetricSummary = {
 type DashboardBodyMetrics = {
     weight: BodyMetricSummary;
     bodyFat: BodyMetricSummary;
+};
+
+type ReviewPeriodSummary = {
+    workouts: number;
+    activeDays: number;
+    totalVolumeKg: number;
+    strengthWorkouts: number;
+    cardioWorkouts: number;
+    topExercise: string | null;
+    averageVolumePerWorkoutKg: number;
+    consistencyRate: number;
+    summary: string;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -76,6 +89,7 @@ function buildMetricSummary(rows: BodyMetricPoint[]): BodyMetricSummary {
     const previous = sorted[1] ?? null;
 
     let deltaFrom30Days: number | null = null;
+    let deltaFrom90Days: number | null = null;
     let deltaFrom365Days: number | null = null;
 
     if (latest) {
@@ -92,6 +106,19 @@ function buildMetricSummary(rows: BodyMetricPoint[]): BodyMetricSummary {
         if (!target30 && sorted.length > 1) target30 = sorted[sorted.length - 1];
         if (target30 && target30 !== latest)
             deltaFrom30Days = latest.value - target30.value;
+
+        const ninetyDaysAgo = new Date();
+        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+        let target90: BodyMetricPoint | null = null;
+        for (const r of sorted) {
+            if (new Date(r.dateStr + "T00:00:00") <= ninetyDaysAgo) {
+                target90 = r;
+                break;
+            }
+        }
+        if (!target90 && sorted.length > 1) target90 = sorted[sorted.length - 1];
+        if (target90 && target90 !== latest)
+            deltaFrom90Days = latest.value - target90.value;
 
         const oneYearAgo = new Date();
         oneYearAgo.setDate(oneYearAgo.getDate() - 365);
@@ -113,6 +140,7 @@ function buildMetricSummary(rows: BodyMetricPoint[]): BodyMetricSummary {
         deltaFromPrevious:
             latest && previous ? latest.value - previous.value : null,
         deltaFrom30Days,
+        deltaFrom90Days,
         deltaFrom365Days,
         recentPoints: sorted
             .slice(0, 30)
@@ -216,6 +244,75 @@ function calculateVolume(weight: string | null, sets: string | null): number {
     return w * totalReps;
 }
 
+function buildReviewSummary(
+    periodWorkouts: Array<{ name: string; type: string; weight: string | null; sets: string | null; createdAt: Date }>,
+    expectedDays: number
+): ReviewPeriodSummary {
+    const activeDaySet = new Set<string>();
+    const exerciseCountMap: Record<string, number> = {};
+
+    let totalVolumeKg = 0;
+    let strengthWorkouts = 0;
+    let cardioWorkouts = 0;
+
+    for (const workout of periodWorkouts) {
+        const dateKey = normalizeDate(new Date(workout.createdAt));
+        activeDaySet.add(dateKey);
+        exerciseCountMap[workout.name] = (exerciseCountMap[workout.name] || 0) + 1;
+
+        if (workout.type === "strength") strengthWorkouts += 1;
+        if (workout.type === "cardio") cardioWorkouts += 1;
+
+        totalVolumeKg += calculateVolume(workout.weight, workout.sets);
+    }
+
+    const topExercise = Object.entries(exerciseCountMap)
+        .sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+
+    const workouts = periodWorkouts.length;
+    const activeDays = activeDaySet.size;
+    const averageVolumePerWorkoutKg = workouts > 0 ? totalVolumeKg / workouts : 0;
+    const consistencyRate = expectedDays > 0 ? activeDays / expectedDays : 0;
+
+    let summary = "本周期还没有训练记录，先完成一次训练吧。";
+    if (workouts > 0) {
+        const consistencyText = consistencyRate >= 0.6 ? "节奏不错" : consistencyRate >= 0.3 ? "还在建立节奏" : "频率偏低";
+        const focusText =
+            strengthWorkouts > cardioWorkouts ? "以力量训练为主" :
+                cardioWorkouts > strengthWorkouts ? "以有氧训练为主" : "力量和有氧比较均衡";
+        const topExerciseText = topExercise ? `高频动作是 ${topExercise}` : "还没有明显高频动作";
+
+        summary = `${consistencyText}，这段时间共训练 ${workouts} 次、活跃 ${activeDays} 天，${focusText}，${topExerciseText}。`;
+    }
+
+    return {
+        workouts,
+        activeDays,
+        totalVolumeKg,
+        strengthWorkouts,
+        cardioWorkouts,
+        topExercise,
+        averageVolumePerWorkoutKg,
+        consistencyRate,
+        summary,
+    };
+}
+
+function getTrackedDays(periodWorkouts: Array<{ createdAt: Date }>): number {
+    if (periodWorkouts.length === 0) return 1;
+
+    const timestamps = periodWorkouts
+        .map((workout) => new Date(workout.createdAt).getTime())
+        .sort((a, b) => a - b);
+
+    const first = new Date(timestamps[0]);
+    const last = new Date(timestamps[timestamps.length - 1]);
+    const start = new Date(first.getFullYear(), first.getMonth(), first.getDate()).getTime();
+    const end = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
+
+    return Math.max(1, Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1);
+}
+
 export async function getDashboardData(year: number, month: number) {
     const today = new Date();
 
@@ -247,7 +344,7 @@ export async function getDashboardData(year: number, month: number) {
             .orderBy(desc(dailyCheckins.dateStr)),
 
         // 2. Workouts this week
-        db.select({ id: workouts.id })
+        db.select()
             .from(workouts)
             .where(gte(workouts.createdAt, startOfWeek)),
 
@@ -324,7 +421,7 @@ export async function getDashboardData(year: number, month: number) {
     // But since `analyticsRows` has all unique names + session counts, let's just query to calculate volumes for them 
     // Wait, the previous logic parsed everything. Let's do a more robust approach to volume calculation.
 
-    const allRelevantWorkouts = await db.select({ name: workouts.name, weight: workouts.weight, sets: workouts.sets }).from(workouts);
+    const allRelevantWorkouts = await db.select().from(workouts);
     const analyticsMap: Record<string, { sessions: number; volume: number }> = {};
 
     analyticsRows.forEach(row => {
@@ -348,6 +445,11 @@ export async function getDashboardData(year: number, month: number) {
         .sort((a, b) => parseFloat(b.volume) - parseFloat(a.volume))
         .slice(0, 5);
 
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const monthlyReview = buildReviewSummary(monthWorkouts, daysInMonth);
+    const weeklyReview = buildReviewSummary(weekWorkouts, 7);
+    const allTimeReview = buildReviewSummary(allRelevantWorkouts, getTrackedDays(allRelevantWorkouts));
+
     return {
         streak,
         workoutsThisWeek,
@@ -360,5 +462,12 @@ export async function getDashboardData(year: number, month: number) {
             bodyFat: daysSince(bm.bodyFat.latestDateStr),
         },
         profileHeight: profile.height,
+        profileTargets: {
+            weight: profile.targetWeight,
+            bodyFat: profile.targetBodyFat,
+        },
+        weeklyReview,
+        monthlyReview,
+        allTimeReview,
     };
 }
