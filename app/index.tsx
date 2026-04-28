@@ -15,7 +15,7 @@ import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
 
 import {
     addWorkout, updateWorkout, deleteWorkout,
-    checkinToday, checkinDate, getWorkoutsByDate, getStrengthPresets, isTodayCheckedIn, isDateCheckedIn, getCheckinByDate,
+    checkinDate, getWorkoutsByDate, getStrengthPresets, isDateCheckedIn, getCheckinByDate,
     type WorkoutItem, type StrengthPresetItem,
 } from "@/db/services/workout";
 import { estimateDailyCaloriesWithAI } from "@/db/services/ai";

@@ -22,12 +22,38 @@ export type StrengthPresetItem = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function getTodayDateStr(): string {
-    const now = new Date();
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, "0");
-    const dd = String(now.getDate()).padStart(2, "0");
+function toDateStr(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
+}
+
+function getTodayDateStr(): string {
+    return toDateStr(new Date());
+}
+
+function getDateBounds(dateStr: string): { startOfDay: Date; endOfDay: Date } {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    const startOfDay = new Date(y, m - 1, d, 0, 0, 0, 0);
+    const endOfDay = new Date(y, m - 1, d + 1, 0, 0, 0, 0);
+    return { startOfDay, endOfDay };
+}
+
+function buildWorkoutCreatedAt(forDate?: string): Date | undefined {
+    if (!forDate) return undefined;
+
+    const now = new Date();
+    const [y, m, d] = forDate.split("-").map(Number);
+    return new Date(
+        y,
+        m - 1,
+        d,
+        now.getHours(),
+        now.getMinutes(),
+        now.getSeconds(),
+        now.getMilliseconds()
+    );
 }
 
 function toWorkoutItem(row: {
@@ -68,9 +94,13 @@ export async function checkinToday(aiEstimatedCal?: number | null): Promise<void
     return checkinDate(dateStr, aiEstimatedCal);
 }
 
+export async function removeCheckinByDate(dateStr: string): Promise<void> {
+    await db.delete(dailyCheckins).where(eq(dailyCheckins.dateStr, dateStr));
+}
+
 export async function removeTodayCheckin(): Promise<void> {
     const dateStr = getTodayDateStr();
-    await db.delete(dailyCheckins).where(eq(dailyCheckins.dateStr, dateStr));
+    await removeCheckinByDate(dateStr);
 }
 
 export async function getCheckinsByMonth(
@@ -116,9 +146,7 @@ export async function getTodayWorkouts(): Promise<WorkoutItem[]> {
 
 /** 按任意日期字符串（YYYY-MM-DD）查询运动记录 */
 export async function getWorkoutsByDate(dateStr: string): Promise<WorkoutItem[]> {
-    const [y, m, d] = dateStr.split("-").map(Number);
-    const startOfDay = new Date(y, m - 1, d);
-    const endOfDay = new Date(y, m - 1, d + 1);
+    const { startOfDay, endOfDay } = getDateBounds(dateStr);
 
     const rows = await db
         .select()
@@ -158,12 +186,9 @@ export async function addWorkout(data: {
     /** 指定记录日期（YYYY-MM-DD），不传则使用当前时间 */
     forDate?: string;
 }): Promise<void> {
-    let createdAt: Date | undefined;
-    if (data.forDate) {
-        const [y, m, d] = data.forDate.split("-").map(Number);
-        // 存为当天正午 12:00，确保落在日期区间内
-        createdAt = new Date(y, m - 1, d, 12, 0, 0);
-    }
+    const targetDateStr = data.forDate ?? getTodayDateStr();
+    const createdAt = buildWorkoutCreatedAt(data.forDate);
+
     await db.insert(workouts).values({
         id: Crypto.randomUUID(),
         type: data.type,
@@ -173,11 +198,18 @@ export async function addWorkout(data: {
         stats: data.stats ?? null,
         ...(createdAt ? { createdAt } : {}),
     });
-    // 仅当修改今天的记录时才重置打卡
-    const todayStr = getTodayDateStr();
-    if (!data.forDate || data.forDate === todayStr) {
-        await removeTodayCheckin();
-    }
+
+    await removeCheckinByDate(targetDateStr);
+}
+
+async function getWorkoutDateStrById(id: string): Promise<string | null> {
+    const rows = await db
+        .select({ createdAt: workouts.createdAt })
+        .from(workouts)
+        .where(eq(workouts.id, id));
+
+    if (rows.length === 0) return null;
+    return toDateStr(new Date(rows[0].createdAt));
 }
 
 export async function updateWorkout(
@@ -190,6 +222,8 @@ export async function updateWorkout(
         stats?: string;
     }
 ): Promise<void> {
+    const workoutDateStr = await getWorkoutDateStrById(id);
+
     await db
         .update(workouts)
         .set({
@@ -199,12 +233,19 @@ export async function updateWorkout(
             stats: data.stats ?? null,
         })
         .where(eq(workouts.id, id));
-    await removeTodayCheckin();
+
+    if (workoutDateStr) {
+        await removeCheckinByDate(workoutDateStr);
+    }
 }
 
 export async function deleteWorkout(id: string): Promise<void> {
+    const workoutDateStr = await getWorkoutDateStrById(id);
     await db.delete(workouts).where(eq(workouts.id, id));
-    await removeTodayCheckin();
+
+    if (workoutDateStr) {
+        await removeCheckinByDate(workoutDateStr);
+    }
 }
 
 export async function getWorkoutsByMonth(
