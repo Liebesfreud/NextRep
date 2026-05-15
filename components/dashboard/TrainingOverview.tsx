@@ -68,6 +68,27 @@ function formatRate(rate: number) {
     return `${Math.round(rate * 100)}%`;
 }
 
+function formatWorkoutDetail(workout: DayWorkout) {
+    if (workout.type !== "strength") return workout.sets || "--";
+
+    if (!workout.sets) return workout.weight || "--";
+
+    try {
+        if (workout.sets.trim().startsWith("[")) {
+            const parsed = JSON.parse(workout.sets);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                const completedSets = parsed.filter((set: any) => set.isCompleted);
+                const visibleSets = completedSets.length > 0 ? completedSets : parsed;
+                const weightText = workout.weight ? `${workout.weight} · ` : "";
+                return `${weightText}${visibleSets.length} 组`;
+            }
+        }
+    } catch {
+        // Fall back to the stored text below.
+    }
+
+    return workout.sets;
+}
 function getMonthLabel(month: number) {
     return `${month + 1} 月`;
 }
@@ -356,7 +377,7 @@ export function TrainingOverview({
                                     </Text>
                                 </View>
                                 <Text style={{ color: colors.gray4 }} className="text-[11px] font-medium">
-                                    {workout.sets || "--"} 组
+                                    {formatWorkoutDetail(workout)}
                                 </Text>
                             </View>
                         ))}

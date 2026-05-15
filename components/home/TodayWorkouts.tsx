@@ -387,7 +387,7 @@ export function TodayWorkouts({
             )}
 
             {/* Check-in Button —— 仅今天且有记录 */}
-            {isToday && workouts.length > 0 && !isCheckedIn && (
+            {workouts.length > 0 && !isCheckedIn && (
                 <AnimatedPressable
                     onPress={handleCheckin}
                     disabled={isPending}
@@ -396,17 +396,17 @@ export function TodayWorkouts({
                 >
                     <CheckCircle size={18} color="#000" strokeWidth={2.5} />
                     <Text className="font-extrabold text-base tracking-widest text-black">
-                        {isPending ? "打卡中..." : "完成今日打卡"}
+                        {isPending ? "打卡中..." : isToday ? "完成今日打卡" : "补打卡"}
                     </Text>
                 </AnimatedPressable>
             )}
-            {isToday && isCheckedIn && (
+            {isCheckedIn && (
                 <View
                     style={{ backgroundColor: `${colors.green}1A`, borderColor: `${colors.green}33`, borderWidth: 1 }}
                     className="w-full py-4 rounded-bento-sm flex-row items-center justify-center gap-2"
                 >
                     <CheckCircle size={18} color={colors.green} strokeWidth={2.5} />
-                    <Text style={{ color: colors.green }} className="font-extrabold text-base tracking-widest">今日打卡已完成</Text>
+                    <Text style={{ color: colors.green }} className="font-extrabold text-base tracking-widest">{isToday ? "今日打卡已完成" : "已补打卡"}</Text>
                 </View>
             )}
 
