@@ -1,0 +1,172 @@
+import { View, Text, Pressable, ScrollView } from "react-native";
+import { type ReactNode } from "react";
+import { Activity, Calendar, Dumbbell, Target, TrendingUp, X } from "lucide-react-native";
+import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
+import { useTheme } from "@/hooks/useTheme";
+import { getStrengthCategoryVisual } from "@/constants/exerciseVisuals";
+import { type StrengthExerciseAnalytics } from "@/db/services/dashboard";
+
+type Props = {
+    visible: boolean;
+    exercise: StrengthExerciseAnalytics | null;
+    onClose: () => void;
+};
+
+function formatWeight(value: number | null | undefined) {
+    if (!value) return "--";
+    return Number.isInteger(value) ? `${value} kg` : `${value.toFixed(1)} kg`;
+}
+
+function formatVolume(value: number) {
+    if (!value) return "0 kg";
+    if (value >= 1000) return `${(value / 1000).toFixed(1)} t`;
+    return `${Math.round(value)} kg`;
+}
+
+function formatDate(dateStr: string | null | undefined) {
+    if (!dateStr) return "暂无记录";
+    return dateStr.slice(5).replace("-", "/");
+}
+
+function StatTile({
+    label,
+    value,
+    icon,
+}: {
+    label: string;
+    value: string;
+    icon: ReactNode;
+}) {
+    const { colors } = useTheme();
+
+    return (
+        <View style={{ width: "50%", padding: 5 }}>
+            <View style={{ backgroundColor: colors.gray2, borderColor: colors.border, borderWidth: 1, borderRadius: 12, padding: 12, minHeight: 82 }}>
+                <View className="flex-row items-center gap-1.5 mb-2">
+                    {icon}
+                    <Text style={{ color: colors.gray4 }} className="text-[11px] font-bold">
+                        {label}
+                    </Text>
+                </View>
+                <Text style={{ color: colors.white }} className="text-lg font-black" numberOfLines={1}>
+                    {value}
+                </Text>
+            </View>
+        </View>
+    );
+}
+
+export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
+    const { colors } = useTheme();
+
+    if (!exercise) return null;
+
+    const visual = getStrengthCategoryVisual(exercise.tag, colors);
+    const Icon = visual.icon;
+    const realBreakthroughs = exercise.breakthroughs.filter((item) => item.previousWeightKg !== null);
+    const recentHistory = exercise.history.slice(0, 6);
+    const recentBreakthroughs = exercise.breakthroughs.slice(0, 5);
+
+    return (
+        <BottomSheetModal
+            visible={visible}
+            onClose={onClose}
+            sheetHeight="82%"
+            backgroundColor={colors.bento}
+        >
+            <View className="flex-row justify-between items-start mb-5">
+                <View className="flex-row items-center gap-3 flex-1 pr-3">
+                    <View style={{ backgroundColor: visual.iconBg, width: 46, height: 46, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
+                        <Icon size={22} color={visual.accent} />
+                    </View>
+                    <View className="flex-1">
+                        <Text style={{ color: colors.white }} className="text-xl font-black" numberOfLines={1}>
+                            {exercise.name}
+                        </Text>
+                        <Text style={{ color: visual.accent }} className="text-xs font-bold mt-1">
+                            {exercise.tag || "力量训练"}
+                        </Text>
+                    </View>
+                </View>
+                <Pressable
+                    onPress={onClose}
+                    style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
+                >
+                    <X size={20} color={colors.gray4} />
+                </Pressable>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
+                <View style={{ marginHorizontal: -5, flexDirection: "row", flexWrap: "wrap", marginBottom: 8 }}>
+                    <StatTile label="历史最高" value={formatWeight(exercise.maxWeightKg)} icon={<Dumbbell size={14} color={visual.accent} />} />
+                    <StatTile label="重量突破" value={`${realBreakthroughs.length} 次`} icon={<TrendingUp size={14} color={colors.green} />} />
+                    <StatTile label="训练天数" value={`${exercise.trainingDays} 天`} icon={<Calendar size={14} color={colors.blue} />} />
+                    <StatTile label="累计容量" value={formatVolume(exercise.totalVolumeKg)} icon={<Target size={14} color={colors.orange} />} />
+                </View>
+
+                <View style={{ backgroundColor: colors.gray2, borderColor: colors.border, borderWidth: 1, borderRadius: 14, padding: 14, marginBottom: 12 }}>
+                    <View className="flex-row items-center justify-between mb-3">
+                        <Text style={{ color: colors.white }} className="text-sm font-black">最近训练</Text>
+                        <Text style={{ color: colors.gray4 }} className="text-xs font-bold">
+                            {formatDate(exercise.latestDateStr)}
+                        </Text>
+                    </View>
+                    {recentHistory.length === 0 ? (
+                        <View style={{ alignItems: "center", paddingVertical: 22 }}>
+                            <Activity size={28} color={colors.gray4} />
+                            <Text style={{ color: colors.gray4 }} className="text-sm font-bold mt-3">
+                                还没有训练记录
+                            </Text>
+                        </View>
+                    ) : (
+                        <View className="gap-2">
+                            {recentHistory.map((record, index) => (
+                                <View key={`${record.createdAt}-${index}`} className="flex-row items-center justify-between gap-3">
+                                    <View className="flex-1">
+                                        <Text style={{ color: colors.white }} className="text-sm font-bold">
+                                            {record.dateStr}
+                                        </Text>
+                                        <Text style={{ color: colors.gray4 }} className="text-xs font-semibold mt-0.5">
+                                            {record.setCount} 组 · {record.totalReps} 次 · {formatVolume(record.volumeKg)}
+                                        </Text>
+                                    </View>
+                                    <Text style={{ color: colors.white }} className="text-sm font-black">
+                                        {formatWeight(record.maxWeightKg)}
+                                    </Text>
+                                </View>
+                            ))}
+                        </View>
+                    )}
+                </View>
+
+                <View style={{ backgroundColor: colors.gray2, borderColor: colors.border, borderWidth: 1, borderRadius: 14, padding: 14 }}>
+                    <Text style={{ color: colors.white }} className="text-sm font-black mb-3">重量里程碑</Text>
+                    {recentBreakthroughs.length === 0 ? (
+                        <Text style={{ color: colors.gray4 }} className="text-sm font-bold py-2">
+                            有最高重量记录后会显示突破历程
+                        </Text>
+                    ) : (
+                        <View className="gap-2">
+                            {recentBreakthroughs.map((item, index) => (
+                                <View key={`${item.createdAt}-${index}`} className="flex-row items-center justify-between gap-3">
+                                    <View className="flex-1">
+                                        <Text style={{ color: colors.white }} className="text-sm font-bold">
+                                            {item.previousWeightKg === null ? "初始记录" : "刷新最高重量"}
+                                        </Text>
+                                        <Text style={{ color: colors.gray4 }} className="text-xs font-semibold mt-0.5">
+                                            {item.dateStr}
+                                            {item.previousWeightKg !== null ? ` · 从 ${formatWeight(item.previousWeightKg)} 到` : ""}
+                                        </Text>
+                                    </View>
+                                    <Text style={{ color: visual.accent }} className="text-sm font-black">
+                                        {formatWeight(item.weightKg)}
+                                    </Text>
+                                </View>
+                            ))}
+                        </View>
+                    )}
+                </View>
+            </ScrollView>
+        </BottomSheetModal>
+    );
+}
