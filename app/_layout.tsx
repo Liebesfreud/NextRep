@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Home, LayoutDashboard, Bot, Settings } from "lucide-react-native";
-import { View, Text, StyleSheet } from "react-native";
+import { Pressable, View, Text, StyleSheet } from "react-native";
 import { ThemeProvider, useTheme } from "@/hooks/useTheme";
 import { initDatabase } from "@/db/client";
 import * as SplashScreen from "expo-splash-screen";
@@ -17,16 +17,54 @@ SplashScreen.preventAutoHideAsync().catch(() => { });
 function TabLayout() {
     const { colors, theme } = useTheme();
     const [dbInitialized, setDbInitialized] = useState(false);
+    const [dbError, setDbError] = useState<string | null>(null);
+    const [retryKey, setRetryKey] = useState(0);
 
     useEffect(() => {
+        let cancelled = false;
+
         // Initialize SQLite tables on first launch
+        setDbError(null);
         initDatabase()
             .then(() => {
+                if (cancelled) return;
                 setDbInitialized(true);
                 SplashScreen.hideAsync().catch(console.warn);
             })
-            .catch(console.error);
-    }, []);
+            .catch((error) => {
+                if (cancelled) return;
+                console.error(error);
+                setDbError(error?.message || "数据库初始化失败，请重试。");
+                SplashScreen.hideAsync().catch(console.warn);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [retryKey]);
+
+    if (dbError) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center", padding: 24, backgroundColor: colors.bg }}>
+                <StatusBar style={theme === "dark" ? "light" : "dark"} />
+                <Text style={{ color: colors.white, fontSize: 22, fontWeight: "900", marginBottom: 10 }}>
+                    启动失败
+                </Text>
+                <Text style={{ color: colors.gray4, fontSize: 14, lineHeight: 22, marginBottom: 20 }}>
+                    {dbError}
+                </Text>
+                <Pressable
+                    onPress={() => {
+                        setDbInitialized(false);
+                        setRetryKey((prev) => prev + 1);
+                    }}
+                    style={{ alignSelf: "flex-start", backgroundColor: colors.green, borderRadius: 12, paddingHorizontal: 18, paddingVertical: 12 }}
+                >
+                    <Text style={{ color: colors.bg, fontSize: 14, fontWeight: "900" }}>重试</Text>
+                </Pressable>
+            </View>
+        );
+    }
 
     if (!dbInitialized) return null;
 

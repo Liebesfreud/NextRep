@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { View, ScrollView } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
@@ -17,6 +17,8 @@ type DashboardData = Awaited<ReturnType<typeof getDashboardData>>;
 
 export default function DashboardScreen() {
     const { colors } = useTheme();
+    const mountedRef = useRef(true);
+    const loadSeqRef = useRef(0);
     const todayNum = new Date().getDate();
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
@@ -28,18 +30,38 @@ export default function DashboardScreen() {
     const [loading, setLoading] = useState(true);
     const [expandedMetric, setExpandedMetric] = useState<"weight" | "bodyFat" | null>(null);
 
+    useEffect(() => {
+        return () => {
+            mountedRef.current = false;
+            loadSeqRef.current += 1;
+        };
+    }, []);
+
     const loadData = useCallback(async () => {
+        if (!mountedRef.current) return;
+
+        const requestId = ++loadSeqRef.current;
         setLoading(true);
         try {
             const res = await getDashboardData(currentYear, currentMonth);
+            if (!mountedRef.current || requestId !== loadSeqRef.current) return;
             setData(res);
+        } catch (error) {
+            console.error(error);
         } finally {
-            setLoading(false);
-            SplashScreen.hideAsync().catch(() => { });
+            if (mountedRef.current && requestId === loadSeqRef.current) {
+                setLoading(false);
+                SplashScreen.hideAsync().catch(() => { });
+            }
         }
     }, [currentYear, currentMonth]);
 
-    useFocusEffect(useCallback(() => { loadData(); }, [loadData]));
+    useFocusEffect(useCallback(() => {
+        loadData();
+        return () => {
+            loadSeqRef.current += 1;
+        };
+    }, [loadData]));
 
     const handleSaveMetric = async (metricType: "weight" | "bodyFat", valueStr: string, dateStr: string) => {
         const value = Number(valueStr);

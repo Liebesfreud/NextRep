@@ -1,6 +1,6 @@
 import { db } from "../client";
 import { workouts, dailyCheckins, bodyMetrics } from "../schema";
-import { gte, lt, and, asc, desc, sql } from "drizzle-orm";
+import { gte, lt, and, desc } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
 import { getUserProfile } from "./profile";
 
@@ -50,6 +50,14 @@ type ReviewPeriodSummary = {
     averageVolumePerWorkoutKg: number;
     consistencyRate: number;
     summary: string;
+};
+
+type WorkoutSummaryRow = {
+    name: string;
+    type: string;
+    weight: string | null;
+    sets: string | null;
+    createdAt: Date;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -245,7 +253,7 @@ function calculateVolume(weight: string | null, sets: string | null): number {
 }
 
 function buildReviewSummary(
-    periodWorkouts: Array<{ name: string; type: string; weight: string | null; sets: string | null; createdAt: Date }>,
+    periodWorkouts: WorkoutSummaryRow[],
     expectedDays: number
 ): ReviewPeriodSummary {
     const activeDaySet = new Set<string>();
@@ -313,6 +321,12 @@ function getTrackedDays(periodWorkouts: Array<{ createdAt: Date }>): number {
     return Math.max(1, Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1);
 }
 
+function estimateDailyDurationMinutes(workoutCount: number, volumeKg: number): number {
+    if (workoutCount <= 0) return 0;
+    const volumeMinutes = Math.min(30, Math.floor(volumeKg / 500));
+    return workoutCount * 12 + volumeMinutes;
+}
+
 export async function getDashboardData(year: number, month: number) {
     const today = new Date();
 
@@ -333,7 +347,7 @@ export async function getDashboardData(year: number, month: number) {
         allCheckins,
         weekWorkouts,
         monthWorkouts,
-        analyticsRows,
+        allReviewWorkouts,
         bm,
         profile,
     ] = await Promise.all([
@@ -344,24 +358,38 @@ export async function getDashboardData(year: number, month: number) {
             .orderBy(desc(dailyCheckins.dateStr)),
 
         // 2. Workouts this week
-        db.select()
+        db.select({
+            name: workouts.name,
+            type: workouts.type,
+            weight: workouts.weight,
+            sets: workouts.sets,
+            createdAt: workouts.createdAt,
+        })
             .from(workouts)
             .where(gte(workouts.createdAt, startOfWeek)),
 
         // 3. Monthly data
-        db.select()
+        db.select({
+            id: workouts.id,
+            name: workouts.name,
+            type: workouts.type,
+            weight: workouts.weight,
+            sets: workouts.sets,
+            createdAt: workouts.createdAt,
+        })
             .from(workouts)
             .where(and(gte(workouts.createdAt, startOfMonth), lt(workouts.createdAt, endOfMonth))),
 
-        // 4. Content Analytics - Uses SQLite group by instead of JS memory aggregation
+        // 4. All-time review and analytics need volume parsing, so keep only required columns.
         db.select({
             name: workouts.name,
-            sessions: sql<number>`cast(count(${workouts.id}) as integer)`,
-            // We'll calculate volume post-query since it relies on JS logic (calculateVolume), 
-            // but doing it grouped by name limits the result set massively.
+            type: workouts.type,
+            weight: workouts.weight,
+            sets: workouts.sets,
+            createdAt: workouts.createdAt,
         })
             .from(workouts)
-            .groupBy(workouts.name),
+            .orderBy(workouts.createdAt),
 
         // 5. Body Metrics
         getBodyMetricsSummary(),
@@ -399,12 +427,16 @@ export async function getDashboardData(year: number, month: number) {
                 isWorkout: true,
                 workouts: [],
                 volume: 0,
-                duration: Math.floor(Math.random() * 30) + 30, // Mock duration
+                duration: 0,
             };
         }
         const vol = calculateVolume(w.weight, w.sets);
         monthlyVolumeKg += vol;
         dailyData[day].volume += vol;
+        dailyData[day].duration = estimateDailyDurationMinutes(
+            dailyData[day].workouts.length + 1,
+            dailyData[day].volume
+        );
         dailyData[day].workouts.push({
             id: w.id,
             name: w.name,
@@ -414,24 +446,13 @@ export async function getDashboardData(year: number, month: number) {
         });
     });
 
-    // We still have to run through all workouts to compute accurate volume 
-    // due to the custom logic of calculateVolume, but we pull ONLY what's needed for the 5 biggest grouped sessions.
-    // To do this fully in SQL requires a complex string sum on weight and sets, which is unreliable across databases,
-    // so we will query only the rows matching the top groups if necessary, or just query all like before but ONLY map the volume
-    // But since `analyticsRows` has all unique names + session counts, let's just query to calculate volumes for them 
-    // Wait, the previous logic parsed everything. Let's do a more robust approach to volume calculation.
-
-    const allRelevantWorkouts = await db.select().from(workouts);
     const analyticsMap: Record<string, { sessions: number; volume: number }> = {};
 
-    analyticsRows.forEach(row => {
-        analyticsMap[row.name] = { sessions: row.sessions, volume: 0 };
-    });
-
-    allRelevantWorkouts.forEach(w => {
-        if (analyticsMap[w.name]) {
-            analyticsMap[w.name].volume += calculateVolume(w.weight, w.sets);
-        }
+    allReviewWorkouts.forEach(w => {
+        const current = analyticsMap[w.name] ?? { sessions: 0, volume: 0 };
+        current.sessions += 1;
+        current.volume += calculateVolume(w.weight, w.sets);
+        analyticsMap[w.name] = current;
     });
 
     const analytics = Object.entries(analyticsMap)
@@ -448,7 +469,7 @@ export async function getDashboardData(year: number, month: number) {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const monthlyReview = buildReviewSummary(monthWorkouts, daysInMonth);
     const weeklyReview = buildReviewSummary(weekWorkouts, 7);
-    const allTimeReview = buildReviewSummary(allRelevantWorkouts, getTrackedDays(allRelevantWorkouts));
+    const allTimeReview = buildReviewSummary(allReviewWorkouts, getTrackedDays(allReviewWorkouts));
 
     return {
         streak,

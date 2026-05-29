@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { getUserProfile, updateUserProfile, type UserProfileData } from "@/db/services/profile";
@@ -14,6 +14,7 @@ import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
 
 export default function SettingsScreen() {
     const { colors } = useTheme();
+    const mountedRef = useRef(true);
     const [isSaved, setIsSaved] = useState(false);
     const [isPending, setIsPending] = useState(false);
 
@@ -36,20 +37,32 @@ export default function SettingsScreen() {
     });
 
     useEffect(() => {
-        getUserProfile().then((p) => {
-            setProfile(p);
-            SplashScreen.hideAsync().catch(() => { });
-        });
+        getUserProfile()
+            .then((p) => {
+                if (!mountedRef.current) return;
+                setProfile(p);
+            })
+            .catch(console.error)
+            .finally(() => {
+                if (mountedRef.current) SplashScreen.hideAsync().catch(() => { });
+            });
+
+        return () => {
+            mountedRef.current = false;
+        };
     }, []);
 
     const handleSave = async () => {
         setIsPending(true);
         try {
             await updateUserProfile(profile);
+            if (!mountedRef.current) return;
             setIsSaved(true);
-            setTimeout(() => setIsSaved(false), 2000);
+            setTimeout(() => {
+                if (mountedRef.current) setIsSaved(false);
+            }, 2000);
         } finally {
-            setIsPending(false);
+            if (mountedRef.current) setIsPending(false);
         }
     };
 

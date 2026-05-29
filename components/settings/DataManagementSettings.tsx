@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { View, Text, Alert } from "react-native";
 import { Database, Download, Upload, Trash2, ChevronRight } from "lucide-react-native";
 import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
@@ -15,14 +16,16 @@ type ActionRowProps = {
     labelColor: string;
     descColor: string;
     onPress: () => void;
+    disabled?: boolean;
     isLast?: boolean;
     colors: any;
 };
 
-function ActionRow({ icon, iconBg, label, desc, labelColor, descColor, onPress, isLast, colors }: ActionRowProps) {
+function ActionRow({ icon, iconBg, label, desc, labelColor, descColor, onPress, disabled, isLast, colors }: ActionRowProps) {
     return (
         <AnimatedPressable
             onPress={onPress}
+            disabled={disabled}
             style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -30,6 +33,7 @@ function ActionRow({ icon, iconBg, label, desc, labelColor, descColor, onPress, 
                 paddingVertical: 13,
                 borderBottomWidth: isLast ? 0 : 1,
                 borderBottomColor: colors.border,
+                opacity: disabled ? 0.5 : 1,
             }}
         >
             <View style={{
@@ -51,8 +55,12 @@ function ActionRow({ icon, iconBg, label, desc, labelColor, descColor, onPress, 
 
 export function DataManagementSettings() {
     const { colors } = useTheme();
+    const [pendingAction, setPendingAction] = useState<"export" | "import" | "clear" | null>(null);
+    const isPending = pendingAction !== null;
 
     const handleExport = async () => {
+        if (isPending) return;
+        setPendingAction("export");
         try {
             const data = await exportAllData();
             const json = JSON.stringify(data, null, 2);
@@ -62,42 +70,74 @@ export function DataManagementSettings() {
             await FileSystem.writeAsStringAsync(path, json, { encoding: FileSystem.EncodingType.UTF8 });
             await Sharing.shareAsync(path, { mimeType: "application/json", dialogTitle: "导出 NextRep 数据" });
         } catch (e: any) {
-            Alert.alert("导出失败", e.message);
+            Alert.alert("导出失败", e?.message || "导出过程中发生错误，请稍后再试");
+        } finally {
+            setPendingAction(null);
         }
     };
 
     const handleImport = async () => {
+        if (isPending) return;
+        setPendingAction("import");
         try {
             const result = await DocumentPicker.getDocumentAsync({ type: "application/json" });
-            if (result.canceled) return;
+            if (result.canceled) {
+                setPendingAction(null);
+                return;
+            }
             const content = await FileSystem.readAsStringAsync(result.assets[0].uri);
             const data = JSON.parse(content);
-            Alert.alert("确认导入", "确定要导入数据吗？这将覆盖当前的所有数据且不可撤销。", [
-                { text: "取消", style: "cancel" },
-                {
-                    text: "确认导入", style: "destructive",
-                    onPress: async () => {
-                        await importAllData(data);
-                        Alert.alert("导入成功", "数据已成功恢复");
+            Alert.alert(
+                "确认导入",
+                "确定要导入数据吗？这将覆盖当前的所有数据且不可撤销。",
+                [
+                    { text: "取消", style: "cancel", onPress: () => setPendingAction(null) },
+                    {
+                        text: "确认导入", style: "destructive",
+                        onPress: async () => {
+                            try {
+                                await importAllData(data);
+                                Alert.alert("导入成功", "数据已成功恢复");
+                            } catch (e: any) {
+                                Alert.alert("导入失败", e?.message || "导入过程中发生错误，请稍后再试");
+                            } finally {
+                                setPendingAction(null);
+                            }
+                        },
                     },
-                },
-            ]);
+                ],
+                { onDismiss: () => setPendingAction(null) },
+            );
         } catch (e: any) {
             Alert.alert("导入失败", "文件格式不正确");
+            setPendingAction(null);
         }
     };
 
     const handleClear = () => {
-        Alert.alert("⚠️ 清空数据", "确定要清空所有数据吗？此操作无法恢复！", [
-            { text: "取消", style: "cancel" },
-            {
-                text: "确认清空", style: "destructive",
-                onPress: async () => {
-                    await clearDatabase();
-                    Alert.alert("已完成", "所有数据已清空");
+        if (isPending) return;
+        setPendingAction("clear");
+        Alert.alert(
+            "⚠️ 清空数据",
+            "确定要清空所有数据吗？此操作无法恢复！",
+            [
+                { text: "取消", style: "cancel", onPress: () => setPendingAction(null) },
+                {
+                    text: "确认清空", style: "destructive",
+                    onPress: async () => {
+                        try {
+                            await clearDatabase();
+                            Alert.alert("已完成", "所有数据已清空");
+                        } catch (e: any) {
+                            Alert.alert("清空失败", e?.message || "清空数据时发生错误，请稍后再试");
+                        } finally {
+                            setPendingAction(null);
+                        }
+                    },
                 },
-            },
-        ]);
+            ],
+            { onDismiss: () => setPendingAction(null) },
+        );
     };
 
     return (
@@ -128,6 +168,7 @@ export function DataManagementSettings() {
                 labelColor={colors.white}
                 descColor={colors.gray4}
                 onPress={handleExport}
+                disabled={isPending}
                 colors={colors}
             />
             <ActionRow
@@ -138,6 +179,7 @@ export function DataManagementSettings() {
                 labelColor={colors.white}
                 descColor={colors.gray4}
                 onPress={handleImport}
+                disabled={isPending}
                 colors={colors}
             />
             <ActionRow
@@ -148,6 +190,7 @@ export function DataManagementSettings() {
                 labelColor={colors.red}
                 descColor={`${colors.red}88`}
                 onPress={handleClear}
+                disabled={isPending}
                 isLast
                 colors={colors}
             />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, Alert, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, Alert, KeyboardAvoidingView, Platform, FlatList } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { Dumbbell, Plus, Trash2, ChevronLeft, Search } from "lucide-react-native";
 import { useRouter } from "expo-router";
@@ -58,6 +58,47 @@ export default function ExerciseManagementScreen() {
     };
 
     const filteredPresets = presets.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const renderPresetItem = ({ item: p }: { item: StrengthPresetItem }) => {
+        const visual = getStrengthCategoryVisual(p.tag, colors);
+        const Icon = visual.icon;
+
+        return (
+            <View
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingVertical: 16,
+                    paddingHorizontal: 14,
+                    borderWidth: 0.75,
+                    borderColor: `${visual.accent}26`,
+                    borderRadius: 18,
+                    backgroundColor: visual.cardBg ?? colors.gray2,
+                    marginBottom: 10,
+                }}
+            >
+                <View style={{ backgroundColor: visual.iconBg, width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 16 }}>
+                    <Icon size={20} color={visual.accent} />
+                </View>
+                <View style={{ flex: 1 }}>
+                    <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold", marginBottom: 6 }}>{p.name}</Text>
+                    <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>
+                        {p.tag || "力量训练"}
+                    </Text>
+                </View>
+                <Pressable onPress={() => handleDelete(p.name)} style={{ padding: 8, marginLeft: 8 }}>
+                    <Trash2 size={20} color={`${colors.red}99`} />
+                </Pressable>
+            </View>
+        );
+    };
+
+    const renderEmptyList = () => (
+        <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40, opacity: 0.5 }}>
+            <Dumbbell size={40} color={colors.gray4} style={{ marginBottom: 12 }} />
+            <Text style={{ color: colors.gray4, fontWeight: "bold" }}>列表空空如也</Text>
+        </View>
+    );
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -141,48 +182,13 @@ export default function ExerciseManagementScreen() {
                 </AnimatedEnter>
 
                 <AnimatedEnter delay={120} distance={14} style={{ flex: 1 }}>
-                    <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}>
-                        {filteredPresets.map((p, i) => {
-                            const visual = getStrengthCategoryVisual(p.tag, colors);
-                            const Icon = visual.icon;
-
-                            return (
-                                <View
-                                    key={i}
-                                    style={{
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        paddingVertical: 16,
-                                        paddingHorizontal: 14,
-                                        borderWidth: 0.75,
-                                        borderColor: `${visual.accent}26`,
-                                        borderRadius: 18,
-                                        backgroundColor: visual.cardBg ?? colors.gray2,
-                                        marginBottom: 10,
-                                    }}
-                                >
-                                    <View style={{ backgroundColor: visual.iconBg, width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 16 }}>
-                                        <Icon size={20} color={visual.accent} />
-                                    </View>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold", marginBottom: 6 }}>{p.name}</Text>
-                                        <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>
-                                            {p.tag || "力量训练"}
-                                        </Text>
-                                    </View>
-                                    <Pressable onPress={() => handleDelete(p.name)} style={{ padding: 8, marginLeft: 8 }}>
-                                        <Trash2 size={20} color={`${colors.red}99`} />
-                                    </Pressable>
-                                </View>
-                            );
-                        })}
-                        {filteredPresets.length === 0 && (
-                            <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40, opacity: 0.5 }}>
-                                <Dumbbell size={40} color={colors.gray4} style={{ marginBottom: 12 }} />
-                                <Text style={{ color: colors.gray4, fontWeight: "bold" }}>列表空空如也</Text>
-                            </View>
-                        )}
-                    </ScrollView>
+                    <FlatList
+                        data={filteredPresets}
+                        keyExtractor={(item) => item.name}
+                        renderItem={renderPresetItem}
+                        ListEmptyComponent={renderEmptyList}
+                        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}
+                    />
                 </AnimatedEnter>
             </View>
         </KeyboardAvoidingView>

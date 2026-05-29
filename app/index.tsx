@@ -50,6 +50,8 @@ function parseKcal(stats: string | null): number {
 export default function HomeScreen() {
     const { colors } = useTheme();
     const confettiRef = useRef<any>(null);
+    const mountedRef = useRef(true);
+    const loadSeqRef = useRef(0);
 
     const [greeting, setGreeting] = useState("你好");
     const [userName, setUserName] = useState("健身达人");
@@ -76,25 +78,46 @@ export default function HomeScreen() {
 
     // ─── Load Data ─────────────────────────────────────────────────────────────
 
-    const loadData = useCallback(async () => {
-        const [ws, presets, checkedIn, profile, checkinData] = await Promise.all([
-            getWorkoutsByDate(selectedDate),
-            getStrengthPresets(),
-            isDateCheckedIn(selectedDate),
-            getUserProfile(),
-            getCheckinByDate(selectedDate),
-        ]);
-        setWorkouts(ws);
-        setStrengthPresets(presets);
-        setIsCheckedIn(checkedIn);
-        setUserName(profile.name);
-        setAiEstimatedCal(checkinData?.aiEstimatedCal ?? null);
-        SplashScreen.hideAsync().catch(() => { });
+    useEffect(() => {
+        return () => {
+            mountedRef.current = false;
+            loadSeqRef.current += 1;
+        };
+    }, []);
+
+    const loadData = useCallback(async (dateStr = selectedDate) => {
+        if (!mountedRef.current) return;
+
+        const requestId = ++loadSeqRef.current;
+        try {
+            const [ws, presets, checkedIn, profile, checkinData] = await Promise.all([
+                getWorkoutsByDate(dateStr),
+                getStrengthPresets(),
+                isDateCheckedIn(dateStr),
+                getUserProfile(),
+                getCheckinByDate(dateStr),
+            ]);
+            if (!mountedRef.current || requestId !== loadSeqRef.current) return;
+            setWorkouts(ws);
+            setStrengthPresets(presets);
+            setIsCheckedIn(checkedIn);
+            setUserName(profile.name);
+            setAiEstimatedCal(checkinData?.aiEstimatedCal ?? null);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            if (mountedRef.current && requestId === loadSeqRef.current) {
+                SplashScreen.hideAsync().catch(() => { });
+            }
+        }
     }, [selectedDate]);
 
     useFocusEffect(useCallback(() => {
-        loadData();
-    }, [loadData]));
+        loadData(selectedDate);
+        return () => {
+            loadSeqRef.current += 1;
+        };
+    }, [loadData, selectedDate]));
 
     // 切换日期时重新加载
     const handleDateChange = (dateStr: string) => {
@@ -133,9 +156,9 @@ export default function HomeScreen() {
             if (editingWorkout) await updateWorkout(editingWorkout.id, payload);
             else await addWorkout({ ...payload, forDate: selectedDate });
             closeModal();
-            await loadData();
+            await loadData(selectedDate);
         } finally {
-            setIsPending(false);
+            if (mountedRef.current) setIsPending(false);
         }
     };
 
@@ -144,9 +167,9 @@ export default function HomeScreen() {
         try {
             await deleteWorkout(id);
             closeModal();
-            await loadData();
+            await loadData(selectedDate);
         } finally {
-            setIsPending(false);
+            if (mountedRef.current) setIsPending(false);
         }
     };
 
@@ -161,14 +184,14 @@ export default function HomeScreen() {
                 } catch {
                     // fall through
                 } finally {
-                    setIsAiPredicting(false);
+                    if (mountedRef.current) setIsAiPredicting(false);
                 }
             }
             await checkinDate(selectedDate, aiCal);
             confettiRef.current?.start();
-            await loadData();
+            await loadData(selectedDate);
         } finally {
-            setIsPending(false);
+            if (mountedRef.current) setIsPending(false);
         }
     };
 

@@ -186,20 +186,43 @@ export async function addWorkout(data: {
     /** 指定记录日期（YYYY-MM-DD），不传则使用当前时间 */
     forDate?: string;
 }): Promise<void> {
-    const targetDateStr = data.forDate ?? getTodayDateStr();
-    const createdAt = buildWorkoutCreatedAt(data.forDate);
+    const { forDate, ...item } = data;
+    await addWorkouts([item], forDate);
+}
 
-    await db.insert(workouts).values({
-        id: Crypto.randomUUID(),
-        type: data.type,
-        name: data.name,
-        weight: data.weight ?? null,
-        sets: data.sets ?? null,
-        stats: data.stats ?? null,
-        ...(createdAt ? { createdAt } : {}),
+export type AddWorkoutItem = {
+    type: "strength" | "cardio";
+    name: string;
+    weight?: string;
+    sets?: string;
+    stats?: string;
+};
+
+export async function addWorkouts(items: AddWorkoutItem[], forDate?: string): Promise<void> {
+    if (items.length === 0) return;
+
+    const targetDateStr = forDate ?? getTodayDateStr();
+    const createdAt = buildWorkoutCreatedAt(forDate);
+
+    await db.transaction(async (tx) => {
+        for (const item of items) {
+            await tx.insert(workouts).values({
+                id: Crypto.randomUUID(),
+                type: item.type,
+                name: item.name,
+                weight: item.weight ?? null,
+                sets: item.sets ?? null,
+                stats: item.stats ?? null,
+                ...(createdAt ? { createdAt } : {}),
+            });
+        }
+
+        await tx.delete(dailyCheckins).where(eq(dailyCheckins.dateStr, targetDateStr));
     });
+}
 
-    await removeCheckinByDate(targetDateStr);
+export async function addWorkoutsForDate(items: AddWorkoutItem[], dateStr: string): Promise<void> {
+    await addWorkouts(items, dateStr);
 }
 
 async function getWorkoutDateStrById(id: string): Promise<string | null> {

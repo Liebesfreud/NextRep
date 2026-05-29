@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, ScrollView, TextInput, Alert, Keyboard } from "react-native";
+import { View, Text, Pressable, ScrollView, TextInput, Alert, Keyboard, FlatList } from "react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, Dumbbell, Trash2, Plus, Check, Search, Library } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
-import { type WorkoutItem, type StrengthPresetItem, removeStrengthPreset, addStrengthPreset } from "@/db/services/workout";
+import { type WorkoutItem, type StrengthPresetItem } from "@/db/services/workout";
 import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
 import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 
@@ -204,6 +204,54 @@ export function StrengthModal({
         ]);
     };
 
+    const renderExerciseItem = ({ item: ex }: { item: StrengthPresetItem }) => {
+        const visual = getStrengthCategoryVisual(ex.tag, colors);
+        const Icon = visual.icon;
+
+        return (
+            <Pressable
+                onPress={() => {
+                    setSelectedExercise(ex.name);
+                    setModalStep("form");
+                }}
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingVertical: 12,
+                    paddingHorizontal: 12,
+                    borderWidth: 0.75,
+                    borderColor: `${visual.accent}26`,
+                    backgroundColor: visual.cardBg ?? colors.gray2,
+                    borderRadius: 18,
+                    marginBottom: 10,
+                }}
+            >
+                <View style={{ backgroundColor: visual.iconBg, width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 16 }}>
+                    <Icon size={20} color={visual.accent} />
+                </View>
+                <View style={{ flex: 1, justifyContent: "center" }}>
+                    <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold", marginBottom: 6 }}>{ex.name}</Text>
+                    <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>
+                        {ex.tag || "力量训练"}
+                    </Text>
+                </View>
+                <Plus size={20} color={visual.accent} style={{ opacity: 0.7, marginLeft: 8 }} />
+            </Pressable>
+        );
+    };
+
+    const renderExerciseEmpty = () => (
+        <View style={{ paddingVertical: 48, alignItems: "center", justifyContent: "center", opacity: 0.6 }}>
+            <Dumbbell size={40} color={colors.gray4} style={{ marginBottom: 16 }} />
+            <Text style={{ color: colors.gray4, fontSize: 14, fontWeight: "bold", textAlign: "center", marginBottom: 8 }}>
+                没有找到相关动作
+            </Text>
+            <Text style={{ color: colors.gray4, fontSize: 12, textAlign: "center" }}>
+                请前往“设置 {'->'} 数据与备份”新增你的自定义动作库
+            </Text>
+        </View>
+    );
+
     return (
         <BottomSheetModal
             visible={visible}
@@ -310,58 +358,16 @@ export function StrengthModal({
                             </ScrollView>
                         </View>
 
-                        {/* FlatList of Exercises */}
-                        <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, marginHorizontal: -24, paddingHorizontal: 24 }} keyboardShouldPersistTaps="handled">
-                            {filteredPresets.map((ex, i) => {
-                                const visual = getStrengthCategoryVisual(ex.tag, colors);
-                                const Icon = visual.icon;
-
-                                return (
-                                    <Pressable
-                                        key={i}
-                                        onPress={() => {
-                                            setSelectedExercise(ex.name);
-                                            setModalStep("form");
-                                        }}
-                                        style={{
-                                            flexDirection: "row",
-                                            alignItems: "center",
-                                            paddingVertical: 12,
-                                            paddingHorizontal: 12,
-                                            borderWidth: 0.75,
-                                            borderColor: `${visual.accent}26`,
-                                            backgroundColor: visual.cardBg ?? colors.gray2,
-                                            borderRadius: 18,
-                                            marginBottom: 10,
-                                        }}
-                                    >
-                                        <View style={{ backgroundColor: visual.iconBg, width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 16 }}>
-                                            <Icon size={20} color={visual.accent} />
-                                        </View>
-                                        <View style={{ flex: 1, justifyContent: "center" }}>
-                                            <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold", marginBottom: 6 }}>{ex.name}</Text>
-                                            <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>
-                                                {ex.tag || "力量训练"}
-                                            </Text>
-                                        </View>
-                                        <Plus size={20} color={visual.accent} style={{ opacity: 0.7, marginLeft: 8 }} />
-                                    </Pressable>
-                                );
-                            })}
-
-                            {filteredPresets.length === 0 && (
-                                <View style={{ paddingVertical: 48, alignItems: "center", justifyContent: "center", opacity: 0.6 }}>
-                                    <Dumbbell size={40} color={colors.gray4} style={{ marginBottom: 16 }} />
-                                    <Text style={{ color: colors.gray4, fontSize: 14, fontWeight: "bold", textAlign: "center", marginBottom: 8 }}>
-                                        没有找到相关动作
-                                    </Text>
-                                    <Text style={{ color: colors.gray4, fontSize: 12, textAlign: "center" }}>
-                                        请前往“设置 {'->'} 数据与备份”新增你的自定义动作库
-                                    </Text>
-                                </View>
-                            )}
-                            <View style={{ height: 100 }} />
-                        </ScrollView>
+                        <FlatList
+                            data={filteredPresets}
+                            keyExtractor={(item) => item.name}
+                            renderItem={renderExerciseItem}
+                            ListEmptyComponent={renderExerciseEmpty}
+                            showsVerticalScrollIndicator={false}
+                            keyboardShouldPersistTaps="handled"
+                            style={{ flex: 1, marginHorizontal: -24 }}
+                            contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 100 }}
+                        />
                     </View>
                 ) : (
                     <View style={{ flex: 1 }}>

@@ -1,6 +1,32 @@
 import { getUserProfile, recordAITokens } from "./profile";
 import type { WorkoutItem } from "./workout";
 
+const DEFAULT_AI_TIMEOUT_MS = 30000;
+const AI_TEST_TIMEOUT_MS = 15000;
+
+function resolveChatEndpoint(baseUrl: string): string {
+    if (baseUrl.endsWith("/chat/completions")) return baseUrl;
+    return baseUrl.endsWith("/") ? `${baseUrl}chat/completions` : `${baseUrl}/chat/completions`;
+}
+
+function getFetchErrorMessage(error: any): string {
+    if (error?.name === "AbortError") return "请求超时，请检查网络或稍后再试。";
+    return error?.message || "网络请求失败，请稍后再试。";
+}
+
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs = DEFAULT_AI_TIMEOUT_MS): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+        return await fetch(url, { ...init, signal: controller.signal });
+    } catch (error: any) {
+        throw new Error(getFetchErrorMessage(error));
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}
+
 // ─── AI Connection Testing ────────────────────────────────────────────────────
 
 export async function testAIConnection(baseUrl: string, apiKey: string, model: string): Promise<boolean> {
@@ -10,13 +36,10 @@ export async function testAIConnection(baseUrl: string, apiKey: string, model: s
     const testModel = (model || "gpt-4o").trim();
     const cleanApiKey = apiKey.trim();
 
-    let endpoint = testBaseUrl;
-    if (!endpoint.endsWith("/chat/completions")) {
-        endpoint = endpoint.endsWith("/") ? `${endpoint}chat/completions` : `${endpoint}/chat/completions`;
-    }
+    const endpoint = resolveChatEndpoint(testBaseUrl);
 
     try {
-        const response = await fetch(endpoint, {
+        const response = await fetchWithTimeout(endpoint, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -27,16 +50,16 @@ export async function testAIConnection(baseUrl: string, apiKey: string, model: s
                 messages: [{ role: "user", content: "hi" }],
                 max_tokens: 5,
             }),
-        });
+        }, AI_TEST_TIMEOUT_MS);
 
         if (!response.ok) {
-            const err = await response.text();
-            throw new Error(`请求失败: ${response.status} ${response.statusText}`);
+            const err = await response.text().catch(() => "");
+            throw new Error(`请求失败: ${response.status} ${response.statusText}${err ? ` - ${err.slice(0, 120)}` : ""}`);
         }
 
         return true;
     } catch (e: any) {
-        throw new Error(`连接测试失败: ${e.message}`);
+        throw new Error(`连接测试失败: ${getFetchErrorMessage(e)}`);
     }
 }
 
@@ -62,10 +85,7 @@ export async function chatWithAI(
     const model = (resolvedConfig.model || "gpt-4o").trim();
     const cleanApiKey = resolvedConfig.apiKey.trim();
     
-    let endpoint = baseUrl;
-    if (!endpoint.endsWith("/chat/completions")) {
-        endpoint = endpoint.endsWith("/") ? `${endpoint}chat/completions` : `${endpoint}/chat/completions`;
-    }
+    const endpoint = resolveChatEndpoint(baseUrl);
 
     const workoutsSummary = recentWorkouts
         .map(
@@ -108,7 +128,7 @@ ${metricsSummary || "暂无最新指标"}
         { role: "user", content: userMessage },
     ];
 
-    const response = await fetch(endpoint, {
+    const response = await fetchWithTimeout(endpoint, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -118,8 +138,8 @@ ${metricsSummary || "暂无最新指标"}
     });
 
     if (!response.ok) {
-        const err = await response.text();
-        throw new Error(`AI 请求失败: ${response.status} ${response.statusText}`);
+        const err = await response.text().catch(() => "");
+        throw new Error(`AI 请求失败: ${response.status} ${response.statusText}${err ? ` - ${err.slice(0, 120)}` : ""}`);
     }
 
     const data = await response.json();
@@ -150,10 +170,7 @@ export async function estimateDailyCaloriesWithAI(
     const model = (resolvedConfig.model || "gpt-4o").trim();
     const cleanApiKey = resolvedConfig.apiKey.trim();
 
-    let endpoint = baseUrl;
-    if (!endpoint.endsWith("/chat/completions")) {
-        endpoint = endpoint.endsWith("/") ? `${endpoint}chat/completions` : `${endpoint}/chat/completions`;
-    }
+    const endpoint = resolveChatEndpoint(baseUrl);
 
     const workoutsSummary = workouts
         .map(
@@ -181,7 +198,7 @@ export async function estimateDailyCaloriesWithAI(
     const userPrompt = `今日运动明细:\n${workoutsSummary}`;
 
     try {
-        const response = await fetch(endpoint, {
+        const response = await fetchWithTimeout(endpoint, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -224,6 +241,104 @@ export type AiReportData = {
     todaysPlan: { type: "strength" | "cardio"; name: string; sets?: string; stats?: string }[];
 };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function stripJsonFence(content: string): string {
+    const trimmed = content.trim();
+    const fenceMatch = trimmed.match(/^```(?:json|JSON)?\s*([\s\S]*?)\s*```$/);
+    return fenceMatch ? fenceMatch[1].trim() : trimmed;
+}
+
+function extractJsonObject(content: string): string {
+    const stripped = stripJsonFence(content);
+    if (stripped.startsWith("{") && stripped.endsWith("}")) return stripped;
+
+    const start = stripped.indexOf("{");
+    if (start < 0) return stripped;
+
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+
+    for (let i = start; i < stripped.length; i += 1) {
+        const char = stripped[i];
+
+        if (escaped) {
+            escaped = false;
+            continue;
+        }
+
+        if (char === "\\") {
+            escaped = true;
+            continue;
+        }
+
+        if (char === "\"") {
+            inString = !inString;
+            continue;
+        }
+
+        if (inString) continue;
+
+        if (char === "{") depth += 1;
+        if (char === "}") {
+            depth -= 1;
+            if (depth === 0) return stripped.slice(start, i + 1);
+        }
+    }
+
+    return stripped;
+}
+
+function toStringOrFallback(value: unknown, fallback: string): string {
+    return typeof value === "string" && value.trim() ? value.trim() : fallback;
+}
+
+function normalizeStringArray(value: unknown): string[] {
+    if (!Array.isArray(value)) return [];
+    return value
+        .filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+        .map((item) => item.trim())
+        .slice(0, 6);
+}
+
+function normalizeReportData(raw: unknown, presets: { name: string; tag: string | null }[]): AiReportData {
+    if (!isRecord(raw)) throw new Error("AI 返回内容不是 JSON 对象");
+
+    const presetNames = new Set(presets.map((preset) => preset.name));
+    const rawScore = typeof raw.intensityScore === "number"
+        ? raw.intensityScore
+        : Number(raw.intensityScore);
+    const intensityScore = Number.isFinite(rawScore)
+        ? Math.max(0, Math.min(100, Math.round(rawScore)))
+        : 50;
+
+    const rawPlan = Array.isArray(raw.todaysPlan) ? raw.todaysPlan : [];
+    const todaysPlan = rawPlan.flatMap((item): AiReportData["todaysPlan"] => {
+        if (!isRecord(item)) return [];
+
+        const type = item.type === "cardio" ? "cardio" : item.type === "strength" ? "strength" : null;
+        const name = typeof item.name === "string" ? item.name.trim() : "";
+        if (!type || !name) return [];
+        if (presetNames.size > 0 && !presetNames.has(name)) return [];
+
+        const sets = typeof item.sets === "string" && item.sets.trim() ? item.sets.trim() : undefined;
+        const stats = typeof item.stats === "string" && item.stats.trim() ? item.stats.trim() : undefined;
+
+        return [{ type, name, sets, stats }];
+    }).slice(0, 5);
+
+    return {
+        overallEvaluation: toStringOrFallback(raw.overallEvaluation, "AI 已生成建议，但没有返回详细评价。"),
+        intensityScore,
+        movementSuggestions: normalizeStringArray(raw.movementSuggestions),
+        recoveryPlan: toStringOrFallback(raw.recoveryPlan, "注意训练后的拉伸、补水和睡眠恢复。"),
+        todaysPlan,
+    };
+}
+
 export async function generateTrainingReportWithAI(
     recentWorkouts: { name: string; weight: string | null; sets: string | null; stats: string | null; createdAt: string }[],
     recentMetrics: { metricType: string; dateStr: string; value: number }[],
@@ -243,10 +358,7 @@ export async function generateTrainingReportWithAI(
     const model = (resolvedConfig.model || "gpt-4o").trim();
     const cleanApiKey = resolvedConfig.apiKey.trim();
 
-    let endpoint = baseUrl;
-    if (!endpoint.endsWith("/chat/completions")) {
-        endpoint = endpoint.endsWith("/") ? `${endpoint}chat/completions` : `${endpoint}/chat/completions`;
-    }
+    const endpoint = resolveChatEndpoint(baseUrl);
 
     const workoutsSummary = recentWorkouts
         .map(
@@ -308,25 +420,23 @@ ${metricsSummary || "暂无最新指标"}
         { role: "user", content: "请根据上述数据生成我的今日训练报告和今日训练计划（直接返回 JSON）。" },
     ];
 
-    const response = await fetch(endpoint, {
+    const response = await fetchWithTimeout(endpoint, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${cleanApiKey}`,
         },
-        // Not all models support response_format: { type: "json_object" }, so we rely on prompt engineering 
-        // but we add it if using explicit openai models. Safer to just prompt and parse.
         body: JSON.stringify({ 
             model, 
             messages, 
             temperature: 0.5,
-            response_format: { type: "json_object" }
+            ...(baseUrl.includes("api.openai.com") ? { response_format: { type: "json_object" } } : {}),
         }),
     });
 
     if (!response.ok) {
-        const err = await response.text();
-        throw new Error(`AI 请求失败: ${response.status} ${response.statusText}`);
+        const err = await response.text().catch(() => "");
+        throw new Error(`AI 请求失败: ${response.status} ${response.statusText}${err ? ` - ${err.slice(0, 120)}` : ""}`);
     }
 
     const data = await response.json();
@@ -335,23 +445,14 @@ ${metricsSummary || "暂无最新指标"}
         await recordAITokens(data.usage.total_tokens).catch(console.error);
     }
 
-    let rawContent = data.choices[0].message.content.trim();
-    // 移除可能由 AI 多管闲事加上的 markdown json 标签
-    if (rawContent.startsWith("\`\`\`json")) {
-        rawContent = rawContent.substring(7);
-        if (rawContent.endsWith("\`\`\`")) {
-            rawContent = rawContent.substring(0, rawContent.length - 3);
-        }
-    } else if (rawContent.startsWith("\`\`\`")) {
-         rawContent = rawContent.substring(3);
-        if (rawContent.endsWith("\`\`\`")) {
-            rawContent = rawContent.substring(0, rawContent.length - 3);
-        }
-    }
+    const rawContent = typeof data.choices?.[0]?.message?.content === "string"
+        ? data.choices[0].message.content
+        : "";
+    const jsonContent = extractJsonObject(rawContent);
 
     try {
-        return JSON.parse(rawContent) as AiReportData;
+        return normalizeReportData(JSON.parse(jsonContent), presets);
     } catch (e) {
-        throw new Error("AI 返回了无法解析的 JSON 格式: " + rawContent.substring(0, 100) + "...");
+        throw new Error("AI 返回了无法解析的 JSON 格式: " + rawContent.trim().substring(0, 100) + "...");
     }
 }

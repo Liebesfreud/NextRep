@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useMemo, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { Clock3, Flame, MapPin, Plus, Sparkles } from "lucide-react-native";
@@ -8,7 +8,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { db } from "@/db/client";
 import { bodyMetrics, workouts } from "@/db/schema";
 import { generateTrainingReportWithAI, type AiReportData } from "@/db/services/ai";
-import { addWorkout, getStrengthPresets } from "@/db/services/workout";
+import * as workoutService from "@/db/services/workout";
 import { useTheme } from "@/hooks/useTheme";
 
 type EnergyOption = "high" | "medium" | "low";
@@ -38,6 +38,13 @@ type CoachContextData = {
         name: string;
         tag: string | null;
     }[];
+};
+
+type PlanWorkoutInput = {
+    type: "strength" | "cardio";
+    name: string;
+    sets?: string;
+    stats?: string;
 };
 
 const INITIAL_CHECK_IN: CheckInState = {
@@ -106,6 +113,9 @@ function sectionCard(colors: ReturnType<typeof useTheme>["colors"]) {
 
 export default function AiCoachScreen() {
     const { colors } = useTheme();
+    const mountedRef = useRef(true);
+    const contextSeqRef = useRef(0);
+    const reportSeqRef = useRef(0);
     const [isLoading, setIsLoading] = useState(false);
     const [isApplying, setIsApplying] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -118,12 +128,22 @@ export default function AiCoachScreen() {
         presets: [],
     });
 
+    useEffect(() => {
+        return () => {
+            mountedRef.current = false;
+            contextSeqRef.current += 1;
+            reportSeqRef.current += 1;
+        };
+    }, []);
+
     useFocusEffect(useCallback(() => {
+        const requestId = ++contextSeqRef.current;
         Promise.all([
             db.select().from(workouts).orderBy(desc(workouts.createdAt)).limit(20),
             db.select().from(bodyMetrics).orderBy(desc(bodyMetrics.dateStr)).limit(5),
-            getStrengthPresets(),
+            workoutService.getStrengthPresets(),
         ]).then(([workoutRows, metricRows, presetRows]) => {
+            if (!mountedRef.current || requestId !== contextSeqRef.current) return;
             setContextData({
                 recentWorkouts: workoutRows.map((item) => ({
                     name: item.name,
@@ -139,8 +159,14 @@ export default function AiCoachScreen() {
                 })),
                 presets: presetRows,
             });
-            SplashScreen.hideAsync().catch(() => {});
+        }).catch(console.error).finally(() => {
+            if (mountedRef.current && requestId === contextSeqRef.current) {
+                SplashScreen.hideAsync().catch(() => {});
+            }
         });
+        return () => {
+            contextSeqRef.current += 1;
+        };
     }, []));
 
     const adjustedPlan = useMemo(
@@ -158,6 +184,7 @@ export default function AiCoachScreen() {
         setError(null);
         setUseLiteMode(false);
         setIsLoading(true);
+        const requestId = ++reportSeqRef.current;
 
         try {
             const data = await generateTrainingReportWithAI(
@@ -165,11 +192,16 @@ export default function AiCoachScreen() {
                 contextData.recentMetrics,
                 contextData.presets
             );
+            if (!mountedRef.current || requestId !== reportSeqRef.current) return;
             setReportData(data);
         } catch (e: any) {
-            setError(e.message || "生成 AI 建议失败，请稍后再试。");
+            if (mountedRef.current && requestId === reportSeqRef.current) {
+                setError(e.message || "生成 AI 建议失败，请稍后再试。");
+            }
         } finally {
-            setIsLoading(false);
+            if (mountedRef.current && requestId === reportSeqRef.current) {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -179,24 +211,22 @@ export default function AiCoachScreen() {
         setIsApplying(true);
         try {
             const todayStr = getTodayDateStr();
-            for (const item of adjustedPlan) {
-                await addWorkout({
-                    type: item.type,
-                    name: item.name,
-                    sets: item.sets,
-                    stats: item.stats,
-                    forDate: todayStr,
-                });
-            }
+            await workoutService.addWorkouts(adjustedPlan.map((item): PlanWorkoutInput => ({
+                type: item.type,
+                name: item.name,
+                sets: item.sets,
+                stats: item.stats,
+            })), todayStr);
 
+            if (!mountedRef.current) return;
             Alert.alert("已添加", "今天的计划已经加入训练列表。", [
                 { text: "去首页", onPress: () => router.push("/") },
                 { text: "留在这里", style: "cancel" },
             ]);
         } catch (e: any) {
-            Alert.alert("应用失败", e.message || "添加计划失败，请稍后再试。");
+            if (mountedRef.current) Alert.alert("应用失败", e.message || "添加计划失败，请稍后再试。");
         } finally {
-            setIsApplying(false);
+            if (mountedRef.current) setIsApplying(false);
         }
     };
 

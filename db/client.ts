@@ -50,6 +50,15 @@ export async function initDatabase(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_body_metrics_type_date
       ON body_metrics (metricType, dateStr DESC);
 
+    CREATE INDEX IF NOT EXISTS idx_workout_created_at
+      ON "Workout" ("createdAt");
+
+    CREATE INDEX IF NOT EXISTS idx_workout_name
+      ON "Workout" ("name");
+
+    CREATE INDEX IF NOT EXISTS idx_daily_checkin_date_str
+      ON "DailyCheckin" ("dateStr");
+
     CREATE TABLE IF NOT EXISTS "UserProfile" (
       "id"        TEXT PRIMARY KEY NOT NULL DEFAULT 'me',
       "name"      TEXT NOT NULL DEFAULT '健身达人',
