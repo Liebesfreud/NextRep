@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, Modal, Pressable } from "react-native";
 import { Plus, Dumbbell, Activity, CheckCircle, Calendar, ChevronLeft, ChevronRight, X } from "lucide-react-native";
 import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import { LightEffect } from "@/components/ui/LightEffect";
 import { useTheme } from "@/hooks/useTheme";
-import { type WorkoutItem } from "@/db/services/workout";
+import { getCheckinsByMonth, type WorkoutItem } from "@/db/services/workout";
 
 function formatTime(iso: string) {
     return new Intl.DateTimeFormat("zh-CN", {
@@ -54,6 +54,31 @@ function DatePickerModal({
     const selParts = selectedDate.split("-").map(Number);
     const [viewYear, setViewYear] = useState(selParts[0]);
     const [viewMonth, setViewMonth] = useState(selParts[1] - 1); // 0-indexed
+    const [checkins, setCheckins] = useState<Record<number, boolean>>({});
+
+    useEffect(() => {
+        if (!visible) return;
+        const parts = selectedDate.split("-").map(Number);
+        setCheckins({});
+        setViewYear(parts[0]);
+        setViewMonth(parts[1] - 1);
+    }, [visible, selectedDate]);
+
+    useEffect(() => {
+        if (!visible) return;
+        let isActive = true;
+        setCheckins({});
+        getCheckinsByMonth(viewYear, viewMonth)
+            .then((data) => {
+                if (isActive) setCheckins(data);
+            })
+            .catch(() => {
+                if (isActive) setCheckins({});
+            });
+        return () => {
+            isActive = false;
+        };
+    }, [visible, viewYear, viewMonth]);
 
     const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
     const firstDayOfWeek = new Date(viewYear, viewMonth, 1).getDay();
@@ -79,7 +104,7 @@ function DatePickerModal({
     const WEEK_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
     const MONTH_NAMES = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
 
-    const totalCells = Math.ceil((firstDayOfWeek + daysInMonth) / 7) * 7;
+    const totalCells = 42;
     const cells: (number | null)[] = Array.from({ length: totalCells }, (_, i) => {
         const day = i - firstDayOfWeek + 1;
         return day >= 1 && day <= daysInMonth ? day : null;
@@ -133,6 +158,7 @@ function DatePickerModal({
                             const isToday = dateStr === today;
                             const isSelected = dateStr === selectedDate;
                             const isFuture = dateStr > today;
+                            const isCheckedIn = !!checkins[day];
 
                             return (
                                 <Pressable
@@ -151,10 +177,14 @@ function DatePickerModal({
                                         borderRadius: 8,
                                         alignItems: "center",
                                         justifyContent: "center",
+                                        borderWidth: isCheckedIn && !isSelected ? 1 : 0,
+                                        borderColor: isCheckedIn && !isSelected ? `${colors.green}99` : "transparent",
                                         backgroundColor: isSelected
                                             ? colors.green
                                             : isToday
                                                 ? `${colors.green}33`
+                                                : isCheckedIn
+                                                    ? `${colors.green}1A`
                                                 : "transparent",
                                         opacity: isFuture ? 0.2 : 1,
                                     }}>
@@ -165,6 +195,18 @@ function DatePickerModal({
                                         }}>
                                             {day}
                                         </Text>
+                                        {isCheckedIn && (
+                                            <View
+                                                style={{
+                                                    position: "absolute",
+                                                    bottom: 5,
+                                                    width: 4,
+                                                    height: 4,
+                                                    borderRadius: 2,
+                                                    backgroundColor: isSelected ? "#000" : colors.green,
+                                                }}
+                                            />
+                                        )}
                                     </View>
                                 </Pressable>
                             );

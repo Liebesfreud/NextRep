@@ -178,6 +178,11 @@ export function StrengthModal({
         setTimeout(callback, delay);
     };
 
+    const handleClose = () => {
+        Keyboard.dismiss();
+        onClose();
+    };
+
     const deleteSet = (id: string) => {
         if (sets.length === 1) {
             // If it's the last set, just clear it
@@ -293,7 +298,7 @@ export function StrengthModal({
                             </AnimatedPressable>
                         )}
                         <Pressable
-                            onPress={() => dismissKeyboardAndRun(onClose)}
+                            onPress={handleClose}
                             style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
                         >
                             <X size={20} color={colors.gray4} />

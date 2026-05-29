@@ -47,6 +47,11 @@ export function CardioModal({
         setTimeout(callback, delay);
     };
 
+    const handleClose = () => {
+        Keyboard.dismiss();
+        onClose();
+    };
+
     const handleSave = () => {
         if (!selectedExercise) return;
         const parts: string[] = [];
@@ -86,7 +91,7 @@ export function CardioModal({
                     </Text>
                 )}
                 <Pressable
-                    onPress={() => dismissKeyboardAndRun(onClose)}
+                    onPress={handleClose}
                     style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
                 >
                     <X size={20} color={colors.gray4} />

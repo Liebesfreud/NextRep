@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     Modal,
     View,
@@ -35,6 +35,7 @@ export function BottomSheetModal({
     backgroundColor,
     avoidKeyboard = false,
 }: Props) {
+    const [isMounted, setIsMounted] = useState(visible);
     // 遮罩层透明度动画
     const backdropOpacity = useRef(new Animated.Value(0)).current;
     // 卡片滑动位移动画
@@ -42,6 +43,9 @@ export function BottomSheetModal({
 
     useEffect(() => {
         if (visible) {
+            setIsMounted(true);
+            backdropOpacity.setValue(0);
+            sheetTranslateY.setValue(SCREEN_HEIGHT);
             // 打开：遮罩淡入 + 卡片上滑（cubic ease-out，顺滑无超调）
             Animated.parallel([
                 Animated.timing(backdropOpacity, {
@@ -57,8 +61,9 @@ export function BottomSheetModal({
                     useNativeDriver: true,
                 }),
             ]).start();
-        } else {
+        } else if (isMounted) {
             // 关闭：卡片快速下滑 + 遮罩淡出
+            Keyboard.dismiss();
             Animated.parallel([
                 Animated.timing(backdropOpacity, {
                     toValue: 0,
@@ -72,7 +77,9 @@ export function BottomSheetModal({
                     easing: Easing.in(Easing.cubic),
                     useNativeDriver: true,
                 }),
-            ]).start();
+            ]).start(({ finished }) => {
+                if (finished) setIsMounted(false);
+            });
         }
     }, [visible]);
 
@@ -102,6 +109,7 @@ export function BottomSheetModal({
 
             {/* 底部卡片 —— 从底部弹入 */}
             <Animated.View
+                pointerEvents={visible ? "auto" : "none"}
                 style={[
                     styles.sheet,
                     sheetHeightStyle,
@@ -125,7 +133,7 @@ export function BottomSheetModal({
 
     return (
         <Modal
-            visible={visible}
+            visible={visible || isMounted}
             transparent
             animationType="none"
             statusBarTranslucent

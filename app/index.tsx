@@ -147,7 +147,6 @@ export default function HomeScreen() {
 
     const closeModal = () => {
         setActiveModal(null);
-        setEditingWorkout(null);
     };
 
     const handleSave = async (payload: any) => {
