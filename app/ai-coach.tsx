@@ -12,6 +12,7 @@ import * as workoutService from "@/db/services/workout";
 import { useTheme } from "@/hooks/useTheme";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 type EnergyOption = "high" | "medium" | "low";
 type DurationOption = "20" | "40" | "60";
@@ -102,15 +103,6 @@ function getAdjustedPlan(reportData: AiReportData | null, checkIn: CheckInState,
     }
 
     return plan;
-}
-
-function sectionCard(colors: ReturnType<typeof useTheme>["colors"]) {
-    return {
-        backgroundColor: colors.bento,
-        borderColor: colors.border,
-        borderWidth: 1,
-        borderRadius: 18,
-    } as const;
 }
 
 export default function AiCoachScreen() {
@@ -247,7 +239,7 @@ export default function AiCoachScreen() {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 14 }}>
-                <View style={{ ...sectionCard(colors), padding: 16 }}>
+                <Card>
                     <Text style={{ color: colors.green, fontSize: 11, fontWeight: "800", letterSpacing: 1.2 }}>今日状态</Text>
                     <Text style={{ color: colors.white, fontSize: 20, fontWeight: "900", marginTop: 8 }}>先选一下今天的状态</Text>
 
@@ -282,9 +274,9 @@ export default function AiCoachScreen() {
                         {isLoading ? <ActivityIndicator size="small" color={colors.bg} /> : <Sparkles size={16} color={colors.bg} strokeWidth={2.6} />}
                         <ButtonText className="text-[15px] text-accent-foreground">{isLoading ? "正在生成建议..." : "生成今日建议"}</ButtonText>
                     </Button>
-                </View>
+                </Card>
 
-                <View style={{ ...sectionCard(colors), padding: 16 }}>
+                <Card>
                     <Text style={{ color: colors.green, fontSize: 11, fontWeight: "800", letterSpacing: 1.2 }}>AI 建议</Text>
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, marginTop: 8 }}>
                         <Text style={{ color: colors.white, fontSize: 20, fontWeight: "900", flex: 1 }}>今天的建议</Text>
@@ -299,9 +291,9 @@ export default function AiCoachScreen() {
                             {reportData?.overallEvaluation || "生成建议后，这里会显示 AI 对你今天训练的判断。"}
                         </Text>
                     </View>
-                </View>
+                </Card>
 
-                <View style={{ ...sectionCard(colors), padding: 16 }}>
+                <Card>
                     <Text style={{ color: colors.green, fontSize: 11, fontWeight: "800", letterSpacing: 1.2 }}>今日计划</Text>
                     <Text style={{ color: colors.white, fontSize: 20, fontWeight: "900", marginTop: 8 }}>今天的训练计划</Text>
 
@@ -335,12 +327,12 @@ export default function AiCoachScreen() {
                             <ButtonText className="text-[13px] text-accent-foreground">应用到今日训练</ButtonText>
                         </Button>
                     </View>
-                </View>
+                </Card>
 
                 {error && (
-                    <View style={{ ...sectionCard(colors), padding: 14, backgroundColor: `${colors.red}14`, borderColor: `${colors.red}33` }}>
+                    <Card style={{ backgroundColor: `${colors.red}14`, borderColor: `${colors.red}33` }} className="p-3.5">
                         <Text style={{ color: colors.red, fontSize: 13, lineHeight: 20, fontWeight: "700" }}>{error}</Text>
-                    </View>
+                    </Card>
                 )}
             </ScrollView>
         </View>
