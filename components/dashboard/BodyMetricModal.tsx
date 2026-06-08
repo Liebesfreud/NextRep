@@ -173,20 +173,20 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                             {([7, 30, 90] as const).map((range) => {
                                 const active = trendRange === range;
                                 return (
-                                    <Pressable
+                                    <Button
                                         key={range}
                                         onPress={() => setTrendRange(range)}
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-auto rounded-lg px-2.5 py-1.5"
                                         style={{
-                                            paddingHorizontal: 10,
-                                            paddingVertical: 6,
-                                            borderRadius: 8,
                                             backgroundColor: active ? colors.gray3 : "transparent",
                                         }}
                                     >
                                         <Text style={{ color: active ? colors.white : colors.gray4, fontSize: 11, fontWeight: active ? "700" : "600" }}>
                                             {range}天
                                         </Text>
-                                    </Pressable>
+                                    </Button>
                                 );
                             })}
                         </View>
