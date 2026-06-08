@@ -330,12 +330,12 @@ export function TodayWorkouts({
                                     </View>
                                     <View className="flex-1">
                                         <View className="flex-row justify-between items-center">
-                                            <Text style={{ color: colors.white }} className="font-bold text-sm">{w.name}</Text>
+                                            <Text className="text-sm font-bold">{w.name}</Text>
                                             <View style={{ backgroundColor: `${colors.orange}1A` }} className="px-2 py-0.5 rounded-md">
                                                 <Text style={{ color: colors.orange }} className="text-xs font-semibold">{formatTime(w.createdAt)}</Text>
                                             </View>
                                         </View>
-                                        {w.stats && <Text style={{ color: colors.white, opacity: 0.9 }} className="text-xs font-semibold mt-0.5">{w.stats}</Text>}
+                                        {w.stats && <Text className="mt-0.5 text-xs font-semibold opacity-90">{w.stats}</Text>}
                                     </View>
                                 </AnimatedPressable>
                             ))}
@@ -346,7 +346,7 @@ export function TodayWorkouts({
                     {strengthWorkouts.length > 0 && (
                         <Card className="rounded-bento-sm bg-secondary p-3 gap-2">
                             <View className="flex-row justify-between items-center ml-1 mb-0.5">
-                                <Text style={{ color: colors.gray4, opacity: 0.7 }} className="text-xs font-extrabold tracking-widest uppercase">
+                                <Text variant="caption" className="text-xs font-extrabold uppercase tracking-widest opacity-70">
                                     力量训练
                                 </Text>
                                 <AnimatedPressable onPress={handleOpenStrength}
@@ -363,15 +363,15 @@ export function TodayWorkouts({
                                     </View>
                                     <View className="flex-1">
                                         <View className="flex-row justify-between items-center">
-                                            <Text style={{ color: colors.white }} className="font-bold text-sm">{w.name}</Text>
+                                            <Text className="text-sm font-bold">{w.name}</Text>
                                             <View style={{ backgroundColor: colors.border }} className="px-2 py-0.5 rounded-md">
-                                                <Text style={{ color: colors.gray4 }} className="text-xs font-semibold">{formatTime(w.createdAt)}</Text>
+                                                <Text variant="caption" className="text-xs font-semibold">{formatTime(w.createdAt)}</Text>
                                             </View>
                                         </View>
                                         <Text className="text-xs font-semibold mt-0.5">
-                                            {w.weight && <Text style={{ color: colors.white, opacity: 0.9 }}>{w.weight}</Text>}
-                                            {w.weight && w.sets && <Text style={{ color: colors.gray4 }}> • </Text>}
-                                            {w.sets && <Text style={{ color: colors.gray4 }}>{formatSets(w.sets)}</Text>}
+                                            {w.weight && <Text className="opacity-90">{w.weight}</Text>}
+                                            {w.weight && w.sets && <Text className="text-muted-foreground"> • </Text>}
+                                            {w.sets && <Text className="text-muted-foreground">{formatSets(w.sets)}</Text>}
                                         </Text>
                                     </View>
                                 </AnimatedPressable>
@@ -382,7 +382,7 @@ export function TodayWorkouts({
             ) : (
                 <View className="items-center justify-center py-8" style={{ opacity: 0.6 }}>
                     <Dumbbell size={40} color={colors.gray4} />
-                    <Text style={{ color: colors.gray4 }} className="text-sm font-bold mt-3">
+                    <Text variant="muted" className="mt-3 font-bold">
                         {isToday ? "今天还没有记录运动" : "这一天暂无运动记录"}
                     </Text>
                 </View>
