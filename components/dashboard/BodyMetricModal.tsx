@@ -1,10 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
-import { View, Text, Pressable, ScrollView, TextInput } from "react-native";
+import { View, Pressable, ScrollView } from "react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, ChevronRight, Save } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { type BodyMetricPoint } from "@/db/services/dashboard";
 import Svg, { Circle, Path } from "react-native-svg";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
 
 type Props = {
     visible: boolean;
@@ -128,11 +131,12 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                 <Text style={{ color: colors.white }} className="text-2xl font-extrabold tracking-tight">
                     {metricType === "weight" ? "记录体重" : "记录体脂率"}
                 </Text>
-                <Pressable onPress={onClose}
-                    style={{ backgroundColor: colors.gray3 }}
-                    className="w-8 h-8 rounded-lg items-center justify-center">
+                <Button onPress={onClose}
+                    variant="secondary"
+                    size="icon"
+                    className="h-8 w-8 rounded-lg">
                     <X size={20} color={colors.gray4} />
-                </Pressable>
+                </Button>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -219,24 +223,22 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                         <Text style={{ color: colors.gray4 }} className="text-xs font-bold tracking-wider mb-1.5 pl-1">
                             {metricType === "weight" ? "体重 (kg)" : "体脂率 (%)"}
                         </Text>
-                        <TextInput
+                        <Input
                             keyboardType="decimal-pad"
                             value={formValue}
                             onChangeText={setFormValue}
                             placeholder={metricType === "weight" ? "例如：75.5" : "例如：15.0"}
-                            placeholderTextColor={`${colors.gray4}66`}
-                            style={{ color: colors.white, backgroundColor: colors.gray2, height: 44, paddingHorizontal: 16, borderRadius: 10, fontWeight: "bold", fontSize: 15, borderWidth: 1, borderColor: `${colors.gray3}4D` }}
+                            className="h-11 px-4 text-[15px] font-bold"
                             autoFocus
                         />
                     </View>
                     <View className="flex-1">
                         <Text style={{ color: colors.gray4 }} className="text-xs font-bold tracking-wider mb-1.5 pl-1">记录日期</Text>
-                        <TextInput
+                        <Input
                             value={formDate}
                             onChangeText={setFormDate}
                             placeholder="YYYY-MM-DD"
-                            placeholderTextColor={`${colors.gray4}66`}
-                            style={{ color: colors.white, backgroundColor: colors.gray2, height: 44, paddingHorizontal: 16, borderRadius: 10, fontWeight: "bold", fontSize: 15, borderWidth: 1, borderColor: `${colors.gray3}4D` }}
+                            className="h-11 px-4 text-[15px] font-bold"
                         />
                     </View>
                 </View>
@@ -245,16 +247,16 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                     <Text style={{ color: colors.red }} className="text-xs font-bold px-1 mb-2">{error}</Text>
                 )}
 
-                <Pressable
+                <Button
                     onPress={handleSave}
                     disabled={isSaving}
-                    style={{ backgroundColor: colors.green, borderRadius: 12, paddingVertical: 12, alignItems: "center", flexDirection: "row", justifyContent: "center", gap: 8, opacity: isSaving ? 0.5 : 1, marginBottom: 8 }}
+                    className="mb-2 bg-accent py-3"
                 >
                     <Save size={16} color={colors.white} />
-                    <Text style={{ color: colors.white }} className="font-bold text-base">
+                    <ButtonText className="text-base text-foreground">
                         {isSaving ? "保存中..." : "保存记录"}
-                    </Text>
-                </Pressable>
+                    </ButtonText>
+                </Button>
 
                 {/* Metric Calendar */}
                 <View className="mt-1">
