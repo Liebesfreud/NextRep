@@ -7,6 +7,7 @@ import { useIsFocused } from '@react-navigation/native';
 interface AnimatedEnterProps {
     children: React.ReactNode;
     delay?: number;
+    className?: string;
     style?: StyleProp<ViewStyle>;
     direction?: 'up' | 'down' | 'left' | 'right' | 'none';
     distance?: number;
@@ -15,6 +16,7 @@ interface AnimatedEnterProps {
 export const AnimatedEnter: React.FC<AnimatedEnterProps> = ({
     children,
     delay = 0,
+    className,
     style,
     direction = 'up',
     distance = 15, // 极简：位移距离不要超过 15px
@@ -53,6 +55,7 @@ export const AnimatedEnter: React.FC<AnimatedEnterProps> = ({
                 // 为了让入场有阶梯感同时退场迅速干脆：只在处于焦点获得时给延时，否则迅速退回 initial
                 delay: isFocused ? delay : 0,
             }}
+            className={className}
             style={style}
         >
             {children}

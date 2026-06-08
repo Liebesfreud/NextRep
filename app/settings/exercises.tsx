@@ -275,7 +275,7 @@ export default function ExerciseManagementScreen() {
                 </View>
             </AnimatedEnter>
 
-            <AnimatedEnter delay={100} distance={14} style={{ flex: 1 }}>
+            <AnimatedEnter delay={100} distance={14} className="flex-1">
                 <FlatList
                     data={filteredExercises}
                     keyExtractor={(item) => item.name}
