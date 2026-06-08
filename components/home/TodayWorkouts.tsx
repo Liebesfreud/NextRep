@@ -437,11 +437,10 @@ export function TodayWorkouts({
             )}
             {isCheckedIn && (
                 <View
-                    style={{ backgroundColor: `${colors.green}1A`, borderColor: `${colors.green}33` }}
-                    className="w-full flex-row items-center justify-center gap-2 rounded-bento-sm border py-4"
+                    className="w-full flex-row items-center justify-center gap-2 rounded-bento-sm border border-success/20 bg-success/10 py-4"
                 >
                     <CheckCircle size={18} color={colors.green} strokeWidth={2.5} />
-                    <Text style={{ color: colors.green }} className="font-extrabold text-base tracking-widest">{isToday ? "今日打卡已完成" : "已补打卡"}</Text>
+                    <Text className="text-base font-extrabold tracking-widest text-success">{isToday ? "今日打卡已完成" : "已补打卡"}</Text>
                 </View>
             )}
 

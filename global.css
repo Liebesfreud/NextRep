@@ -17,6 +17,8 @@
   --destructive-foreground: #ffffff;
   --accent: #30d158;
   --accent-foreground: #000000;
+  --success: #30d158;
+  --success-foreground: #000000;
   --border: rgba(255, 255, 255, 0.06);
   --input: rgba(255, 255, 255, 0.08);
   --ring: #ff9f0a;
@@ -37,6 +39,8 @@
   --destructive-foreground: #ffffff;
   --accent: #34c759;
   --accent-foreground: #000000;
+  --success: #34c759;
+  --success-foreground: #000000;
   --border: rgba(0, 0, 0, 0.05);
   --input: rgba(0, 0, 0, 0.06);
   --ring: #ff9500;
@@ -57,6 +61,8 @@
   --destructive-foreground: #ffffff;
   --accent: #30d158;
   --accent-foreground: #000000;
+  --success: #30d158;
+  --success-foreground: #000000;
   --border: rgba(255, 255, 255, 0.06);
   --input: rgba(255, 255, 255, 0.08);
   --ring: #ff9f0a;
