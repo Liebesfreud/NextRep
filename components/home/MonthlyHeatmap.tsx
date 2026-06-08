@@ -223,7 +223,7 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                                             }}
                                             className="rounded-bento-sm py-3"
                                         >
-                                            <ButtonText variant="ghost" style={{ color: month === m ? "#000" : colors.gray4, fontWeight: month === m ? "bold" : "normal", textAlign: "center" }}>
+                                            <ButtonText variant="ghost" style={{ color: month === m ? colors.accentForeground : colors.gray4, fontWeight: month === m ? "bold" : "normal", textAlign: "center" }}>
                                                 {mName}
                                             </ButtonText>
                                         </Button>
