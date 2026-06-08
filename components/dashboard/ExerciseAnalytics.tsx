@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Pressable } from "react-native";
+import { View } from "react-native";
 import { ChevronRight, Library, Target } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
@@ -64,10 +64,11 @@ export function ExerciseAnalytics({ data }: Props) {
                         const Icon = visual.icon;
 
                         return (
-                            <Pressable
+                            <Button
                                 key={exercise.name}
                                 onPress={() => setSelectedExercise(exercise)}
-                                className="flex-row items-center justify-between gap-3 rounded-xl p-2.5"
+                                variant="ghost"
+                                className="h-auto justify-between rounded-xl p-2.5"
                             >
                                 <View className="flex-row items-center gap-3 flex-1">
                                     <View className="w-7 items-center">
@@ -93,7 +94,7 @@ export function ExerciseAnalytics({ data }: Props) {
                                     </Text>
                                     <ChevronRight size={15} color={colors.gray4} />
                                 </View>
-                            </Pressable>
+                            </Button>
                         );
                     })}
                 </Card>
