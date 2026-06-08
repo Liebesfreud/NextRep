@@ -120,28 +120,24 @@ function DatePickerModal({
                 style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "center", alignItems: "center" }}
                 onPress={onClose}
             >
-                <Pressable
-                    onPress={() => { }}
+                <Pressable onPress={() => { }}>
+                    <Card
                     style={{
-                        backgroundColor: colors.bento,
-                        borderRadius: 20,
-                        padding: 20,
                         width: 320,
-                        borderWidth: 1,
-                        borderColor: colors.border,
                     }}
+                    className="rounded-[20px] p-5"
                 >
                     {/* 月份导航 */}
                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                        <Pressable onPress={prevMonth} style={{ padding: 6 }}>
+                        <Button onPress={prevMonth} variant="ghost" size="icon" className="h-8 w-8">
                             <ChevronLeft size={20} color={colors.white} />
-                        </Pressable>
-                        <Text style={{ color: colors.white, fontWeight: "800", fontSize: 16 }}>
+                        </Button>
+                        <Text className="text-base font-extrabold">
                             {viewYear}年 {MONTH_NAMES[viewMonth]}
                         </Text>
-                        <Pressable onPress={nextMonth} style={{ padding: 6, opacity: isNextDisabled ? 0.3 : 1 }}>
+                        <Button onPress={nextMonth} variant="ghost" size="icon" disabled={isNextDisabled} className="h-8 w-8">
                             <ChevronRight size={20} color={colors.white} />
-                        </Pressable>
+                        </Button>
                     </View>
 
                     {/* 星期标签 */}
@@ -226,6 +222,7 @@ function DatePickerModal({
                             <Text style={{ color: colors.green, fontWeight: "700", fontSize: 13 }}>回到今天</Text>
                         </Pressable>
                     </View>
+                    </Card>
                 </Pressable>
             </Pressable>
         </Modal>
