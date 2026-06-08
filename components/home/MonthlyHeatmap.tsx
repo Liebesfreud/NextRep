@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { View, PanResponder, ScrollView, Animated } from "react-native";
+import { View, PanResponder, ScrollView } from "react-native";
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import { X, CalendarCheck } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { getCheckinsByMonth, getWorkoutsByMonth } from "@/db/services/workout";
@@ -27,8 +28,8 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
     const currentMonthRef = useRef({ year: currentYear, month: currentMonth });
     const loadSeqRef = useRef(0);
 
-    // Fade animation for swipe transitions
-    const fadeAnim = useRef(new Animated.Value(1)).current;
+    const heatmapOpacity = useSharedValue(1);
+    const heatmapAnimatedStyle = useAnimatedStyle(() => ({ opacity: heatmapOpacity.value }));
 
     useEffect(() => {
         currentMonthRef.current = { year, month };
@@ -52,11 +53,11 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
     const monthName = useMemo(() => MONTH_FORMATTER.format(new Date(year, month)), [year, month]);
 
     const playSwipeTransition = useCallback(() => {
-        Animated.sequence([
-            Animated.timing(fadeAnim, { toValue: 0.5, duration: 100, useNativeDriver: true }),
-            Animated.timing(fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true })
-        ]).start();
-    }, [fadeAnim]);
+        heatmapOpacity.value = withSequence(
+            withTiming(0.5, { duration: 100 }),
+            withTiming(1, { duration: 200 })
+        );
+    }, [heatmapOpacity]);
 
     const navigateMonth = useCallback((direction: -1 | 1) => {
         const current = currentMonthRef.current;
@@ -137,7 +138,7 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
             </View>
 
             {/* Right Panel: Minimalist Heatmap Grid */}
-            <Animated.View style={{ opacity: fadeAnim, gap: 3 }}>
+            <Animated.View style={[{ gap: 3 }, heatmapAnimatedStyle]}>
                 {Array.from({ length: 6 }).map((_, r) => (
                     <View key={r} style={{ flexDirection: "row", gap: 3 }}>
                         {Array.from({ length: 7 }).map((_, c) => {
