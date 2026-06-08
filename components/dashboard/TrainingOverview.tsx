@@ -166,9 +166,9 @@ function ReviewCard({ title, summary }: { title: string; summary?: ReviewSummary
                 {title}
             </Text>
 
-            <View className="flex-row flex-wrap" style={{ marginHorizontal: -6 }}>
+            <View className="-mx-1.5 flex-row flex-wrap">
                 {metrics.map((item) => (
-                    <View key={item.label} style={{ width: "50%", padding: 6 }}>
+                    <View key={item.label} className="w-1/2 p-1.5">
                         <Text variant="caption" className="text-[11px] font-bold">
                             {item.label}
                         </Text>
