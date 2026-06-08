@@ -1,9 +1,10 @@
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { Moon, Sun } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
+import { Button, ButtonText } from "@/components/ui/button";
 
 export function AppearanceSettings() {
     const { colors, theme, preference, setTheme } = useTheme();
@@ -42,19 +43,17 @@ export function AppearanceSettings() {
                 </View>
                 <View className="flex-row rounded-lg bg-muted/80 p-0.5">
                     {(["light", "dark", "system"] as const).map(p => (
-                        <Pressable 
-                            key={p} 
+                        <Button
+                            key={p}
                             onPress={() => setTheme(p)}
-                            style={{ 
-                                paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6,
-                                backgroundColor: preference === p ? colors.bento : "transparent",
-                                shadowColor: preference === p ? "#000" : "transparent", shadowOpacity: 0.1, shadowRadius: 2, shadowOffset: {width:0,height:1}
-                            }}
+                            variant={preference === p ? "secondary" : "ghost"}
+                            size="sm"
+                            className="h-auto rounded-md px-2.5 py-1.5"
                         >
-                            <Text className={preference === p ? "text-xs font-bold" : "text-xs font-medium text-muted-foreground"}>
+                            <ButtonText variant={preference === p ? "secondary" : "ghost"} size="sm" className={preference === p ? "font-bold" : "font-medium text-muted-foreground"}>
                                 {p === "light" ? "日间" : p === "dark" ? "暗夜" : "系统"}
-                            </Text>
-                        </Pressable>
+                            </ButtonText>
+                        </Button>
                     ))}
                 </View>
             </View>
