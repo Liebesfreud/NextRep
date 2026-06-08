@@ -249,7 +249,6 @@ export default function AiCoachScreen() {
                             title="精力"
                             icon={<Flame size={14} color={colors.orange} />}
                             value={checkIn.energy}
-                            colors={colors}
                             options={[{ key: "high", label: "很好" }, { key: "medium", label: "一般" }, { key: "low", label: "疲劳" }]}
                             onChange={(value) => setCheckIn((prev) => ({ ...prev, energy: value as EnergyOption }))}
                         />
@@ -257,7 +256,6 @@ export default function AiCoachScreen() {
                             title="时长"
                             icon={<Clock3 size={14} color={colors.green} />}
                             value={checkIn.duration}
-                            colors={colors}
                             options={[{ key: "20", label: "20m" }, { key: "40", label: "40m" }, { key: "60", label: "60m+" }]}
                             onChange={(value) => setCheckIn((prev) => ({ ...prev, duration: value as DurationOption }))}
                         />
@@ -265,7 +263,6 @@ export default function AiCoachScreen() {
                             title="地点"
                             icon={<MapPin size={14} color={colors.red} />}
                             value={checkIn.location}
-                            colors={colors}
                             options={[{ key: "gym", label: "健身房" }, { key: "home", label: "家里" }]}
                             onChange={(value) => setCheckIn((prev) => ({ ...prev, location: value as LocationOption }))}
                         />
@@ -305,7 +302,7 @@ export default function AiCoachScreen() {
                     ) : (
                         <View className="mt-3.5 gap-2.5">
                             {adjustedPlan.map((plan, index) => (
-                                <View key={`${plan.name}-${index}`} className="rounded-[14px] border border-border bg-card/60 p-3.5">
+                                <Card key={`${plan.name}-${index}`} className="rounded-[14px] bg-card/60 p-3.5">
                                     <View className="flex-row items-center justify-between gap-2.5">
                                         <View className="flex-1">
                                             <Text className="text-base font-extrabold">{plan.name}</Text>
@@ -313,7 +310,7 @@ export default function AiCoachScreen() {
                                         </View>
                                         <Text className="text-xs font-black text-accent">{plan.sets || plan.stats || "自定义"}</Text>
                                     </View>
-                                </View>
+                                </Card>
                             ))}
                         </View>
                     )}
@@ -345,7 +342,7 @@ export default function AiCoachScreen() {
     );
 }
 
-function FilterRow({ title, icon, options, value, onChange, colors }: { title: string; icon: ReactNode; options: { key: string; label: string }[]; value: string; onChange: (value: string) => void; colors: ReturnType<typeof useTheme>["colors"]; }) {
+function FilterRow({ title, icon, options, value, onChange }: { title: string; icon: ReactNode; options: { key: string; label: string }[]; value: string; onChange: (value: string) => void; }) {
     return (
         <View>
             <View className="mb-2 flex-row items-center gap-1.5">
@@ -364,10 +361,9 @@ function FilterRow({ title, icon, options, value, onChange, colors }: { title: s
                         >
                             <Badge
                                 variant={active ? "default" : "secondary"}
-                                style={{ borderColor: active ? colors.green : colors.border, backgroundColor: active ? `${colors.green}18` : `${colors.gray3}44` }}
-                                className="border px-3 py-2"
+                                className={active ? "border border-success bg-success/10 px-3 py-2" : "border border-border bg-muted/40 px-3 py-2"}
                             >
-                                <BadgeText style={{ color: active ? colors.green : colors.white }}>{option.label}</BadgeText>
+                                <BadgeText className={active ? "text-success" : "text-foreground"}>{option.label}</BadgeText>
                             </Badge>
                         </Button>
                     );
