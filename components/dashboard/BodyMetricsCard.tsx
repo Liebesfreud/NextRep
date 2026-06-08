@@ -51,17 +51,17 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
     const bodyFatGap = bodyFatVal != null && targetBodyFat != null ? bodyFatVal - targetBodyFat : null;
 
     return (
-        <Card style={{ flexDirection: "column", gap: 10 }} className="p-3">
+        <Card className="gap-2.5 p-3">
             {/* Header */}
-            <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 2 }}>
+            <View className="flex-row items-center px-0.5">
                 <Scale size={16} color={colors.red} />
-                <Text style={{ color: colors.white, opacity: 0.9, fontWeight: "bold", fontSize: 12, letterSpacing: 0.4, marginLeft: 6 }}>
+                <Text variant="caption" className="ml-1.5 font-bold tracking-[0.4px] opacity-90">
                     身体指标
                 </Text>
             </View>
 
             {/* 第一部分：顶部数据区 */}
-            <View style={{ flexDirection: "row", gap: 10 }}>
+            <View className="flex-row gap-2.5">
 
                 {/* 左侧核心卡片（体重） */}
                 <Pressable
