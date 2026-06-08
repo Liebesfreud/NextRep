@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { View, ScrollView } from "react-native";
 import { useFocusEffect } from "expo-router";
-import { useTheme } from "@/hooks/useTheme";
 import { getDashboardData, addBodyMetric } from "@/db/services/dashboard";
 import * as SplashScreen from "expo-splash-screen";
 
@@ -16,7 +15,6 @@ import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
 type DashboardData = Awaited<ReturnType<typeof getDashboardData>>;
 
 export default function DashboardScreen() {
-    const { colors } = useTheme();
     const mountedRef = useRef(true);
     const loadSeqRef = useRef(0);
     const todayNum = new Date().getDate();
@@ -70,7 +68,7 @@ export default function DashboardScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: colors.bg }}>
+        <View className="flex-1 bg-background">
             <ScrollView
                 className="flex-1"
                 contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 60, paddingBottom: 100, gap: 16 }}
