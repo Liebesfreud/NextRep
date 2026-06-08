@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Home, LayoutDashboard, Bot, Settings } from "lucide-react-native";
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 import { ThemeProvider, useTheme } from "@/hooks/useTheme";
 import { initDatabase } from "@/db/client";
 import * as SplashScreen from "expo-splash-screen";
 import { ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from "@react-navigation/native";
 import { Button, ButtonText } from "@/components/ui/button";
+import { TabBarBackground } from "@/components/ui/tab-bar-background";
 import { Text } from "@/components/ui/text";
 import "../global.css";
 
@@ -98,37 +99,7 @@ function TabLayout() {
                         shadowRadius: 32,    // 极大的模糊半径让阴影更柔和
                         elevation: 8,
                     },
-                    tabBarBackground: () => (
-                        <View style={{ 
-                            ...StyleSheet.absoluteFillObject, 
-                            backgroundColor: colors.bento, 
-                            borderRadius: 16, 
-                            overflow: 'hidden' 
-                        }}>
-                            {/* 1. 全局极弱环境光 (3% opacity) - 贴近物理材质 */}
-                            <View style={{
-                                position: 'absolute',
-                                top: 0, left: 0, right: 0, bottom: 0,
-                                backgroundColor: '#FFFFFF',
-                                opacity: 0.03,
-                            }} />
-                            {/* 2. 顶部柔软弥散高光 (8% opacity, 极大的模糊) */}
-                            <View style={{
-                                position: 'absolute',
-                                top: -50,
-                                left: '10%',
-                                right: '10%',
-                                height: 50,
-                                backgroundColor: '#FFFFFF',
-                                shadowColor: '#FFFFFF',
-                                shadowOffset: { width: 0, height: 25 },
-                                shadowOpacity: 0.08,
-                                shadowRadius: 40, 
-                                borderRadius: 100,
-                                elevation: 0,
-                            }} />
-                        </View>
-                    ),
+                    tabBarBackground: () => <TabBarBackground />,
                     tabBarShowLabel: false,
                     tabBarLabelPosition: 'beside-icon',
                     tabBarActiveTintColor: colors.white,
