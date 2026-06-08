@@ -4,6 +4,7 @@ import { Activity, BarChart2, Calendar, Dumbbell, Flame, TrendingUp } from "luci
 import { useTheme } from "@/hooks/useTheme";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SectionHeader } from "@/components/ui/section-header";
 import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
 
@@ -95,20 +96,6 @@ function formatWorkoutDetail(workout: DayWorkout) {
 }
 function getMonthLabel(month: number) {
     return `${month + 1} 月`;
-}
-
-function SectionTitle({ icon, title, action }: { icon: ReactNode; title: string; action?: ReactNode }) {
-    return (
-        <View className="flex-row items-center justify-between gap-3">
-            <View className="flex-row items-center gap-2">
-                {icon}
-                <Text variant="label" className="tracking-wide">
-                    {title}
-                </Text>
-            </View>
-            {action}
-        </View>
-    );
 }
 
 function ToggleAction({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
@@ -250,7 +237,7 @@ export function TrainingOverview({
 
     return (
         <Card className="gap-5">
-            <SectionTitle icon={<BarChart2 size={17} color={colors.green} />} title="训练表现" />
+            <SectionHeader icon={<BarChart2 size={17} color={colors.green} />} title="训练表现" />
 
             <Card className="gap-3 bg-muted p-3">
                 <View className="flex-row gap-4">
@@ -262,7 +249,7 @@ export function TrainingOverview({
 
             <Separator />
 
-            <SectionTitle
+            <SectionHeader
                 icon={<Calendar size={17} color={colors.green} />}
                 title="训练日历"
                 action={
@@ -383,7 +370,7 @@ export function TrainingOverview({
 
             <Separator />
 
-            <SectionTitle
+            <SectionHeader
                 icon={<TrendingUp size={17} color={colors.blue} />}
                 title="阶段复盘"
                 action={
