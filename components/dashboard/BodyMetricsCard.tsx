@@ -24,10 +24,11 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
     const bodyFatVal = bodyFatMetric?.latestValue;
     const weightDelta = weightMetric?.deltaFromPrevious;
 
+    const hasWeightDelta = weightDelta != null;
     const isWeightDecrease = (weightDelta ?? 0) <= 0;
-    const trendColor = weightDelta === null ? colors.gray4 : (isWeightDecrease ? colors.green : colors.orange);
-    const trendBgColor = weightDelta === null ? colors.border : (isWeightDecrease ? `${colors.green}1A` : `${colors.orange}1A`);
-    const trendText = weightDelta === null ? "暂无数据" : `${isWeightDecrease ? "↓" : "↑"} ${Math.abs(weightDelta).toFixed(1)} kg 相比上次`;
+    const trendColor = hasWeightDelta ? (isWeightDecrease ? colors.green : colors.orange) : colors.gray4;
+    const trendBgColor = hasWeightDelta ? (isWeightDecrease ? `${colors.green}1A` : `${colors.orange}1A`) : colors.border;
+    const trendText = hasWeightDelta ? `${isWeightDecrease ? "↓" : "↑"} ${Math.abs(weightDelta).toFixed(1)} kg 相比上次` : "暂无数据";
 
     // BMI logic based on Chinese standard
     const bmiVal = (weightVal && heightCm) ? (weightVal / Math.pow(heightCm / 100, 2)).toFixed(1) : "-";
