@@ -260,13 +260,13 @@ export function TrainingOverview({
         <Card className="gap-5">
             <SectionTitle icon={<BarChart2 size={17} color={colors.green} />} title="训练表现" />
 
-            <View style={{ backgroundColor: colors.gray3, borderColor: colors.border, borderWidth: 1, padding: 12, borderRadius: 16 }} className="gap-3">
+            <Card className="gap-3 bg-muted p-3">
                 <View className="flex-row gap-4">
                     <MetricStat label="本周训练" value={loading ? "-" : String(data?.workoutsThisWeek ?? 0)} unit="次" icon={<Activity size={14} color={colors.green} />} />
                     <MetricStat label="本月训练量" value={loading ? "-" : String(data?.monthlyVolumeTon ?? "0.0")} unit="t" icon={<Dumbbell size={14} color={colors.orange} />} />
                     <MetricStat label="累计打卡" value={loading ? "-" : String(data?.streak ?? 0)} unit="天" icon={<Flame size={14} color={colors.red} />} />
                 </View>
-            </View>
+            </Card>
 
             <Separator />
 
@@ -354,7 +354,7 @@ export function TrainingOverview({
                 </View>
             )}
 
-            <View style={{ backgroundColor: colors.gray3, borderColor: colors.border, borderWidth: 1, padding: 12, borderRadius: 16 }} className="gap-3">
+            <Card className="gap-3 bg-muted p-3">
                 <View className="flex-row items-center justify-between">
                     <Text style={{ color: colors.white }} className="text-sm font-bold">
                         {currentMonth + 1} 月 {selectedDay} 日
@@ -387,7 +387,7 @@ export function TrainingOverview({
                         暂无记录
                     </Text>
                 )}
-            </View>
+            </Card>
 
             <Separator />
 
