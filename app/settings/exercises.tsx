@@ -187,9 +187,14 @@ export default function ExerciseManagementScreen() {
                                 className="ml-2.5 min-h-0 flex-1 border-0 bg-transparent p-0 text-[15px] font-bold"
                             />
                             {searchQuery.length > 0 ? (
-                                <Pressable onPress={() => setSearchQuery("")}>
+                                <Button
+                                    onPress={() => setSearchQuery("")}
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7"
+                                >
                                     <X size={16} color={colors.gray4} />
-                                </Pressable>
+                                </Button>
                             ) : null}
                         </View>
                         <Button
