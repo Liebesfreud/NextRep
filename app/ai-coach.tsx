@@ -10,6 +10,7 @@ import { bodyMetrics, workouts } from "@/db/schema";
 import { generateTrainingReportWithAI, type AiReportData } from "@/db/services/ai";
 import * as workoutService from "@/db/services/workout";
 import { useTheme } from "@/hooks/useTheme";
+import { Badge, BadgeText } from "@/components/ui/badge";
 
 type EnergyOption = "high" | "medium" | "low";
 type DurationOption = "20" | "40" | "60";
@@ -356,8 +357,14 @@ function FilterRow({ title, icon, options, value, onChange, colors }: { title: s
                 {options.map((option) => {
                     const active = option.key === value;
                     return (
-                        <Pressable key={option.key} onPress={() => onChange(option.key)} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, borderWidth: 1, borderColor: active ? colors.green : colors.border, backgroundColor: active ? `${colors.green}18` : `${colors.gray3}44` }}>
-                            <Text style={{ color: active ? colors.green : colors.white, fontSize: 12, fontWeight: "800" }}>{option.label}</Text>
+                        <Pressable key={option.key} onPress={() => onChange(option.key)}>
+                            <Badge
+                                variant={active ? "default" : "secondary"}
+                                style={{ borderColor: active ? colors.green : colors.border, backgroundColor: active ? `${colors.green}18` : `${colors.gray3}44` }}
+                                className="border px-3 py-2"
+                            >
+                                <BadgeText style={{ color: active ? colors.green : colors.white }}>{option.label}</BadgeText>
+                            </Badge>
                         </Pressable>
                     );
                 })}
