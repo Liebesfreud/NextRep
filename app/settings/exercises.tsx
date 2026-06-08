@@ -217,10 +217,10 @@ export default function ExerciseManagementScreen() {
                                     >
                                         <Badge
                                             variant={isSelected ? "default" : "secondary"}
-                                            style={{ backgroundColor: isSelected ? `${accent}1A` : colors.gray2, borderColor: isSelected ? accent : colors.border }}
-                                            className="border px-3 py-2"
+                                            style={isSelected ? { backgroundColor: `${accent}1A`, borderColor: accent } : undefined}
+                                            className={isSelected ? "border px-3 py-2" : "border border-border bg-secondary px-3 py-2"}
                                         >
-                                            <BadgeText style={{ color: isSelected ? colors.white : colors.gray4 }}>{cat}</BadgeText>
+                                            <BadgeText className={isSelected ? "text-white" : "text-muted-foreground"}>{cat}</BadgeText>
                                         </Badge>
                                     </Button>
                                 );
@@ -252,10 +252,10 @@ export default function ExerciseManagementScreen() {
                                                 >
                                                     <Badge
                                                         variant={isSelected ? "default" : "secondary"}
-                                                        style={{ backgroundColor: isSelected ? visual.iconBg : colors.gray2, borderColor: isSelected ? visual.accent : colors.border }}
-                                                        className="border px-3 py-2"
+                                                        style={isSelected ? { backgroundColor: visual.iconBg, borderColor: visual.accent } : undefined}
+                                                        className={isSelected ? "border px-3 py-2" : "border border-border bg-secondary px-3 py-2"}
                                                     >
-                                                        <BadgeText style={{ color: isSelected ? colors.white : colors.gray4 }}>{tag}</BadgeText>
+                                                        <BadgeText className={isSelected ? "text-white" : "text-muted-foreground"}>{tag}</BadgeText>
                                                     </Badge>
                                                 </Button>
                                             );
