@@ -310,8 +310,8 @@ export function TodayWorkouts({
                 <View className="gap-bento">
                     {/* Cardio */}
                     {cardioWorkouts.length > 0 && (
-                        <View style={{ backgroundColor: `${colors.orange}1A`, borderColor: `${colors.orange}33` }}
-                            className="rounded-bento-sm border p-3 gap-2">
+                        <Card style={{ backgroundColor: `${colors.orange}1A`, borderColor: `${colors.orange}33` }}
+                            className="rounded-bento-sm p-3 gap-2">
                             <View className="flex-row justify-between items-center ml-1">
                                 <Text style={{ color: colors.orange }} className="text-xs font-extrabold tracking-widest uppercase opacity-90">
                                     有氧训练
@@ -339,12 +339,12 @@ export function TodayWorkouts({
                                     </View>
                                 </AnimatedPressable>
                             ))}
-                        </View>
+                        </Card>
                     )}
 
                     {/* Strength */}
                     {strengthWorkouts.length > 0 && (
-                        <View style={{ backgroundColor: colors.gray2 }} className="rounded-bento-sm p-3 gap-2">
+                        <Card className="rounded-bento-sm bg-secondary p-3 gap-2">
                             <View className="flex-row justify-between items-center ml-1 mb-0.5">
                                 <Text style={{ color: colors.gray4, opacity: 0.7 }} className="text-xs font-extrabold tracking-widest uppercase">
                                     力量训练
@@ -376,7 +376,7 @@ export function TodayWorkouts({
                                     </View>
                                 </AnimatedPressable>
                             ))}
-                        </View>
+                        </Card>
                     )}
                 </View>
             ) : (
