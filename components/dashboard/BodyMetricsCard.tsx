@@ -90,7 +90,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
 
                     {/* 趋势标签 */}
                     <View className="self-start rounded-md px-[7px] py-[3px]" style={{ backgroundColor: trendBgColor }}>
-                        <Text style={{ color: trendColor, fontSize: 10, fontWeight: "700" }}>
+                        <Text className="text-[10px] font-bold" style={{ color: trendColor }}>
                             {trendText}
                         </Text>
                     </View>
@@ -126,7 +126,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                             </View>
                             {bodyFatVal && (
                                 <View className="rounded px-1 py-px" style={{ backgroundColor: bodyFatStatusBg }}>
-                                    <Text style={{ fontSize: 9, color: bodyFatStatusColor, fontWeight: "700" }}>
+                                    <Text className="text-[9px] font-bold" style={{ color: bodyFatStatusColor }}>
                                         {bodyFatStatusText}
                                     </Text>
                                 </View>
@@ -155,7 +155,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                                 {loading ? "-" : bmiVal}
                             </Text>
                             <View className="rounded px-1 py-px" style={{ backgroundColor: bmiStatus.bg }}>
-                                <Text style={{ fontSize: 9, color: bmiStatus.color, fontWeight: "700" }}>
+                                <Text className="text-[9px] font-bold" style={{ color: bmiStatus.color }}>
                                     {bmiStatus.text}
                                 </Text>
                             </View>

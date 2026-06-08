@@ -247,11 +247,11 @@ export function StrengthModal({
                 </View>
                 <View className="flex-1 justify-center">
                     <Text className="mb-1.5 text-base font-bold">{ex.name}</Text>
-                    <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>
+                    <Text className="text-xs font-bold" style={{ color: visual.accent }}>
                         {ex.tag || "力量训练"}
                     </Text>
                 </View>
-                <Plus size={20} color={visual.accent} style={{ opacity: 0.7, marginLeft: 8 }} />
+                <Plus size={20} color={visual.accent} className="ml-2 opacity-70" />
             </Button>
         );
     };
