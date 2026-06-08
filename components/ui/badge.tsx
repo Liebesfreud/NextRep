@@ -39,7 +39,7 @@ const Badge = React.forwardRef<React.ElementRef<typeof View>, BadgeProps>(({ cla
 ));
 Badge.displayName = "Badge";
 
-type BadgeTextProps = React.ComponentPropsWithoutRef<typeof Text> & VariantProps<typeof badgeTextVariants>;
+type BadgeTextProps = Omit<React.ComponentPropsWithoutRef<typeof Text>, "variant"> & VariantProps<typeof badgeTextVariants>;
 
 const BadgeText = React.forwardRef<React.ElementRef<typeof Text>, BadgeTextProps>(
     ({ className, variant, ...props }, ref) => (
