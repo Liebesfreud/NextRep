@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Home, LayoutDashboard, Bot, Settings } from "lucide-react-native";
-import { Pressable, View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { ThemeProvider, useTheme } from "@/hooks/useTheme";
 import { initDatabase } from "@/db/client";
 import * as SplashScreen from "expo-splash-screen";
 import { ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from "@react-navigation/native";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 import "../global.css";
 
 // Prevent auto hide
@@ -45,23 +47,23 @@ function TabLayout() {
 
     if (dbError) {
         return (
-            <View style={{ flex: 1, justifyContent: "center", padding: 24, backgroundColor: colors.bg }}>
+            <View className="flex-1 justify-center bg-background p-6">
                 <StatusBar style={theme === "dark" ? "light" : "dark"} />
-                <Text style={{ color: colors.white, fontSize: 22, fontWeight: "900", marginBottom: 10 }}>
+                <Text variant="heading" className="mb-2.5">
                     启动失败
                 </Text>
-                <Text style={{ color: colors.gray4, fontSize: 14, lineHeight: 22, marginBottom: 20 }}>
+                <Text variant="muted" className="mb-5 leading-[22px]">
                     {dbError}
                 </Text>
-                <Pressable
+                <Button
                     onPress={() => {
                         setDbInitialized(false);
                         setRetryKey((prev) => prev + 1);
                     }}
-                    style={{ alignSelf: "flex-start", backgroundColor: colors.green, borderRadius: 12, paddingHorizontal: 18, paddingVertical: 12 }}
+                    className="self-start bg-accent"
                 >
-                    <Text style={{ color: colors.bg, fontSize: 14, fontWeight: "900" }}>重试</Text>
-                </Pressable>
+                    <ButtonText className="text-accent-foreground">重试</ButtonText>
+                </Button>
             </View>
         );
     }
