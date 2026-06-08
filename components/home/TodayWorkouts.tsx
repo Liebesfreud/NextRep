@@ -388,18 +388,18 @@ export function TodayWorkouts({
                 <View className="flex-row gap-bento">
                     {cardioWorkouts.length === 0 && (
                         <Button onPress={handleOpenCardio}
-                            style={{ backgroundColor: `${colors.orange}26`, borderColor: `${colors.orange}33`, borderWidth: 1 }}
+                            style={{ backgroundColor: `${colors.orange}26`, borderColor: `${colors.orange}33` }}
                             variant="outline"
-                            className="flex-1 py-3">
+                            className="flex-1 border py-3">
                             <Activity size={16} color={colors.orange} />
                             <ButtonText variant="outline" className="text-sm" style={{ color: colors.orange }}>有氧运动</ButtonText>
                         </Button>
                     )}
                     {strengthWorkouts.length === 0 && (
                         <Button onPress={handleOpenStrength}
-                            style={{ backgroundColor: colors.gray2, borderColor: colors.border, borderWidth: 1 }}
+                            style={{ backgroundColor: colors.gray2, borderColor: colors.border }}
                             variant="outline"
-                            className="flex-1 py-3">
+                            className="flex-1 border py-3">
                             <Dumbbell size={16} color={colors.white} />
                             <ButtonText variant="outline" className="text-sm text-foreground">力量训练</ButtonText>
                         </Button>
@@ -411,16 +411,16 @@ export function TodayWorkouts({
             {!isToday && (
                 <View className="flex-row gap-bento">
                     <Button onPress={handleOpenCardio}
-                        style={{ backgroundColor: `${colors.orange}26`, borderColor: `${colors.orange}33`, borderWidth: 1 }}
+                        style={{ backgroundColor: `${colors.orange}26`, borderColor: `${colors.orange}33` }}
                         variant="outline"
-                        className="flex-1 py-3">
+                        className="flex-1 border py-3">
                         <Activity size={16} color={colors.orange} />
                         <ButtonText variant="outline" className="text-sm" style={{ color: colors.orange }}>补录有氧</ButtonText>
                     </Button>
                     <Button onPress={handleOpenStrength}
-                        style={{ backgroundColor: colors.gray2, borderColor: colors.border, borderWidth: 1 }}
+                        style={{ backgroundColor: colors.gray2, borderColor: colors.border }}
                         variant="outline"
-                        className="flex-1 py-3">
+                        className="flex-1 border py-3">
                         <Dumbbell size={16} color={colors.white} />
                         <ButtonText variant="outline" className="text-sm text-foreground">补录力量</ButtonText>
                     </Button>
@@ -442,8 +442,8 @@ export function TodayWorkouts({
             )}
             {isCheckedIn && (
                 <View
-                    style={{ backgroundColor: `${colors.green}1A`, borderColor: `${colors.green}33`, borderWidth: 1 }}
-                    className="w-full py-4 rounded-bento-sm flex-row items-center justify-center gap-2"
+                    style={{ backgroundColor: `${colors.green}1A`, borderColor: `${colors.green}33` }}
+                    className="w-full flex-row items-center justify-center gap-2 rounded-bento-sm border py-4"
                 >
                     <CheckCircle size={18} color={colors.green} strokeWidth={2.5} />
                     <Text style={{ color: colors.green }} className="font-extrabold text-base tracking-widest">{isToday ? "今日打卡已完成" : "已补打卡"}</Text>
