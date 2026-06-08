@@ -9,6 +9,7 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
+import { cn } from "@/lib/utils";
 
 type Props = {
     visible: boolean;
@@ -178,12 +179,12 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                                         onPress={() => setTrendRange(range)}
                                         variant="ghost"
                                         size="sm"
-                                        className="h-auto rounded-lg px-2.5 py-1.5"
-                                        style={{
-                                            backgroundColor: active ? colors.gray3 : "transparent",
-                                        }}
+                                        className={cn("h-auto rounded-lg px-2.5 py-1.5", active ? "bg-muted" : "bg-transparent")}
                                     >
-                                        <Text style={{ color: active ? colors.white : colors.gray4, fontSize: 11, fontWeight: active ? "700" : "600" }}>
+                                        <Text
+                                            style={{ color: active ? colors.white : colors.gray4 }}
+                                            className={cn("text-[11px]", active ? "font-bold" : "font-semibold")}
+                                        >
                                             {range}天
                                         </Text>
                                     </Button>
