@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { Alert, View } from "react-native";
 import { Activity, Plus, Radio, ShieldCheck, Trash2, Zap } from "lucide-react-native";
 import { type UserProfileData } from "@/db/services/profile";
 import { testAIConnection } from "@/db/services/ai";
@@ -134,7 +134,12 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
                     return (
                         <View key={config.id} className={cn("border-b border-border", isActive && "bg-primary/5")}>
                             <View className="flex-row items-center gap-2.5 px-3.5 pb-2 pt-3">
-                                <Pressable onPress={() => setProfile((current) => ({ ...current, activeAiConfigId: config.id }))}>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7"
+                                    onPress={() => setProfile((current) => ({ ...current, activeAiConfigId: config.id }))}
+                                >
                                     <View
                                         className={cn(
                                             "h-5 w-5 items-center justify-center rounded-full border-2",
@@ -143,7 +148,7 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
                                     >
                                         {isActive && <View className="h-2.5 w-2.5 rounded-full bg-primary" />}
                                     </View>
-                                </Pressable>
+                                </Button>
                                 <Input
                                     value={config.name}
                                     onChangeText={(value) => {
