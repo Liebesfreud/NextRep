@@ -77,17 +77,17 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                         minHeight: 106,
                     }}
                 >
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        <Text style={{ color: colors.white, opacity: 0.8, fontWeight: "600", fontSize: 12 }}>
+                    <View className="flex-row items-center">
+                        <Text variant="caption" className="font-semibold text-foreground opacity-80">
                             体重
                         </Text>
                     </View>
 
-                    <View style={{ flexDirection: "row", alignItems: "baseline", marginTop: 6, marginBottom: 8 }}>
-                        <Text style={{ color: colors.white, fontSize: 28, fontWeight: "800", letterSpacing: -1 }}>
+                    <View className="mb-2 mt-1.5 flex-row items-baseline">
+                        <Text className="text-[28px] font-extrabold tracking-[-1px] text-foreground">
                             {loading ? "-" : (weightVal ?? "-")}
                         </Text>
-                        <Text style={{ color: colors.white, opacity: 0.5, fontSize: 12, marginLeft: 4, fontWeight: "600" }}>
+                        <Text variant="caption" className="ml-1 font-semibold text-foreground opacity-50">
                             kg
                         </Text>
                     </View>
@@ -108,7 +108,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                         </Text>
                     </View>
 
-                    <Text style={{ color: colors.gray4, fontSize: 10, marginTop: 8, fontWeight: "600" }} numberOfLines={2}>
+                    <Text className="mt-2 text-[10px] font-semibold text-muted-foreground" numberOfLines={2}>
                         {targetWeight != null && weightGap != null
                             ? `目标 ${targetWeight}kg · ${weightGap === 0 ? "已达成" : `${weightGap > 0 ? "高于" : "低于"}目标 ${Math.abs(weightGap).toFixed(1)}kg`}`
                             : "设置目标体重后显示差距"}
@@ -131,15 +131,15 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                             justifyContent: "space-between",
                         }}
                     >
-                        <Text style={{ color: colors.white, opacity: 0.8, fontSize: 11, fontWeight: "600" }}>
+                        <Text className="text-[11px] font-semibold text-foreground opacity-80">
                             体脂率
                         </Text>
-                        <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginTop: 2 }}>
-                            <View style={{ flexDirection: "row", alignItems: "baseline" }}>
-                                <Text style={{ color: colors.white, fontSize: 17, fontWeight: "800" }}>
+                        <View className="mt-0.5 flex-row items-end justify-between">
+                            <View className="flex-row items-baseline">
+                                <Text className="text-[17px] font-extrabold text-foreground">
                                     {loading ? "-" : (bodyFatVal ?? "-")}
                                 </Text>
-                                <Text style={{ color: colors.white, opacity: 0.5, fontSize: 9, marginLeft: 2, fontWeight: "600" }}>%</Text>
+                                <Text className="ml-0.5 text-[9px] font-semibold text-foreground opacity-50">%</Text>
                             </View>
                             {bodyFatVal && (
                                 <View style={{ backgroundColor: bodyFatStatusBg, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4 }}>
@@ -149,7 +149,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                                 </View>
                             )}
                         </View>
-                        <Text style={{ color: colors.gray4, fontSize: 9, fontWeight: "600", marginTop: 3 }} numberOfLines={2}>
+                        <Text className="mt-[3px] text-[9px] font-semibold text-muted-foreground" numberOfLines={2}>
                             {targetBodyFat != null && bodyFatGap != null
                                 ? `目标 ${targetBodyFat}% · ${bodyFatGap === 0 ? "已达成" : `${bodyFatGap > 0 ? "高于" : "低于"}目标 ${Math.abs(bodyFatGap).toFixed(1)}%`}`
                                 : "设置目标体脂后显示差距"}
@@ -164,11 +164,11 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                         }}
                         className="flex-1 justify-between rounded-2xl border p-[9px]"
                     >
-                        <Text style={{ color: colors.white, opacity: 0.8, fontSize: 11, fontWeight: "600" }}>
+                        <Text className="text-[11px] font-semibold text-foreground opacity-80">
                             BMI
                         </Text>
-                        <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginTop: 2 }}>
-                            <Text style={{ color: colors.white, fontSize: 17, fontWeight: "800" }}>
+                        <View className="mt-0.5 flex-row items-end justify-between">
+                            <Text className="text-[17px] font-extrabold text-foreground">
                                 {loading ? "-" : bmiVal}
                             </Text>
                             <View style={{ backgroundColor: bmiStatus.bg, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4 }}>
