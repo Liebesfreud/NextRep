@@ -306,8 +306,7 @@ export function StrengthModal({
                                 })}
                                 activeScale={0.92}
                                 activeOpacity={0.75}
-                                className="h-8 w-8 items-center justify-center rounded-lg"
-                                style={{ backgroundColor: colors.gray3 }}
+                                className="h-8 w-8 items-center justify-center rounded-lg bg-muted"
                             >
                                 <Library size={18} color={colors.gray4} />
                             </AnimatedPressable>
