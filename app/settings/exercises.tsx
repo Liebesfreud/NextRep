@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, Alert, KeyboardAvoidingView, Platform, FlatList } from "react-native";
+import { View, Text, ScrollView, Pressable, Alert, KeyboardAvoidingView, Platform, FlatList } from "react-native";
 import { ChevronLeft, ChevronRight, Dumbbell, Plus, Search, Trash2, X } from "lucide-react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
@@ -8,6 +8,10 @@ import { getStrengthExerciseAnalytics, type StrengthExerciseAnalytics } from "@/
 import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
 import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
 import { ExerciseDetailModal } from "@/components/dashboard/ExerciseDetailModal";
+import { Badge, BadgeText } from "@/components/ui/badge";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 function formatWeight(value: number | null | undefined) {
     if (!value) return "--";
@@ -170,14 +174,13 @@ export default function ExerciseManagementScreen() {
             <AnimatedEnter delay={50} distance={12}>
                 <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 10 }}>
                     <View style={{ flexDirection: "row", gap: 10, marginBottom: 12 }}>
-                        <View style={{ backgroundColor: colors.gray2, flexDirection: "row", alignItems: "center", paddingHorizontal: 14, height: 44, borderRadius: 12, flex: 1 }}>
+                        <View className="h-11 flex-1 flex-row items-center rounded-bento-sm bg-secondary px-3.5">
                             <Search size={18} color={colors.gray4} />
-                            <TextInput
+                            <Input
                                 value={searchQuery}
                                 onChangeText={setSearchQuery}
                                 placeholder="搜索动作"
-                                placeholderTextColor={`${colors.gray4}80`}
-                                style={{ color: colors.white, fontSize: 15, fontWeight: "700", marginLeft: 10, flex: 1, padding: 0 }}
+                                className="ml-2.5 min-h-0 flex-1 border-0 bg-transparent p-0 text-[15px] font-bold"
                             />
                             {searchQuery.length > 0 ? (
                                 <Pressable onPress={() => setSearchQuery("")}>
@@ -185,12 +188,14 @@ export default function ExerciseManagementScreen() {
                                 </Pressable>
                             ) : null}
                         </View>
-                        <Pressable
+                        <Button
                             onPress={() => setIsCreating(!isCreating)}
-                            style={{ backgroundColor: isCreating ? `${colors.green}1A` : colors.gray2, borderColor: isCreating ? colors.green : colors.border, borderWidth: 1, width: 44, height: 44, borderRadius: 12, alignItems: "center", justifyContent: "center" }}
+                            variant={isCreating ? "outline" : "secondary"}
+                            size="icon"
+                            className={isCreating ? "border-accent bg-accent/10" : undefined}
                         >
                             {isCreating ? <X size={20} color={colors.green} /> : <Plus size={20} color={colors.white} />}
-                        </Pressable>
+                        </Button>
                     </View>
 
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20, paddingHorizontal: 20 }}>
@@ -200,21 +205,14 @@ export default function ExerciseManagementScreen() {
                                 const visual = cat === "全部" ? null : getStrengthCategoryVisual(cat, colors);
                                 const accent = visual?.accent ?? colors.blue;
                                 return (
-                                    <Pressable
-                                        key={cat}
-                                        onPress={() => setSelectedCategory(cat)}
-                                        style={{
-                                            backgroundColor: isSelected ? `${accent}1A` : colors.gray2,
-                                            borderColor: isSelected ? accent : colors.border,
-                                            borderWidth: 1,
-                                            paddingHorizontal: 12,
-                                            paddingVertical: 7,
-                                            borderRadius: 999,
-                                        }}
-                                    >
-                                        <Text style={{ color: isSelected ? colors.white : colors.gray4, fontSize: 12, fontWeight: "800" }}>
-                                            {cat}
-                                        </Text>
+                                    <Pressable key={cat} onPress={() => setSelectedCategory(cat)}>
+                                        <Badge
+                                            variant={isSelected ? "default" : "secondary"}
+                                            style={{ backgroundColor: isSelected ? `${accent}1A` : colors.gray2, borderColor: isSelected ? accent : colors.border }}
+                                            className="border px-3 py-2"
+                                        >
+                                            <BadgeText style={{ color: isSelected ? colors.white : colors.gray4 }}>{cat}</BadgeText>
+                                        </Badge>
                                     </Pressable>
                                 );
                             })}
@@ -223,13 +221,12 @@ export default function ExerciseManagementScreen() {
 
                     {isCreating && (
                         <AnimatedEnter delay={0} distance={8}>
-                            <View style={{ backgroundColor: colors.bento, borderColor: colors.border, borderWidth: 1, padding: 14, borderRadius: 16, marginTop: 6 }}>
-                                <TextInput
+                            <Card className="mt-1.5 p-3.5">
+                                <Input
                                     value={newName}
                                     onChangeText={setNewName}
                                     placeholder="例如：杠铃卧推"
-                                    placeholderTextColor={`${colors.gray4}66`}
-                                    style={{ color: colors.white, backgroundColor: colors.gray2, paddingHorizontal: 12, height: 42, borderRadius: 10, fontWeight: "800", fontSize: 15, marginBottom: 10 }}
+                                    className="mb-2.5 h-[42px] font-extrabold"
                                 />
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
                                     <View style={{ flexDirection: "row", gap: 8 }}>
@@ -238,32 +235,27 @@ export default function ExerciseManagementScreen() {
                                             const isSelected = tag === newTag;
 
                                             return (
-                                                <Pressable
-                                                    key={tag}
-                                                    onPress={() => setNewTag(isSelected ? null : tag)}
-                                                    style={{
-                                                        backgroundColor: isSelected ? visual.iconBg : colors.gray2,
-                                                        borderColor: isSelected ? visual.accent : colors.border,
-                                                        borderWidth: 1,
-                                                        paddingHorizontal: 12,
-                                                        paddingVertical: 7,
-                                                        borderRadius: 999,
-                                                    }}
-                                                >
-                                                    <Text style={{ color: isSelected ? colors.white : colors.gray4, fontSize: 12, fontWeight: "800" }}>{tag}</Text>
+                                                <Pressable key={tag} onPress={() => setNewTag(isSelected ? null : tag)}>
+                                                    <Badge
+                                                        variant={isSelected ? "default" : "secondary"}
+                                                        style={{ backgroundColor: isSelected ? visual.iconBg : colors.gray2, borderColor: isSelected ? visual.accent : colors.border }}
+                                                        className="border px-3 py-2"
+                                                    >
+                                                        <BadgeText style={{ color: isSelected ? colors.white : colors.gray4 }}>{tag}</BadgeText>
+                                                    </Badge>
                                                 </Pressable>
                                             );
                                         })}
                                     </View>
                                 </ScrollView>
-                                <Pressable
+                                <Button
                                     onPress={handleAdd}
                                     disabled={!newName.trim()}
-                                    style={{ backgroundColor: colors.green, opacity: newName.trim() ? 1 : 0.5, paddingVertical: 12, borderRadius: 10, alignItems: "center" }}
+                                    className="bg-accent"
                                 >
-                                    <Text style={{ color: colors.white, fontWeight: "900", fontSize: 15 }}>保存动作</Text>
-                                </Pressable>
-                            </View>
+                                    <ButtonText className="text-accent-foreground">保存动作</ButtonText>
+                                </Button>
+                            </Card>
                         </AnimatedEnter>
                     )}
                 </View>
