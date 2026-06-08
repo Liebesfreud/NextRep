@@ -331,7 +331,7 @@ export default function AiCoachScreen() {
                 </Card>
 
                 {error && (
-                    <Card style={{ backgroundColor: `${colors.red}14`, borderColor: `${colors.red}33` }} className="p-3.5">
+                    <Card className="border-destructive/20 bg-destructive/10 p-3.5">
                         <Text className="text-[13px] font-bold leading-5 text-destructive">{error}</Text>
                     </Card>
                 )}
