@@ -396,9 +396,8 @@ export function TodayWorkouts({
                     )}
                     {strengthWorkouts.length === 0 && (
                         <Button onPress={handleOpenStrength}
-                            style={{ backgroundColor: colors.gray2, borderColor: colors.border }}
                             variant="outline"
-                            className="flex-1 border py-3">
+                            className="flex-1 border border-border bg-secondary py-3">
                             <Dumbbell size={16} color={colors.white} />
                             <ButtonText variant="outline" className="text-sm text-foreground">力量训练</ButtonText>
                         </Button>
@@ -417,9 +416,8 @@ export function TodayWorkouts({
                         <ButtonText variant="outline" className="text-sm text-accent">补录有氧</ButtonText>
                     </Button>
                     <Button onPress={handleOpenStrength}
-                        style={{ backgroundColor: colors.gray2, borderColor: colors.border }}
                         variant="outline"
-                        className="flex-1 border py-3">
+                        className="flex-1 border border-border bg-secondary py-3">
                         <Dumbbell size={16} color={colors.white} />
                         <ButtonText variant="outline" className="text-sm text-foreground">补录力量</ButtonText>
                     </Button>
