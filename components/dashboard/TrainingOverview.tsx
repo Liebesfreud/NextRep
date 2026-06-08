@@ -2,6 +2,9 @@ import { useMemo, useRef, useState, type ReactNode } from "react";
 import { View, Text, Pressable, ScrollView, useWindowDimensions } from "react-native";
 import { Activity, BarChart2, Calendar, Dumbbell, Flame, TrendingUp } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 type ReviewSummary = {
     workouts: number;
@@ -94,8 +97,7 @@ function getMonthLabel(month: number) {
 }
 
 function Divider() {
-    const { colors } = useTheme();
-    return <View style={{ height: 1, backgroundColor: colors.border }} />;
+    return <Separator />;
 }
 
 function SectionTitle({ icon, title, action }: { icon: ReactNode; title: string; action?: ReactNode }) {
@@ -118,16 +120,17 @@ function ToggleAction({ label, active, onPress }: { label: string; active: boole
     const { colors } = useTheme();
 
     return (
-        <Pressable
+        <Button
             onPress={onPress}
+            variant="secondary"
+            size="sm"
             hitSlop={8}
-            style={{ backgroundColor: colors.gray3, borderColor: colors.border, borderWidth: 1, minHeight: 32, paddingHorizontal: 12, borderRadius: 16 }}
-            className="items-center justify-center"
+            className="min-h-8 rounded-full border border-border px-3"
         >
-            <Text style={{ color: active ? colors.green : colors.gray4 }} className="text-xs font-bold">
+            <ButtonText variant="secondary" size="sm" style={{ color: active ? colors.green : colors.gray4 }}>
                 {label}
-            </Text>
-        </Pressable>
+            </ButtonText>
+        </Button>
     );
 }
 
@@ -167,7 +170,7 @@ function ReviewCard({ title, summary }: { title: string; summary?: ReviewSummary
     ];
 
     return (
-        <View style={{ backgroundColor: colors.gray3, borderColor: colors.border, borderWidth: 1, padding: 12, borderRadius: 16 }} className="gap-3">
+        <Card className="gap-3 bg-muted p-3">
             <Text style={{ color: colors.white }} className="text-sm font-black">
                 {title}
             </Text>
@@ -213,7 +216,7 @@ function ReviewCard({ title, summary }: { title: string; summary?: ReviewSummary
                     </Text>
                 </View>
             </View>
-        </View>
+        </Card>
     );
 }
 
@@ -257,7 +260,7 @@ export function TrainingOverview({
     const reviewSnapInterval = reviewPageWidth + reviewPageGap;
 
     return (
-        <View style={{ backgroundColor: colors.bento, borderColor: colors.border, borderWidth: 1, padding: 16, borderRadius: 16 }} className="gap-5">
+        <Card className="gap-5">
             <SectionTitle icon={<BarChart2 size={17} color={colors.green} />} title="训练表现" />
 
             <View style={{ backgroundColor: colors.gray3, borderColor: colors.border, borderWidth: 1, padding: 12, borderRadius: 16 }} className="gap-3">
@@ -455,6 +458,6 @@ export function TrainingOverview({
                     </View>
                 </>
             ) : null}
-        </View>
+        </Card>
     );
 }
