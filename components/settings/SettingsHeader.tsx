@@ -16,7 +16,7 @@ export function SettingsHeader({ onSave, isPending, isSaved }: Props) {
     return (
         <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-3">
-                <View style={{ backgroundColor: `${colors.green}22` }} className="w-10 h-10 rounded-full items-center justify-center">
+                <View className="h-10 w-10 items-center justify-center rounded-full bg-accent/10">
                     <Settings size={20} color={colors.green} />
                 </View>
                 <View>
