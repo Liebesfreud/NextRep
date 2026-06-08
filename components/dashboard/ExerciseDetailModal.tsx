@@ -40,18 +40,16 @@ function StatTile({
     value: string;
     icon: ReactNode;
 }) {
-    const { colors } = useTheme();
-
     return (
         <View style={{ width: "50%", padding: 5 }}>
             <Card className="min-h-[82px] rounded-xl bg-secondary p-3">
                 <View className="flex-row items-center gap-1.5 mb-2">
                     {icon}
-                    <Text style={{ color: colors.gray4 }} className="text-[11px] font-bold">
+                    <Text variant="caption" className="text-[11px] font-bold">
                         {label}
                     </Text>
                 </View>
-                <Text style={{ color: colors.white }} className="text-lg font-black" numberOfLines={1}>
+                <Text className="text-lg font-black" numberOfLines={1}>
                     {value}
                 </Text>
             </Card>
@@ -79,11 +77,11 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
         >
             <View className="flex-row justify-between items-start mb-5">
                 <View className="flex-row items-center gap-3 flex-1 pr-3">
-                    <View style={{ backgroundColor: visual.iconBg, width: 46, height: 46, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
+                    <View style={{ backgroundColor: visual.iconBg }} className="h-[46px] w-[46px] items-center justify-center rounded-xl">
                         <Icon size={22} color={visual.accent} />
                     </View>
                     <View className="flex-1">
-                        <Text style={{ color: colors.white }} className="text-xl font-black" numberOfLines={1}>
+                        <Text className="text-xl font-black" numberOfLines={1}>
                             {exercise.name}
                         </Text>
                         <Text style={{ color: visual.accent }} className="text-xs font-bold mt-1">
@@ -111,15 +109,15 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
 
                 <Card className="mb-3 rounded-[14px] bg-secondary p-3.5">
                     <View className="flex-row items-center justify-between mb-3">
-                        <Text style={{ color: colors.white }} className="text-sm font-black">最近训练</Text>
-                        <Text style={{ color: colors.gray4 }} className="text-xs font-bold">
+                        <Text variant="label">最近训练</Text>
+                        <Text variant="caption" className="font-bold">
                             {formatDate(exercise.latestDateStr)}
                         </Text>
                     </View>
                     {recentHistory.length === 0 ? (
-                        <View style={{ alignItems: "center", paddingVertical: 22 }}>
+                        <View className="items-center py-[22px]">
                             <Activity size={28} color={colors.gray4} />
-                            <Text style={{ color: colors.gray4 }} className="text-sm font-bold mt-3">
+                            <Text variant="muted" className="mt-3 font-bold">
                                 还没有训练记录
                             </Text>
                         </View>
@@ -128,14 +126,14 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
                             {recentHistory.map((record, index) => (
                                 <View key={`${record.createdAt}-${index}`} className="flex-row items-center justify-between gap-3">
                                     <View className="flex-1">
-                                        <Text style={{ color: colors.white }} className="text-sm font-bold">
+                                        <Text className="text-sm font-bold">
                                             {record.dateStr}
                                         </Text>
-                                        <Text style={{ color: colors.gray4 }} className="text-xs font-semibold mt-0.5">
+                                        <Text variant="caption" className="mt-0.5 font-semibold">
                                             {record.setCount} 组 · {record.totalReps} 次 · {formatVolume(record.volumeKg)}
                                         </Text>
                                     </View>
-                                    <Text style={{ color: colors.white }} className="text-sm font-black">
+                                    <Text className="text-sm font-black">
                                         {formatWeight(record.maxWeightKg)}
                                     </Text>
                                 </View>
@@ -145,9 +143,9 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
                 </Card>
 
                 <Card className="rounded-[14px] bg-secondary p-3.5">
-                    <Text style={{ color: colors.white }} className="text-sm font-black mb-3">重量里程碑</Text>
+                    <Text variant="label" className="mb-3">重量里程碑</Text>
                     {recentBreakthroughs.length === 0 ? (
-                        <Text style={{ color: colors.gray4 }} className="text-sm font-bold py-2">
+                        <Text variant="muted" className="py-2 font-bold">
                             有最高重量记录后会显示突破历程
                         </Text>
                     ) : (
@@ -155,10 +153,10 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
                             {recentBreakthroughs.map((item, index) => (
                                 <View key={`${item.createdAt}-${index}`} className="flex-row items-center justify-between gap-3">
                                     <View className="flex-1">
-                                        <Text style={{ color: colors.white }} className="text-sm font-bold">
+                                        <Text className="text-sm font-bold">
                                             {item.previousWeightKg === null ? "初始记录" : "刷新最高重量"}
                                         </Text>
-                                        <Text style={{ color: colors.gray4 }} className="text-xs font-semibold mt-0.5">
+                                        <Text variant="caption" className="mt-0.5 font-semibold">
                                             {item.dateStr}
                                             {item.previousWeightKg !== null ? ` · 从 ${formatWeight(item.previousWeightKg)} 到` : ""}
                                         </Text>
