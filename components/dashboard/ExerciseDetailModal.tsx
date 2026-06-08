@@ -1,10 +1,13 @@
-import { View, Text, Pressable, ScrollView } from "react-native";
+import { View, ScrollView } from "react-native";
 import { type ReactNode } from "react";
 import { Activity, Calendar, Dumbbell, Target, TrendingUp, X } from "lucide-react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { useTheme } from "@/hooks/useTheme";
 import { getStrengthCategoryVisual } from "@/constants/exerciseVisuals";
 import { type StrengthExerciseAnalytics } from "@/db/services/dashboard";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Text } from "@/components/ui/text";
 
 type Props = {
     visible: boolean;
@@ -41,7 +44,7 @@ function StatTile({
 
     return (
         <View style={{ width: "50%", padding: 5 }}>
-            <View style={{ backgroundColor: colors.gray2, borderColor: colors.border, borderWidth: 1, borderRadius: 12, padding: 12, minHeight: 82 }}>
+            <Card className="min-h-[82px] rounded-xl bg-secondary p-3">
                 <View className="flex-row items-center gap-1.5 mb-2">
                     {icon}
                     <Text style={{ color: colors.gray4 }} className="text-[11px] font-bold">
@@ -51,7 +54,7 @@ function StatTile({
                 <Text style={{ color: colors.white }} className="text-lg font-black" numberOfLines={1}>
                     {value}
                 </Text>
-            </View>
+            </Card>
         </View>
     );
 }
@@ -88,12 +91,14 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
                         </Text>
                     </View>
                 </View>
-                <Pressable
+                <Button
                     onPress={onClose}
-                    style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
+                    variant="secondary"
+                    size="icon"
+                    className="h-8 w-8 rounded-lg"
                 >
                     <X size={20} color={colors.gray4} />
-                </Pressable>
+                </Button>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
@@ -104,7 +109,7 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
                     <StatTile label="累计容量" value={formatVolume(exercise.totalVolumeKg)} icon={<Target size={14} color={colors.orange} />} />
                 </View>
 
-                <View style={{ backgroundColor: colors.gray2, borderColor: colors.border, borderWidth: 1, borderRadius: 14, padding: 14, marginBottom: 12 }}>
+                <Card className="mb-3 rounded-[14px] bg-secondary p-3.5">
                     <View className="flex-row items-center justify-between mb-3">
                         <Text style={{ color: colors.white }} className="text-sm font-black">最近训练</Text>
                         <Text style={{ color: colors.gray4 }} className="text-xs font-bold">
@@ -137,9 +142,9 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
                             ))}
                         </View>
                     )}
-                </View>
+                </Card>
 
-                <View style={{ backgroundColor: colors.gray2, borderColor: colors.border, borderWidth: 1, borderRadius: 14, padding: 14 }}>
+                <Card className="rounded-[14px] bg-secondary p-3.5">
                     <Text style={{ color: colors.white }} className="text-sm font-black mb-3">重量里程碑</Text>
                     {recentBreakthroughs.length === 0 ? (
                         <Text style={{ color: colors.gray4 }} className="text-sm font-bold py-2">
@@ -165,7 +170,7 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
                             ))}
                         </View>
                     )}
-                </View>
+                </Card>
             </ScrollView>
         </BottomSheetModal>
     );
