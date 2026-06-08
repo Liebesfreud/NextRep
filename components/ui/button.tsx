@@ -57,10 +57,17 @@ type ButtonProps = PressableProps &
     VariantProps<typeof buttonVariants> & {
         asChild?: boolean;
         loading?: boolean;
+        indicatorColor?: string;
     };
 
+function getIndicatorColor(variant: ButtonProps["variant"]) {
+    if (variant === "default") return "#000000";
+    if (variant === "destructive") return "#FFFFFF";
+    return "#FF9F0A";
+}
+
 const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>(
-    ({ className, variant, size, asChild = false, loading = false, disabled, children, ...props }, ref) => {
+    ({ className, variant, size, asChild = false, loading = false, indicatorColor, disabled, children, ...props }, ref) => {
         const Component = asChild ? Slot : Pressable;
         const isDisabled = disabled || loading;
 
@@ -73,7 +80,7 @@ const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>
                 accessibilityState={{ disabled: isDisabled }}
                 {...props}
             >
-                {loading ? <ActivityIndicator size="small" color="currentColor" /> : children}
+                {loading ? <ActivityIndicator size="small" color={indicatorColor ?? getIndicatorColor(variant)} /> : children}
             </Component>
         );
     }
