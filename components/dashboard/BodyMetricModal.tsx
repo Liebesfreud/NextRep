@@ -281,7 +281,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                         </View>
                     </View>
 
-                    <View style={{ backgroundColor: colors.gray2, borderRadius: 12, padding: 10, borderWidth: 1, borderColor: colors.border }}>
+                    <Card className="rounded-xl bg-secondary p-2.5">
                         <View style={{ flexDirection: "row", marginBottom: 6 }}>
                             {["日", "一", "二", "三", "四", "五", "六"].map(d => (
                                 <View key={d} style={{ flex: 1, alignItems: "center" }}>
@@ -347,7 +347,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                                 </View>
                             );
                         })()}
-                    </View>
+                    </Card>
                 </View>
             </ScrollView>
         </BottomSheetModal>
