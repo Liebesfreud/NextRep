@@ -102,26 +102,21 @@ export default function ExerciseManagementScreen() {
         return (
             <Card
                 style={{
-                    flexDirection: "row",
-                    alignItems: "center",
                     borderWidth: 0.75,
                     borderColor: `${visual.accent}24`,
-                    borderRadius: 14,
                     backgroundColor: visual.cardBg ?? colors.gray2,
-                    marginBottom: 8,
-                    overflow: "hidden",
                 }}
-                className="p-0"
+                className="mb-2 flex-row items-center overflow-hidden rounded-[14px] p-0"
             >
                 <Button
                     onPress={() => setSelectedExercise(item)}
                     variant="ghost"
                     className="flex-1 justify-start rounded-none py-3 pl-3 pr-1"
                 >
-                    <View style={{ backgroundColor: visual.iconBg, width: 42, height: 42, borderRadius: 12, alignItems: "center", justifyContent: "center", marginRight: 12 }}>
+                    <View style={{ backgroundColor: visual.iconBg }} className="mr-3 h-[42px] w-[42px] items-center justify-center rounded-xl">
                         <Icon size={19} color={visual.accent} />
                     </View>
-                    <View style={{ flex: 1 }}>
+                    <View className="flex-1">
                         <View className="flex-row items-center gap-2">
                             <Text className="flex-1 text-[15px] font-black" numberOfLines={1}>
                                 {item.name}
