@@ -1,5 +1,5 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, ScrollView, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { Clock3, Flame, MapPin, Plus, Sparkles } from "lucide-react-native";
 import { desc } from "drizzle-orm";
@@ -13,6 +13,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Text } from "@/components/ui/text";
 
 type EnergyOption = "high" | "medium" | "low";
 type DurationOption = "20" | "40" | "60";
