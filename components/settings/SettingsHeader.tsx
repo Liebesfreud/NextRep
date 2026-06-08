@@ -1,7 +1,8 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { Check, Save, Settings } from "lucide-react-native";
-import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import { useTheme } from "@/hooks/useTheme";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 
 type Props = {
     onSave: () => void;
@@ -13,43 +14,34 @@ export function SettingsHeader({ onSave, isPending, isSaved }: Props) {
     const { colors } = useTheme();
 
     return (
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+        <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-3">
                 <View style={{ backgroundColor: `${colors.green}22` }} className="w-10 h-10 rounded-full items-center justify-center">
                     <Settings size={20} color={colors.green} />
                 </View>
                 <View>
-                    <Text style={{ color: colors.white }} className="text-2xl font-black leading-none">个人配置</Text>
-                    <Text style={{ color: colors.gray4, opacity: 0.8 }} className="text-[10px] font-bold tracking-widest mt-1 uppercase">
+                    <Text variant="heading" className="leading-none">个人配置</Text>
+                    <Text variant="caption" className="mt-1 text-[10px] font-bold uppercase tracking-widest opacity-80">
                         Settings
                     </Text>
                 </View>
             </View>
 
-            <AnimatedPressable
+            <Button
                 onPress={onSave}
                 disabled={isPending}
-                style={{
-                    flexDirection: "row", alignItems: "center", gap: 6,
-                    paddingHorizontal: 16, paddingVertical: 10,
-                    borderRadius: 12,
-                    backgroundColor: isSaved ? `${colors.green}1A` : colors.green,
-                    borderWidth: 1,
-                    borderColor: isSaved ? `${colors.green}44` : "transparent",
-                    opacity: isPending ? 0.5 : 1,
-                }}
+                variant={isSaved ? "outline" : "default"}
+                size="sm"
+                className={isSaved ? "border-accent/30 bg-accent/10" : "bg-accent"}
             >
                 {isSaved
                     ? <Check size={15} color={colors.green} strokeWidth={3} />
                     : <Save size={15} color={colors.bg} strokeWidth={2.5} />
                 }
-                <Text style={{
-                    color: isSaved ? colors.green : colors.bg,
-                    fontWeight: "700", fontSize: 13,
-                }}>
+                <ButtonText variant={isSaved ? "outline" : "default"} size="sm" className={isSaved ? "text-accent" : "text-accent-foreground"}>
                     {isPending ? "保存中..." : isSaved ? "已保存" : "保存配置"}
-                </Text>
-            </AnimatedPressable>
+                </ButtonText>
+            </Button>
         </View>
     );
 }

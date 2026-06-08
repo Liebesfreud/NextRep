@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { getUserProfile, updateUserProfile, type UserProfileData } from "@/db/services/profile";
 import * as SplashScreen from "expo-splash-screen";
@@ -11,6 +11,7 @@ import { ProfileSettings } from "@/components/settings/ProfileSettings";
 import { AiConfigSettings } from "@/components/settings/AiConfigSettings";
 import { DataManagementSettings } from "@/components/settings/DataManagementSettings";
 import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
+import { Text } from "@/components/ui/text";
 
 export default function SettingsScreen() {
     const { colors } = useTheme();
@@ -67,7 +68,7 @@ export default function SettingsScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: colors.bg }}>
+        <View className="flex-1 bg-background">
             <ScrollView
                 contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 60, paddingBottom: 120, gap: 20 }}
                 showsVerticalScrollIndicator={false}
@@ -104,8 +105,8 @@ export default function SettingsScreen() {
 
                 {/* ── Version ── */}
                 <View className="items-center py-8 opacity-60">
-                    <Text style={{ color: colors.gray4 }} className="text-xs font-extrabold tracking-widest mb-1.5">NEXTREP V1.0</Text>
-                    <Text style={{ color: colors.gray4 }} className="text-xs font-semibold">本地优先の健身数据管家</Text>
+                    <Text variant="caption" className="mb-1.5 font-extrabold tracking-widest">NEXTREP V1.0</Text>
+                    <Text variant="caption" className="font-semibold">本地优先の健身数据管家</Text>
                 </View>
             </ScrollView>
         </View>

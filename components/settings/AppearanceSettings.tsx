@@ -1,35 +1,29 @@
-import { View, Text, Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import { Moon, Sun } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Text } from "@/components/ui/text";
 
 export function AppearanceSettings() {
     const { colors, theme, preference, setTheme } = useTheme();
     const isDark = theme === "dark";
 
     return (
-        <View style={{
-            backgroundColor: colors.bento,
-            borderColor: colors.border,
-            borderWidth: 1,
-            borderRadius: 16,
-            overflow: "hidden",
-        }}>
+        <Card className="overflow-hidden p-0">
             {/* Section Header */}
-            <View style={{
-                flexDirection: "row", alignItems: "center", gap: 8,
-                paddingHorizontal: 14, paddingVertical: 12,
-                borderBottomWidth: 1, borderBottomColor: colors.border,
-            }}>
+            <View className="flex-row items-center gap-2 px-3.5 py-3">
                 {isDark
                     ? <Moon size={14} color={colors.gray4} />
                     : <Sun size={14} color={colors.gray4} />}
-                <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "800", letterSpacing: 1.5, textTransform: "uppercase" }}>
+                <Text variant="caption" className="font-extrabold uppercase tracking-[1.5px]">
                     外观与显示
                 </Text>
             </View>
+            <Separator />
 
             {/* Dark Mode Row */}
-            <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 14, paddingVertical: 13 }}>
+            <View className="flex-row items-center px-3.5 py-3.5">
                 <View style={{
                     width: 34, height: 34, borderRadius: 10,
                     backgroundColor: isDark ? `${colors.green}1A` : `${colors.orange}1A`,
@@ -41,12 +35,12 @@ export function AppearanceSettings() {
                         : <Sun size={16} color={colors.orange} />}
                 </View>
                 <View style={{ flex: 1 }}>
-                    <Text style={{ color: colors.white, fontWeight: "700", fontSize: 14 }}>深色模式</Text>
-                    <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "600", marginTop: 1 }}>
+                    <Text variant="label">深色模式</Text>
+                    <Text variant="caption" className="mt-0.5 font-semibold">
                         {preference === "system" ? `跟随系统 (${isDark ? "暗夜" : "日间"})` : (isDark ? "当前: 暗夜模式" : "当前: 日间模式")}
                     </Text>
                 </View>
-                <View style={{ flexDirection: "row", backgroundColor: `${colors.gray3}80`, borderRadius: 8, padding: 2 }}>
+                <View className="flex-row rounded-lg bg-muted/80 p-0.5">
                     {(["light", "dark", "system"] as const).map(p => (
                         <Pressable 
                             key={p} 
@@ -57,13 +51,13 @@ export function AppearanceSettings() {
                                 shadowColor: preference === p ? "#000" : "transparent", shadowOpacity: 0.1, shadowRadius: 2, shadowOffset: {width:0,height:1}
                             }}
                         >
-                            <Text style={{ color: preference === p ? colors.white : colors.gray4, fontSize: 12, fontWeight: preference === p ? "700" : "500" }}>
+                            <Text className={preference === p ? "text-xs font-bold" : "text-xs font-medium text-muted-foreground"}>
                                 {p === "light" ? "日间" : p === "dark" ? "暗夜" : "系统"}
                             </Text>
                         </Pressable>
                     ))}
                 </View>
             </View>
-        </View>
+        </Card>
     );
 }
