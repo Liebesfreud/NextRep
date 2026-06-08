@@ -1,6 +1,8 @@
-import { View, Pressable } from "react-native";
+import { View } from "react-native";
 import { Scale } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
+import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
+import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
@@ -66,8 +68,10 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
             <View className="flex-row gap-2.5">
 
                 {/* 左侧核心卡片（体重） */}
-                <Pressable
+                <AnimatedPressable
                     onPress={() => setExpandedMetric(expandedMetric === "weight" ? null : "weight")}
+                    activeScale={0.98}
+                    activeOpacity={0.86}
                     className={cn(
                         "min-h-[106px] flex-[1.3] justify-between rounded-2xl border bg-muted p-3",
                         expandedMetric === "weight" ? "border-destructive/50" : "border-border"
@@ -89,25 +93,27 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                     </View>
 
                     {/* 趋势标签 */}
-                    <View className="self-start rounded-md px-[7px] py-[3px]" style={{ backgroundColor: trendBgColor }}>
-                        <Text className="text-[10px] font-bold" style={{ color: trendColor }}>
+                    <Badge className="rounded-md border-0 px-[7px] py-[3px]" style={{ backgroundColor: trendBgColor }}>
+                        <BadgeText className="text-[10px] font-bold" style={{ color: trendColor }}>
                             {trendText}
-                        </Text>
-                    </View>
+                        </BadgeText>
+                    </Badge>
 
                     <Text className="mt-2 text-[10px] font-semibold text-muted-foreground" numberOfLines={2}>
                         {targetWeight != null && weightGap != null
                             ? `目标 ${targetWeight}kg · ${weightGap === 0 ? "已达成" : `${weightGap > 0 ? "高于" : "低于"}目标 ${Math.abs(weightGap).toFixed(1)}kg`}`
                             : "设置目标体重后显示差距"}
                     </Text>
-                </Pressable>
+                </AnimatedPressable>
 
                 {/* 右侧辅助卡片区 */}
                 <View className="flex-1 gap-2.5">
 
                     {/* 右上卡片（体脂率） */}
-                    <Pressable
+                    <AnimatedPressable
                         onPress={() => setExpandedMetric(expandedMetric === "bodyFat" ? null : "bodyFat")}
+                        activeScale={0.98}
+                        activeOpacity={0.86}
                         className={cn(
                             "flex-1 justify-between rounded-2xl border bg-muted p-[9px]",
                             expandedMetric === "bodyFat" ? "border-destructive/50" : "border-border"
@@ -124,11 +130,11 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                                 <Text className="ml-0.5 text-[9px] font-semibold text-foreground opacity-50">%</Text>
                             </View>
                             {bodyFatVal && (
-                                <View className="rounded px-1 py-px" style={{ backgroundColor: bodyFatStatusBg }}>
-                                    <Text className="text-[9px] font-bold" style={{ color: bodyFatStatusColor }}>
+                                <Badge className="rounded border-0 px-1 py-px" style={{ backgroundColor: bodyFatStatusBg }}>
+                                    <BadgeText className="text-[9px] font-bold" style={{ color: bodyFatStatusColor }}>
                                         {bodyFatStatusText}
-                                    </Text>
-                                </View>
+                                    </BadgeText>
+                                </Badge>
                             )}
                         </View>
                         <Text className="mt-[3px] text-[9px] font-semibold text-muted-foreground" numberOfLines={2}>
@@ -136,7 +142,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                                 ? `目标 ${targetBodyFat}% · ${bodyFatGap === 0 ? "已达成" : `${bodyFatGap > 0 ? "高于" : "低于"}目标 ${Math.abs(bodyFatGap).toFixed(1)}%`}`
                                 : "设置目标体脂后显示差距"}
                         </Text>
-                    </Pressable>
+                    </AnimatedPressable>
 
                     {/* 右下卡片（BMI） */}
                     <Card
@@ -149,11 +155,11 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                             <Text className="text-[17px] font-extrabold text-foreground">
                                 {loading ? "-" : bmiVal}
                             </Text>
-                            <View className="rounded px-1 py-px" style={{ backgroundColor: bmiStatus.bg }}>
-                                <Text className="text-[9px] font-bold" style={{ color: bmiStatus.color }}>
+                            <Badge className="rounded border-0 px-1 py-px" style={{ backgroundColor: bmiStatus.bg }}>
+                                <BadgeText className="text-[9px] font-bold" style={{ color: bmiStatus.color }}>
                                     {bmiStatus.text}
-                                </Text>
-                            </View>
+                                </BadgeText>
+                            </Badge>
                         </View>
                     </Card>
 
