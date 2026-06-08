@@ -181,10 +181,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                                         size="sm"
                                         className={cn("h-auto rounded-lg px-2.5 py-1.5", active ? "bg-muted" : "bg-transparent")}
                                     >
-                                        <Text
-                                            style={{ color: active ? colors.white : colors.gray4 }}
-                                            className={cn("text-[11px]", active ? "font-bold" : "font-semibold")}
-                                        >
+                                        <Text className={cn("text-[11px]", active ? "font-bold text-foreground" : "font-semibold text-muted-foreground")}>
                                             {range}天
                                         </Text>
                                     </Button>
@@ -206,8 +203,8 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                                 {chartData.map((point, index) => (
                                     <View key={index} style={{ alignItems: index === 0 ? "flex-start" : index === chartData.length - 1 ? "flex-end" : "center", flex: 1 }}>
-                                        <Text style={{ color: colors.white, fontSize: 11, fontWeight: "700" }}>{point.value}</Text>
-                                        <Text style={{ color: colors.gray4, fontSize: 10, marginTop: 2 }}>{point.label}</Text>
+                                        <Text className="text-[11px] font-bold text-foreground">{point.value}</Text>
+                                        <Text className="mt-0.5 text-[10px] text-muted-foreground">{point.label}</Text>
                                     </View>
                                 ))}
                             </View>
