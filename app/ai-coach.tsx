@@ -319,8 +319,13 @@ export default function AiCoachScreen() {
                     )}
 
                     <View className="mt-3.5 flex-row gap-2.5">
-                        <Button onPress={() => setUseLiteMode((prev) => !prev)} disabled={!reportData} variant="outline" className="flex-1 py-3" style={{ borderColor: useLiteMode ? colors.green : colors.border, backgroundColor: useLiteMode ? `${colors.green}18` : `${colors.gray3}44` }}>
-                            <ButtonText variant="outline" className="text-[13px]" style={{ color: useLiteMode ? colors.green : colors.white }}>{useLiteMode ? "已切到轻松版" : "换个更轻松的"}</ButtonText>
+                        <Button
+                            onPress={() => setUseLiteMode((prev) => !prev)}
+                            disabled={!reportData}
+                            variant="outline"
+                            className={`flex-1 py-3 ${useLiteMode ? "border-accent bg-accent/10" : "border-border bg-muted/40"}`}
+                        >
+                            <ButtonText variant="outline" className={`text-[13px] ${useLiteMode ? "text-accent" : "text-foreground"}`}>{useLiteMode ? "已切到轻松版" : "换个更轻松的"}</ButtonText>
                         </Button>
 
                         <Button onPress={handleApplyTodaysPlan} disabled={isApplying || adjustedPlan.length === 0} className="flex-1 bg-accent py-3">
