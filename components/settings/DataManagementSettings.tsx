@@ -1,52 +1,45 @@
 import { useState } from "react";
-import { View, Text, Alert } from "react-native";
-import { Database, Download, Upload, Trash2, ChevronRight } from "lucide-react-native";
-import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
+import { Alert, View } from "react-native";
+import { ChevronRight, Database, Download, Trash2, Upload } from "lucide-react-native";
+import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
-import * as DocumentPicker from "expo-document-picker";
+import { clearDatabase, exportAllData, importAllData } from "@/db/services/data";
 import { useTheme } from "@/hooks/useTheme";
-import { exportAllData, importAllData, clearDatabase } from "@/db/services/data";
+import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Text } from "@/components/ui/text";
+import { cn } from "@/lib/utils";
 
 type ActionRowProps = {
     icon: React.ReactNode;
-    iconBg: string;
+    iconClassName: string;
     label: string;
     desc: string;
-    labelColor: string;
-    descColor: string;
+    destructive?: boolean;
     onPress: () => void;
     disabled?: boolean;
     isLast?: boolean;
-    colors: any;
 };
 
-function ActionRow({ icon, iconBg, label, desc, labelColor, descColor, onPress, disabled, isLast, colors }: ActionRowProps) {
+function ActionRow({ icon, iconClassName, label, desc, destructive, onPress, disabled, isLast }: ActionRowProps) {
+    const { colors } = useTheme();
+
     return (
         <AnimatedPressable
             onPress={onPress}
             disabled={disabled}
-            style={{
-                flexDirection: "row",
-                alignItems: "center",
-                paddingHorizontal: 14,
-                paddingVertical: 13,
-                borderBottomWidth: isLast ? 0 : 1,
-                borderBottomColor: colors.border,
-                opacity: disabled ? 0.5 : 1,
-            }}
+            className={cn("flex-row items-center px-3.5 py-3.5", !isLast && "border-b border-border", disabled && "opacity-50")}
         >
-            <View style={{
-                width: 34, height: 34, borderRadius: 10,
-                backgroundColor: iconBg,
-                alignItems: "center", justifyContent: "center",
-                marginRight: 12,
-            }}>
-                {icon}
-            </View>
-            <View style={{ flex: 1 }}>
-                <Text style={{ color: labelColor, fontWeight: "700", fontSize: 14 }}>{label}</Text>
-                <Text style={{ color: descColor, fontSize: 11, fontWeight: "600", marginTop: 1 }}>{desc}</Text>
+            <View className={cn("mr-3 h-[34px] w-[34px] items-center justify-center rounded-[10px]", iconClassName)}>{icon}</View>
+            <View className="flex-1">
+                <Text variant="label" className={destructive ? "text-destructive" : undefined}>
+                    {label}
+                </Text>
+                <Text variant="caption" className={cn("mt-0.5 font-semibold", destructive && "text-destructive/70")}>
+                    {desc}
+                </Text>
             </View>
             <ChevronRight size={16} color={colors.gray4} style={{ opacity: 0.5 }} />
         </AnimatedPressable>
@@ -69,8 +62,8 @@ export function DataManagementSettings() {
             const path = `${docDir}${filename}`;
             await FileSystem.writeAsStringAsync(path, json, { encoding: FileSystem.EncodingType.UTF8 });
             await Sharing.shareAsync(path, { mimeType: "application/json", dialogTitle: "导出 NextRep 数据" });
-        } catch (e: any) {
-            Alert.alert("导出失败", e?.message || "导出过程中发生错误，请稍后再试");
+        } catch (error: any) {
+            Alert.alert("导出失败", error?.message || "导出过程中发生错误，请稍后再试");
         } finally {
             setPendingAction(null);
         }
@@ -93,22 +86,23 @@ export function DataManagementSettings() {
                 [
                     { text: "取消", style: "cancel", onPress: () => setPendingAction(null) },
                     {
-                        text: "确认导入", style: "destructive",
+                        text: "确认导入",
+                        style: "destructive",
                         onPress: async () => {
                             try {
                                 await importAllData(data);
                                 Alert.alert("导入成功", "数据已成功恢复");
-                            } catch (e: any) {
-                                Alert.alert("导入失败", e?.message || "导入过程中发生错误，请稍后再试");
+                            } catch (error: any) {
+                                Alert.alert("导入失败", error?.message || "导入过程中发生错误，请稍后再试");
                             } finally {
                                 setPendingAction(null);
                             }
                         },
                     },
                 ],
-                { onDismiss: () => setPendingAction(null) },
+                { onDismiss: () => setPendingAction(null) }
             );
-        } catch (e: any) {
+        } catch (error: any) {
             Alert.alert("导入失败", "文件格式不正确");
             setPendingAction(null);
         }
@@ -123,77 +117,60 @@ export function DataManagementSettings() {
             [
                 { text: "取消", style: "cancel", onPress: () => setPendingAction(null) },
                 {
-                    text: "确认清空", style: "destructive",
+                    text: "确认清空",
+                    style: "destructive",
                     onPress: async () => {
                         try {
                             await clearDatabase();
                             Alert.alert("已完成", "所有数据已清空");
-                        } catch (e: any) {
-                            Alert.alert("清空失败", e?.message || "清空数据时发生错误，请稍后再试");
+                        } catch (error: any) {
+                            Alert.alert("清空失败", error?.message || "清空数据时发生错误，请稍后再试");
                         } finally {
                             setPendingAction(null);
                         }
                     },
                 },
             ],
-            { onDismiss: () => setPendingAction(null) },
+            { onDismiss: () => setPendingAction(null) }
         );
     };
 
     return (
-        <View style={{
-            backgroundColor: colors.bento,
-            borderColor: colors.border,
-            borderWidth: 1,
-            borderRadius: 16,
-            overflow: "hidden",
-        }}>
-            {/* Section Header */}
-            <View style={{
-                flexDirection: "row", alignItems: "center", gap: 8,
-                paddingHorizontal: 14, paddingVertical: 12,
-                borderBottomWidth: 1, borderBottomColor: colors.border,
-            }}>
+        <Card className="overflow-hidden p-0">
+            <View className="flex-row items-center gap-2 px-3.5 py-3">
                 <Database size={14} color={colors.gray4} />
-                <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "800", letterSpacing: 1.5, textTransform: "uppercase" }}>
+                <Text variant="caption" className="font-extrabold uppercase tracking-[1.5px]">
                     数据与备份
                 </Text>
             </View>
+            <Separator />
 
             <ActionRow
                 icon={<Download size={16} color={colors.green} />}
-                iconBg={`${colors.green}1A`}
+                iconClassName="bg-accent/10"
                 label="导出备份"
                 desc="将所有数据导出为 JSON 文件"
-                labelColor={colors.white}
-                descColor={colors.gray4}
                 onPress={handleExport}
                 disabled={isPending}
-                colors={colors}
             />
             <ActionRow
                 icon={<Upload size={16} color={colors.orange} />}
-                iconBg={`${colors.orange}1A`}
+                iconClassName="bg-primary/10"
                 label="导入数据"
                 desc="从备份文件全量恢复数据"
-                labelColor={colors.white}
-                descColor={colors.gray4}
                 onPress={handleImport}
                 disabled={isPending}
-                colors={colors}
             />
             <ActionRow
                 icon={<Trash2 size={16} color={colors.red} />}
-                iconBg={`${colors.red}1A`}
+                iconClassName="bg-destructive/10"
                 label="清空所有记录"
                 desc="危险操作，不可撤销"
-                labelColor={colors.red}
-                descColor={`${colors.red}88`}
                 onPress={handleClear}
                 disabled={isPending}
+                destructive
                 isLast
-                colors={colors}
             />
-        </View>
+        </Card>
     );
 }
