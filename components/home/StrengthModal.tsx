@@ -387,20 +387,20 @@ export function StrengthModal({
                         />
                     </View>
                 ) : (
-                    <View style={{ flex: 1 }}>
-                        <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 24 }}>
-                            <View style={{ backgroundColor: `${colors.green}33`, width: 48, height: 48, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
+                    <View className="flex-1">
+                        <View className="mb-6 flex-row items-center gap-3">
+                            <View className="h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: `${colors.green}33` }}>
                                 <Dumbbell size={24} color={colors.green} />
                             </View>
                             <Text variant="subheading">{selectedExercise}</Text>
                         </View>
 
                         {/* Set-by-Set Header */}
-                        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 4, paddingHorizontal: 4 }}>
+                        <View className="mb-1 flex-row items-center px-1">
                             <Text variant="caption" className="w-10 text-center text-[10px] font-bold uppercase tracking-[1px]">组次</Text>
                             <Text variant="caption" className="flex-1 text-center text-[10px] font-bold uppercase tracking-[1px]">重量 (kg)</Text>
                             <Text variant="caption" className="flex-1 text-center text-[10px] font-bold uppercase tracking-[1px]">次数</Text>
-                            <View style={{ width: 40 }} />
+                            <View className="w-10" />
                         </View>
 
                         {/* Set-by-Set Rows */}
@@ -458,10 +458,10 @@ export function StrengthModal({
                                 <ButtonText variant="secondary" className="text-accent">+ 添加下一组</ButtonText>
                             </Button>
                             <Text variant="caption" className="mt-3 text-center opacity-60">长按某组即可删除</Text>
-                            <View style={{ height: 24 }} />
+                            <View className="h-6" />
                         </ScrollView>
 
-                        <View style={{ flexDirection: "row", gap: 8, marginTop: 16, paddingTop: 8, borderTopWidth: 1, borderTopColor: `${colors.gray3}4D` }}>
+                        <View className="mt-4 flex-row gap-2 border-t pt-2" style={{ borderTopColor: `${colors.gray3}4D` }}>
                             {initialWorkout && (
                                 <Button onPress={handleDeleteWorkout} disabled={isPending} variant="destructive" className="w-16 bg-destructive/10 py-4">
                                     <Trash2 size={20} color={colors.red} />
