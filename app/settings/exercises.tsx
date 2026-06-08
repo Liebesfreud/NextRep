@@ -102,11 +102,10 @@ export default function ExerciseManagementScreen() {
         return (
             <Card
                 style={{
-                    borderWidth: 0.75,
                     borderColor: `${visual.accent}24`,
                     backgroundColor: visual.cardBg ?? colors.gray2,
                 }}
-                className="mb-2 flex-row items-center overflow-hidden rounded-[14px] p-0"
+                className="mb-2 flex-row items-center overflow-hidden rounded-[14px] border p-0"
             >
                 <Button
                     onPress={() => setSelectedExercise(item)}
@@ -134,7 +133,7 @@ export default function ExerciseManagementScreen() {
                             最近 {formatDate(item.latestDateStr)}
                         </Text>
                     </View>
-                    <ChevronRight size={18} color={colors.gray4} style={{ marginLeft: 6 }} />
+                    <ChevronRight size={18} color={colors.gray4} className="ml-1.5" />
                 </Button>
                 {isPreset ? (
                     <Button
