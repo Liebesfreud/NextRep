@@ -10,10 +10,10 @@ import { bodyMetrics, workouts } from "@/db/schema";
 import { generateTrainingReportWithAI, type AiReportData } from "@/db/services/ai";
 import * as workoutService from "@/db/services/workout";
 import { useTheme } from "@/hooks/useTheme";
-import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type EnergyOption = "high" | "medium" | "low";
 type DurationOption = "20" | "40" | "60";
@@ -349,26 +349,21 @@ function FilterRow({ title, icon, options, value, onChange }: { title: string; i
                 {icon}
                 <Text className="text-[13px] font-extrabold">{title}</Text>
             </View>
-            <View className="flex-row flex-wrap gap-2">
+            <ToggleGroup value={value} onValueChange={onChange}>
                 {options.map((option) => {
                     const active = option.key === value;
                     return (
-                        <Button
+                        <ToggleGroupItem
                             key={option.key}
-                            onPress={() => onChange(option.key)}
-                            variant="ghost"
-                            className="h-auto bg-transparent p-0"
+                            value={option.key}
+                            activeClassName="border-success bg-success/10"
+                            inactiveClassName="border-border bg-muted/40"
                         >
-                            <Badge
-                                variant={active ? "default" : "secondary"}
-                                className={active ? "border border-success bg-success/10 px-3 py-2" : "border border-border bg-muted/40 px-3 py-2"}
-                            >
-                                <BadgeText className={active ? "text-success" : "text-foreground"}>{option.label}</BadgeText>
-                            </Badge>
-                        </Button>
+                            <Text className={active ? "text-xs font-black text-success" : "text-xs font-black text-foreground"}>{option.label}</Text>
+                        </ToggleGroupItem>
                     );
                 })}
-            </View>
+            </ToggleGroup>
         </View>
     );
 }
