@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { View, Text, ScrollView, Pressable, Alert, KeyboardAvoidingView, Platform, FlatList } from "react-native";
+import { View, ScrollView, Pressable, Alert, KeyboardAvoidingView, Platform, FlatList } from "react-native";
 import { ChevronLeft, ChevronRight, Dumbbell, Plus, Search, Trash2, X } from "lucide-react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
@@ -12,6 +12,7 @@ import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
 
 function formatWeight(value: number | null | undefined) {
     if (!value) return "--";
@@ -99,7 +100,7 @@ export default function ExerciseManagementScreen() {
         const isPreset = presetNames.has(item.name);
 
         return (
-            <View
+            <Card
                 style={{
                     flexDirection: "row",
                     alignItems: "center",
@@ -110,6 +111,7 @@ export default function ExerciseManagementScreen() {
                     marginBottom: 8,
                     overflow: "hidden",
                 }}
+                className="p-0"
             >
                 <Pressable
                     onPress={() => setSelectedExercise(item)}
@@ -120,34 +122,36 @@ export default function ExerciseManagementScreen() {
                     </View>
                     <View style={{ flex: 1 }}>
                         <View className="flex-row items-center gap-2">
-                            <Text style={{ color: colors.white, fontSize: 15, fontWeight: "900", flex: 1 }} numberOfLines={1}>
+                            <Text style={{ color: colors.white, flex: 1 }} className="text-[15px] font-black" numberOfLines={1}>
                                 {item.name}
                             </Text>
                             {!isPreset ? (
-                                <Text style={{ color: colors.gray4, fontSize: 10, fontWeight: "800" }}>
+                                <Text variant="caption" className="text-[10px] font-extrabold">
                                     历史
                                 </Text>
                             ) : null}
                         </View>
-                        <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "700", marginTop: 5 }} numberOfLines={1}>
+                        <Text variant="caption" className="mt-1 font-bold" numberOfLines={1}>
                             {item.tag || "力量训练"} · {item.trainingDays} 天 · 最高 {formatWeight(item.maxWeightKg)} · {formatVolume(item.totalVolumeKg)}
                         </Text>
-                        <Text style={{ color: colors.gray4, fontSize: 10, fontWeight: "600", marginTop: 3 }}>
+                        <Text variant="caption" className="mt-0.5 text-[10px] font-semibold">
                             最近 {formatDate(item.latestDateStr)}
                         </Text>
                     </View>
                     <ChevronRight size={18} color={colors.gray4} style={{ marginLeft: 6 }} />
                 </Pressable>
                 {isPreset ? (
-                    <Pressable
+                    <Button
                         onPress={() => handleDelete(item.name)}
+                        variant="ghost"
+                        size="icon"
                         hitSlop={8}
-                        style={{ alignSelf: "stretch", width: 42, alignItems: "center", justifyContent: "center" }}
+                        className="h-auto self-stretch rounded-none"
                     >
                         <Trash2 size={18} color={`${colors.red}99`} />
-                    </Pressable>
+                    </Button>
                 ) : null}
-            </View>
+            </Card>
         );
     };
 
