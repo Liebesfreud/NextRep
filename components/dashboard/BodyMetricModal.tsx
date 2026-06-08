@@ -129,7 +129,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
             avoidKeyboard
         >
             <View className="flex-row justify-between items-center mb-6">
-                <Text style={{ color: colors.white }} className="text-2xl font-extrabold tracking-tight">
+                <Text variant="heading" className="tracking-tight">
                     {metricType === "weight" ? "记录体重" : "记录体脂率"}
                 </Text>
                 <Button onPress={onClose}
@@ -143,18 +143,18 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Current Value */}
                 <Card className="mb-3 rounded-xl bg-secondary p-3">
-                    <Text style={{ color: colors.gray4 }} className="text-xs font-bold tracking-wider mb-1 uppercase">
+                    <Text variant="caption" className="mb-1 font-bold uppercase tracking-wider">
                         当前{metricType === "weight" ? "体重" : "体脂率"}
                     </Text>
                     <View className="flex-row items-baseline gap-1">
-                        <Text style={{ color: colors.white }} className="text-3xl font-black tracking-tighter">
+                        <Text className="text-3xl font-black tracking-tighter">
                             {data?.bodyMetrics?.[metricType]?.latestValue ?? "-"}
                         </Text>
-                        <Text style={{ color: colors.gray4 }} className="font-bold">
+                        <Text variant="caption" className="font-bold">
                             {metricType === "weight" ? "kg" : "%"}
                         </Text>
                     </View>
-                    <Text style={{ color: colors.gray4, fontSize: 12, marginTop: 8, fontWeight: "600" }}>
+                    <Text variant="caption" className="mt-2 font-semibold">
                         {targetValue != null && targetGap != null
                             ? `目标 ${targetValue}${chartUnit} · ${targetGap === 0 ? "已达成" : `${targetGap > 0 ? "高于" : "低于"}目标 ${Math.abs(targetGap).toFixed(1)}${chartUnit}`}`
                             : `设置目标${metricType === "weight" ? "体重" : "体脂率"}后显示差距`}
@@ -162,14 +162,14 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                 </Card>
 
                 <Card className="mb-3 rounded-xl bg-secondary p-3">
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                    <View className="mb-2.5 flex-row items-center justify-between">
                         <View>
-                            <Text style={{ color: colors.white, fontSize: 13, fontWeight: "700" }}>趋势图</Text>
-                            <Text style={{ color: colors.gray4, fontSize: 11, marginTop: 2 }}>
+                            <Text variant="label" className="text-[13px]">趋势图</Text>
+                            <Text variant="caption" className="mt-0.5 text-[11px]">
                                 {`${chartRecords.length || 0} 次记录${trendDeltaText != null ? ` · ${trendDeltaText > 0 ? "+" : ""}${trendDeltaText.toFixed(1)} ${chartUnit}` : chartDelta !== null ? ` · ${chartDelta > 0 ? "+" : ""}${chartDelta.toFixed(1)} ${chartUnit}` : ""}`}
                             </Text>
                         </View>
-                        <View style={{ flexDirection: "row", backgroundColor: colors.border, borderRadius: 10, padding: 3, gap: 4 }}>
+                        <View style={{ backgroundColor: colors.border }} className="flex-row gap-1 rounded-[10px] p-[3px]">
                             {([7, 30, 90] as const).map((range) => {
                                 const active = trendRange === range;
                                 return (
@@ -212,8 +212,8 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                             </View>
                         </>
                     ) : (
-                        <View style={{ backgroundColor: colors.border, borderRadius: 10, paddingVertical: 18, alignItems: "center" }}>
-                            <Text style={{ color: colors.gray4, fontSize: 12 }}>至少两条记录后显示趋势图</Text>
+                        <View style={{ backgroundColor: colors.border }} className="items-center rounded-[10px] py-[18px]">
+                            <Text variant="muted">至少两条记录后显示趋势图</Text>
                         </View>
                     )}
                 </Card>
@@ -221,7 +221,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                 {/* Input Form */}
                 <View className="flex-row gap-3 items-end mb-3">
                     <View className="flex-1">
-                        <Text style={{ color: colors.gray4 }} className="text-xs font-bold tracking-wider mb-1.5 pl-1">
+                        <Text variant="caption" className="mb-1.5 pl-1 font-bold tracking-wider">
                             {metricType === "weight" ? "体重 (kg)" : "体脂率 (%)"}
                         </Text>
                         <Input
@@ -234,7 +234,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                         />
                     </View>
                     <View className="flex-1">
-                        <Text style={{ color: colors.gray4 }} className="text-xs font-bold tracking-wider mb-1.5 pl-1">记录日期</Text>
+                        <Text variant="caption" className="mb-1.5 pl-1 font-bold tracking-wider">记录日期</Text>
                         <Input
                             value={formDate}
                             onChangeText={setFormDate}
