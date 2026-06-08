@@ -112,8 +112,6 @@ function SectionTitle({ icon, title, action }: { icon: ReactNode; title: string;
 }
 
 function ToggleAction({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
-    const { colors } = useTheme();
-
     return (
         <Button
             onPress={onPress}
@@ -122,7 +120,7 @@ function ToggleAction({ label, active, onPress }: { label: string; active: boole
             hitSlop={8}
             className="min-h-8 rounded-full border border-border px-3"
         >
-            <ButtonText variant="secondary" size="sm" style={{ color: active ? colors.green : colors.gray4 }}>
+            <ButtonText variant="secondary" size="sm" className={active ? "text-accent" : "text-muted-foreground"}>
                 {label}
             </ButtonText>
         </Button>
