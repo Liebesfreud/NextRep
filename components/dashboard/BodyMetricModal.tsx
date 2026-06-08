@@ -282,10 +282,10 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                     </View>
 
                     <Card className="rounded-xl bg-secondary p-2.5">
-                        <View style={{ flexDirection: "row", marginBottom: 6 }}>
+                        <View className="mb-1.5 flex-row">
                             {["日", "一", "二", "三", "四", "五", "六"].map(d => (
-                                <View key={d} style={{ flex: 1, alignItems: "center" }}>
-                                    <Text style={{ color: colors.gray4, fontSize: 10, fontWeight: "700", opacity: 0.6 }}>{d}</Text>
+                                <View key={d} className="flex-1 items-center">
+                                    <Text variant="caption" className="text-[10px] font-bold opacity-60">{d}</Text>
                                 </View>
                             ))}
                         </View>
@@ -305,7 +305,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                             });
 
                             return (
-                                <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                                <View className="flex-row flex-wrap">
                                     {Array.from({ length: mTotal }).map((_, i) => {
                                         const isPad = i < mStart || i >= mStart + mDays;
                                         const dayN = i - mStart + 1;
