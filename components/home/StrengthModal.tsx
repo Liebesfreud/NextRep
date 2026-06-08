@@ -359,7 +359,12 @@ export function StrengthModal({
                                         const accent = visual?.accent ?? colors.blue;
                                         const backgroundColor = isSelected ? (visual?.iconBg ?? `${colors.blue}08`) : (visual?.chipBg ?? `${colors.blue}06`);
                                         return (
-                                            <Pressable key={cat} onPress={() => setSelectedCategory(cat)}>
+                                            <Button
+                                                key={cat}
+                                                onPress={() => setSelectedCategory(cat)}
+                                                variant="ghost"
+                                                className="h-auto bg-transparent p-0"
+                                            >
                                                 <Badge
                                                     style={{ backgroundColor, borderColor: isSelected ? accent : `${accent}40`, borderWidth: 0.75 }}
                                                     className="px-4 py-2"
@@ -368,7 +373,7 @@ export function StrengthModal({
                                                     {cat}
                                                     </BadgeText>
                                                 </Badge>
-                                            </Pressable>
+                                            </Button>
                                         );
                                     })}
                                 </View>
