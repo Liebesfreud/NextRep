@@ -387,9 +387,8 @@ export function TodayWorkouts({
                 <View className="flex-row gap-bento">
                     {cardioWorkouts.length === 0 && (
                         <Button onPress={handleOpenCardio}
-                            style={{ backgroundColor: `${colors.orange}26`, borderColor: `${colors.orange}33` }}
                             variant="outline"
-                            className="flex-1 border py-3">
+                            className="flex-1 border border-primary/20 bg-primary/15 py-3">
                             <Activity size={16} color={colors.orange} />
                             <ButtonText variant="outline" className="text-sm text-accent">有氧运动</ButtonText>
                         </Button>
@@ -409,9 +408,8 @@ export function TodayWorkouts({
             {!isToday && (
                 <View className="flex-row gap-bento">
                     <Button onPress={handleOpenCardio}
-                        style={{ backgroundColor: `${colors.orange}26`, borderColor: `${colors.orange}33` }}
                         variant="outline"
-                        className="flex-1 border py-3">
+                        className="flex-1 border border-primary/20 bg-primary/15 py-3">
                         <Activity size={16} color={colors.orange} />
                         <ButtonText variant="outline" className="text-sm text-accent">补录有氧</ButtonText>
                     </Button>
