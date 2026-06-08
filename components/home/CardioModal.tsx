@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Pressable, Keyboard } from "react-native";
+import { View, Keyboard } from "react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, Activity, Plus, Timer, Flame, Trash2 } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
@@ -112,23 +112,19 @@ export function CardioModal({
                         const Icon = visual.icon;
 
                         return (
-                            <Pressable
+                            <Button
                                 key={i}
                                 onPress={() => { setSelectedExercise(ex); setModalStep("form"); }}
+                                variant="ghost"
+                                className="w-full justify-between rounded-[18px] p-[18px]"
                                 style={{
                                     backgroundColor: visual.cardBg ?? colors.gray2,
                                     borderWidth: 0.75,
                                     borderColor: `${visual.accent}26`,
-                                    width: "100%",
-                                    padding: 18,
-                                    borderRadius: 18,
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                    alignItems: "center"
                                 }}
                             >
-                                <View style={{ flexDirection: "row", alignItems: "center", gap: 12, flex: 1 }}>
-                                    <View style={{ backgroundColor: visual.iconBg, width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" }}>
+                                <View className="flex-1 flex-row items-center gap-3">
+                                    <View style={{ backgroundColor: visual.iconBg }} className="h-11 w-11 items-center justify-center rounded-[14px]">
                                         <Icon size={20} color={visual.accent} />
                                     </View>
                                     <View className="flex-1">
@@ -137,7 +133,7 @@ export function CardioModal({
                                     </View>
                                 </View>
                                 <Plus size={20} color={visual.accent} />
-                            </Pressable>
+                            </Button>
                         );
                     })}
                 </View>
