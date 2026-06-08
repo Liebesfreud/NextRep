@@ -1,5 +1,5 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, View } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { Clock3, Flame, MapPin, Plus, Sparkles } from "lucide-react-native";
 import { desc } from "drizzle-orm";
@@ -351,7 +351,12 @@ function FilterRow({ title, icon, options, value, onChange, colors }: { title: s
                 {options.map((option) => {
                     const active = option.key === value;
                     return (
-                        <Pressable key={option.key} onPress={() => onChange(option.key)}>
+                        <Button
+                            key={option.key}
+                            onPress={() => onChange(option.key)}
+                            variant="ghost"
+                            className="h-auto bg-transparent p-0"
+                        >
                             <Badge
                                 variant={active ? "default" : "secondary"}
                                 style={{ borderColor: active ? colors.green : colors.border, backgroundColor: active ? `${colors.green}18` : `${colors.gray3}44` }}
@@ -359,7 +364,7 @@ function FilterRow({ title, icon, options, value, onChange, colors }: { title: s
                             >
                                 <BadgeText style={{ color: active ? colors.green : colors.white }}>{option.label}</BadgeText>
                             </Badge>
-                        </Pressable>
+                        </Button>
                     );
                 })}
             </View>
