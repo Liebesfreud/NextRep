@@ -1,19 +1,74 @@
 import * as SQLite from "expo-sqlite";
-import { drizzle } from "drizzle-orm/expo-sqlite";
+import { drizzle as drizzleExpo } from "drizzle-orm/expo-sqlite";
+import { drizzle as drizzleProxy } from "drizzle-orm/sqlite-proxy";
+import { Platform } from "react-native";
 import * as schema from "./schema";
 
-// Open (or create) the database file once — reused as a singleton
-const expoDb = SQLite.openDatabaseSync("nextrep.db", {
+const sqliteOptions = {
   enableChangeListener: true,
-});
+};
 
-export const db = drizzle(expoDb, { schema });
+const webExpoDb =
+  Platform.OS === "web"
+    ? SQLite.openDatabaseAsync("nextrep.db", sqliteOptions)
+    : undefined;
+
+const nativeExpoDb =
+  Platform.OS === "web"
+    ? undefined
+    : SQLite.openDatabaseSync("nextrep.db", sqliteOptions);
+
+async function getExpoDb(): Promise<SQLite.SQLiteDatabase> {
+  return nativeExpoDb ?? (await webExpoDb!);
+}
+
+function rowToValues(row: Record<string, unknown>): unknown[] {
+  return Object.keys(row).map((key) => row[key]);
+}
+
+type AppDatabase = ReturnType<typeof drizzleExpo<typeof schema>>;
+
+export const db: AppDatabase = (
+  Platform.OS === "web"
+    ? drizzleProxy(
+        async (sql, params, method) => {
+          const database = await getExpoDb();
+
+          if (method === "run") {
+            await database.runAsync(sql, params);
+            return { rows: [] };
+          }
+
+          if (method === "get") {
+            const row = await database.getFirstAsync<Record<string, unknown>>(
+              sql,
+              params,
+            );
+            return {
+              rows: row
+                ? (rowToValues(row) as never)
+                : (undefined as unknown as never[]),
+            };
+          }
+
+          const rows = await database.getAllAsync<Record<string, unknown>>(
+            sql,
+            params,
+          );
+          return { rows: rows.map(rowToValues) };
+        },
+        { schema },
+      )
+    : drizzleExpo(nativeExpoDb!, { schema })
+) as unknown as AppDatabase;
 
 // ─── Database Initialisation ─────────────────────────────────────────────────
 // Creates tables if they don't already exist.
 // Call this once at app startup (e.g., in _layout.tsx).
 export async function initDatabase(): Promise<void> {
-  await expoDb.execAsync(`
+  const database = await getExpoDb();
+
+  await database.execAsync(`
     PRAGMA journal_mode = WAL;
 
     CREATE TABLE IF NOT EXISTS "Workout" (
@@ -82,7 +137,7 @@ export async function initDatabase(): Promise<void> {
 
   // Safe migrations for early adopters
   try {
-    await expoDb.execAsync(`
+    await database.execAsync(`
           ALTER TABLE "UserProfile" ADD COLUMN "aiConfigs" TEXT;
           ALTER TABLE "UserProfile" ADD COLUMN "activeAiConfigId" TEXT;
           ALTER TABLE "UserProfile" ADD COLUMN "aiTokensTotal" INTEGER DEFAULT 0;
@@ -94,7 +149,7 @@ export async function initDatabase(): Promise<void> {
   }
 
   try {
-    await expoDb.execAsync(`
+    await database.execAsync(`
       ALTER TABLE "UserProfile" ADD COLUMN "targetWeight" REAL;
     `);
   } catch (e) {
@@ -102,7 +157,7 @@ export async function initDatabase(): Promise<void> {
   }
 
   try {
-    await expoDb.execAsync(`
+    await database.execAsync(`
       ALTER TABLE "UserProfile" ADD COLUMN "targetBodyFat" REAL;
     `);
   } catch (e) {
@@ -111,7 +166,7 @@ export async function initDatabase(): Promise<void> {
 
   // Migrate DailyCheckin: add aiEstimatedCal column
   try {
-    await expoDb.execAsync(`
+    await database.execAsync(`
       ALTER TABLE "DailyCheckin" ADD COLUMN "aiEstimatedCal" INTEGER;
     `);
   } catch (e) {
