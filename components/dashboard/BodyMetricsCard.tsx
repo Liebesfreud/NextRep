@@ -67,15 +67,10 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                 {/* 左侧核心卡片（体重） */}
                 <Pressable
                     onPress={() => setExpandedMetric(expandedMetric === "weight" ? null : "weight")}
+                    className="min-h-[106px] flex-[1.3] justify-between rounded-2xl border p-3"
                     style={{
-                        flex: 1.3,
                         backgroundColor: colors.gray3,
                         borderColor: expandedMetric === "weight" ? `${colors.red}80` : colors.border,
-                        borderWidth: 1,
-                        padding: 12,
-                        borderRadius: 16,
-                        justifyContent: "space-between",
-                        minHeight: 106,
                     }}
                 >
                     <View className="flex-row items-center">
@@ -94,16 +89,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                     </View>
 
                     {/* 趋势标签 */}
-                    <View style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        alignSelf: "flex-start",
-                        backgroundColor: trendBgColor,
-                        paddingHorizontal: 7,
-                        paddingVertical: 3,
-                        borderRadius: 6,
-                        gap: 2
-                    }}>
+                    <View className="self-start rounded-md px-[7px] py-[3px]" style={{ backgroundColor: trendBgColor }}>
                         <Text style={{ color: trendColor, fontSize: 10, fontWeight: "700" }}>
                             {trendText}
                         </Text>
@@ -122,14 +108,10 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                     {/* 右上卡片（体脂率） */}
                     <Pressable
                         onPress={() => setExpandedMetric(expandedMetric === "bodyFat" ? null : "bodyFat")}
+                        className="flex-1 justify-between rounded-2xl border p-[9px]"
                         style={{
-                            flex: 1,
                             backgroundColor: colors.gray3,
                             borderColor: expandedMetric === "bodyFat" ? `${colors.red}80` : colors.border,
-                            borderWidth: 1,
-                            padding: 9,
-                            borderRadius: 16,
-                            justifyContent: "space-between",
                         }}
                     >
                         <Text className="text-[11px] font-semibold text-foreground opacity-80">
@@ -143,7 +125,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                                 <Text className="ml-0.5 text-[9px] font-semibold text-foreground opacity-50">%</Text>
                             </View>
                             {bodyFatVal && (
-                                <View style={{ backgroundColor: bodyFatStatusBg, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4 }}>
+                                <View className="rounded px-1 py-px" style={{ backgroundColor: bodyFatStatusBg }}>
                                     <Text style={{ fontSize: 9, color: bodyFatStatusColor, fontWeight: "700" }}>
                                         {bodyFatStatusText}
                                     </Text>
@@ -172,7 +154,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                             <Text className="text-[17px] font-extrabold text-foreground">
                                 {loading ? "-" : bmiVal}
                             </Text>
-                            <View style={{ backgroundColor: bmiStatus.bg, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4 }}>
+                            <View className="rounded px-1 py-px" style={{ backgroundColor: bmiStatus.bg }}>
                                 <Text style={{ fontSize: 9, color: bmiStatus.color, fontWeight: "700" }}>
                                     {bmiStatus.text}
                                 </Text>
