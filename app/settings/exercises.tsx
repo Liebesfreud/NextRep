@@ -214,7 +214,12 @@ export default function ExerciseManagementScreen() {
                                 const visual = cat === "全部" ? null : getStrengthCategoryVisual(cat, colors);
                                 const accent = visual?.accent ?? colors.blue;
                                 return (
-                                    <Pressable key={cat} onPress={() => setSelectedCategory(cat)}>
+                                    <Button
+                                        key={cat}
+                                        onPress={() => setSelectedCategory(cat)}
+                                        variant="ghost"
+                                        className="h-auto bg-transparent p-0"
+                                    >
                                         <Badge
                                             variant={isSelected ? "default" : "secondary"}
                                             style={{ backgroundColor: isSelected ? `${accent}1A` : colors.gray2, borderColor: isSelected ? accent : colors.border }}
@@ -222,7 +227,7 @@ export default function ExerciseManagementScreen() {
                                         >
                                             <BadgeText style={{ color: isSelected ? colors.white : colors.gray4 }}>{cat}</BadgeText>
                                         </Badge>
-                                    </Pressable>
+                                    </Button>
                                 );
                             })}
                         </View>
