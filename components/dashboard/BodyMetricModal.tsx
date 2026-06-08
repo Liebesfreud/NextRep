@@ -261,20 +261,22 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                 {/* Metric Calendar */}
                 <View className="mt-1">
                     <View className="flex-row justify-between items-center mb-2">
-                        <Text style={{ color: colors.gray4 }} className="text-xs font-bold tracking-wider">
+                        <Text variant="caption" className="font-bold tracking-wider">
                             {metricCalendarDate.getFullYear()}年{metricCalendarDate.getMonth() + 1}月记录日历
                         </Text>
                         <View className="flex-row gap-1">
-                            <Pressable onPress={() => setMetricCalendarDate(new Date(metricCalendarDate.getFullYear(), metricCalendarDate.getMonth() - 1, 1))}
-                                style={{ backgroundColor: colors.border }}
-                                className="w-6 h-6 rounded-md items-center justify-center">
+                            <Button onPress={() => setMetricCalendarDate(new Date(metricCalendarDate.getFullYear(), metricCalendarDate.getMonth() - 1, 1))}
+                                variant="secondary"
+                                size="icon"
+                                className="h-6 w-6 rounded-md bg-border">
                                 <ChevronLeft size={12} color={colors.gray4} />
-                            </Pressable>
-                            <Pressable onPress={() => setMetricCalendarDate(new Date(metricCalendarDate.getFullYear(), metricCalendarDate.getMonth() + 1, 1))}
-                                style={{ backgroundColor: colors.border }}
-                                className="w-6 h-6 rounded-md items-center justify-center">
+                            </Button>
+                            <Button onPress={() => setMetricCalendarDate(new Date(metricCalendarDate.getFullYear(), metricCalendarDate.getMonth() + 1, 1))}
+                                variant="secondary"
+                                size="icon"
+                                className="h-6 w-6 rounded-md bg-border">
                                 <ChevronRight size={12} color={colors.gray4} />
-                            </Pressable>
+                            </Button>
                         </View>
                     </View>
 
