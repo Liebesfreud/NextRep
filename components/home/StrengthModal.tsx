@@ -276,8 +276,8 @@ export function StrengthModal({
             backgroundColor={colors.bento}
             avoidKeyboard
         >
-            <Pressable onPress={() => { }} style={{ flex: 1 }}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+            <Pressable onPress={() => { }} className="flex-1">
+                <View className="mb-6 flex-row items-center justify-between">
                     {modalStep === "form" && !initialWorkout ? (
                         <Button
                             onPress={() => dismissKeyboardAndRun(() => {
@@ -305,7 +305,8 @@ export function StrengthModal({
                                 })}
                                 activeScale={0.92}
                                 activeOpacity={0.75}
-                                style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
+                                className="h-8 w-8 items-center justify-center rounded-lg"
+                                style={{ backgroundColor: colors.gray3 }}
                             >
                                 <Library size={18} color={colors.gray4} />
                             </AnimatedPressable>
