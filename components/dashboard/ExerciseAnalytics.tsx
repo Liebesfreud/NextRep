@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
 import { ChevronRight, Library, Target } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
 import { getStrengthCategoryVisual } from "@/constants/exerciseVisuals";
 import { ExerciseDetailModal } from "@/components/dashboard/ExerciseDetailModal";
 import { type StrengthExerciseAnalytics } from "@/db/services/dashboard";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Text } from "@/components/ui/text";
 
 type DashboardData = {
     analytics?: StrengthExerciseAnalytics[];
@@ -35,24 +38,26 @@ export function ExerciseAnalytics({ data }: Props) {
 
     return (
         <>
-            <View style={{ backgroundColor: colors.bento, borderColor: colors.border, borderWidth: 1, padding: 14, borderRadius: 16 }} className="gap-3">
+            <Card className="gap-3 p-3.5">
                 <View className="flex-row items-center justify-between px-0.5">
                     <View className="flex-row items-center gap-1.5">
                         <Target size={16} color={colors.orange} />
-                        <Text style={{ color: colors.white, opacity: 0.9 }} className="font-bold text-xs tracking-wide">高频动作 TOP5</Text>
+                        <Text variant="caption" className="font-bold tracking-wide opacity-90">高频动作 TOP5</Text>
                     </View>
-                    <Pressable
+                    <Button
                         onPress={() => router.push("/settings/exercises")}
-                        style={{ backgroundColor: colors.gray3, borderColor: colors.border, borderWidth: 1, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
+                        variant="secondary"
+                        size="icon"
+                        className="h-8 w-8 rounded-lg border border-border"
                     >
                         <Library size={17} color={colors.gray4} />
-                    </Pressable>
+                    </Button>
                 </View>
 
                 <View style={{ backgroundColor: colors.gray3, borderWidth: 1, borderColor: colors.border, padding: 8, minHeight: 112, borderRadius: 14 }}>
                     {analytics.length === 0 ? (
                         <View className="items-center justify-center p-5">
-                            <Text style={{ color: colors.gray4 }} className="text-sm italic">暂无力量动作分析数据</Text>
+                            <Text variant="muted" className="italic">暂无力量动作分析数据</Text>
                         </View>
                     ) : analytics.map((exercise, idx) => {
                         const visual = getStrengthCategoryVisual(exercise.tag, colors);
@@ -75,16 +80,16 @@ export function ExerciseAnalytics({ data }: Props) {
                                         <Icon size={18} color={visual.accent} />
                                     </View>
                                     <View className="flex-1">
-                                        <Text style={{ color: colors.white }} className="font-bold text-sm" numberOfLines={1}>
+                                        <Text className="text-sm font-bold" numberOfLines={1}>
                                             {exercise.name}
                                         </Text>
-                                        <Text style={{ color: colors.gray4 }} className="text-xs font-semibold mt-0.5" numberOfLines={1}>
+                                        <Text variant="caption" className="mt-0.5 font-semibold" numberOfLines={1}>
                                             {exercise.trainingDays} 天 · {exercise.records} 条记录 · 最高 {formatWeight(exercise.maxWeightKg)}
                                         </Text>
                                     </View>
                                 </View>
                                 <View className="items-end flex-row gap-1.5">
-                                    <Text style={{ color: colors.white }} className="text-xs font-black">
+                                    <Text variant="caption" className="font-black text-foreground">
                                         {formatVolume(exercise.totalVolumeKg)}
                                     </Text>
                                     <ChevronRight size={15} color={colors.gray4} />
@@ -93,7 +98,7 @@ export function ExerciseAnalytics({ data }: Props) {
                         );
                     })}
                 </View>
-            </View>
+            </Card>
 
             <ExerciseDetailModal
                 visible={!!selectedExercise}
