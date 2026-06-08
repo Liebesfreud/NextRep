@@ -296,7 +296,7 @@ export function StrengthModal({
                             {modalStep === "select" ? "选择动作" : (initialWorkout ? "修改力量训练" : "添加力量训练")}
                         </Text>
                     )}
-                    <View style={{ flexDirection: "row", gap: 8 }}>
+                    <View className="flex-row gap-2">
                         {modalStep === "select" && (
                             <AnimatedPressable
                                 onPress={() => dismissKeyboardAndRun(() => {
@@ -322,9 +322,9 @@ export function StrengthModal({
                 </View>
 
                 {modalStep === "select" ? (
-                    <View style={{ flex: 1 }}>
+                    <View className="flex-1">
                         {/* Modern Search Bar */}
-                        <View style={{ backgroundColor: colors.gray2, flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingVertical: 12, borderRadius: 16, marginBottom: 16 }}>
+                        <View className="mb-4 flex-row items-center rounded-2xl px-4 py-3" style={{ backgroundColor: colors.gray2 }}>
                             <Search size={18} color={colors.gray4} />
                             <Input
                                 value={searchQuery}
@@ -345,9 +345,9 @@ export function StrengthModal({
                         </View>
 
                         {/* Filter Chips */}
-                        <View style={{ marginBottom: 16, marginHorizontal: -24, paddingHorizontal: 24 }}>
+                        <View className="-mx-6 mb-4 px-6">
                             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                <View style={{ flexDirection: "row", gap: 8, paddingBottom: 8, paddingRight: 24 }}>
+                                <View className="flex-row gap-2 pb-2 pr-6">
                                     {categories.map(cat => {
                                         const isSelected = selectedCategory === cat;
                                         const visual = cat === "全部" ? null : getStrengthCategoryVisual(cat, colors);
