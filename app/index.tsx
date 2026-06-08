@@ -12,6 +12,7 @@ import { TodayWorkouts } from "@/components/home/TodayWorkouts";
 import { StrengthModal } from "@/components/home/StrengthModal";
 import { CardioModal } from "@/components/home/CardioModal";
 import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
+import { Card } from "@/components/ui/card";
 
 import {
     addWorkout, updateWorkout, deleteWorkout,
@@ -197,7 +198,7 @@ export default function HomeScreen() {
     // ─── Render ────────────────────────────────────────────────────────────────
 
     return (
-        <View style={{ flex: 1, backgroundColor: colors.bg }}>
+        <View className="flex-1 bg-background">
             <ScrollView
                 className="flex-1"
                 contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 60, paddingBottom: 100, gap: 16 }}
@@ -210,9 +211,9 @@ export default function HomeScreen() {
                 <AnimatedEnter delay={50} distance={15}>
                     <View className="flex-row gap-bento">
                         <HomeStatsCard displayCal={displayCal} totalSets={totalSets} isAiPredicting={isAiPredicting} />
-                        <View style={{ backgroundColor: colors.bento, borderColor: colors.border, flex: 2 }} className="rounded-bento-lg border p-3.5">
+                        <Card className="flex-[2] p-3.5">
                             <MonthlyHeatmap refreshKey={`${workouts.length}-${isCheckedIn}`} />
-                        </View>
+                        </Card>
                     </View>
                 </AnimatedEnter>
 
