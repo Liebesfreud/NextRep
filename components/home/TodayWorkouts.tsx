@@ -116,19 +116,13 @@ function DatePickerModal({
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-            <Pressable
-                style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "center", alignItems: "center" }}
-                onPress={onClose}
-            >
+            <Pressable className="flex-1 items-center justify-center bg-black/60" onPress={onClose}>
                 <Pressable onPress={() => { }}>
                     <Card
-                    style={{
-                        width: 320,
-                    }}
-                    className="rounded-[20px] p-5"
+                    className="w-[320px] rounded-[20px] p-5"
                 >
                     {/* 月份导航 */}
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                    <View className="mb-4 flex-row items-center justify-between">
                         <Button onPress={prevMonth} variant="ghost" size="icon" className="h-8 w-8">
                             <ChevronLeft size={20} color={colors.white} />
                         </Button>
@@ -141,16 +135,16 @@ function DatePickerModal({
                     </View>
 
                     {/* 星期标签 */}
-                    <View style={{ flexDirection: "row", marginBottom: 8 }}>
+                    <View className="mb-2 flex-row">
                         {WEEK_LABELS.map(w => (
-                            <View key={w} style={{ flex: 1, alignItems: "center" }}>
-                                <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "700" }}>{w}</Text>
+                            <View key={w} className="flex-1 items-center">
+                                <Text variant="caption" className="text-[11px] font-bold">{w}</Text>
                             </View>
                         ))}
                     </View>
 
                     {/* 日期格子 */}
-                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                    <View className="flex-row flex-wrap">
                         {cells.map((day, idx) => {
                             if (!day) return <View key={idx} style={{ width: `${100 / 7}%`, aspectRatio: 1 }} />;
 
@@ -214,13 +208,14 @@ function DatePickerModal({
                     </View>
 
                     {/* 快捷跳转 */}
-                    <View style={{ flexDirection: "row", gap: 8, marginTop: 16 }}>
-                        <Pressable
+                    <View className="mt-4 flex-row gap-2">
+                        <Button
                             onPress={() => { onSelect(today); onClose(); }}
-                            style={{ flex: 1, backgroundColor: colors.gray2, paddingVertical: 10, borderRadius: 10, alignItems: "center" }}
+                            variant="secondary"
+                            className="flex-1 rounded-[10px] py-2.5"
                         >
-                            <Text style={{ color: colors.green, fontWeight: "700", fontSize: 13 }}>回到今天</Text>
-                        </Pressable>
+                            <ButtonText variant="secondary" className="text-[13px] text-accent">回到今天</ButtonText>
+                        </Button>
                     </View>
                     </Card>
                 </Pressable>
