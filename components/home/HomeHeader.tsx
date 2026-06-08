@@ -23,7 +23,7 @@ export function HomeHeader({ greeting, userName, isCheckedIn }: Props) {
                     {formattedDate}
                 </Text>
                 <Text variant="title" className="mt-1 font-extrabold">
-                    <Text style={{ color: colors.green }}>{greeting}, </Text>
+                    <Text className="text-accent">{greeting}, </Text>
                     <Text className="opacity-90">{userName}</Text>
                 </Text>
             </View>
