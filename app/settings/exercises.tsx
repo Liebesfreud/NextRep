@@ -167,7 +167,7 @@ export default function ExerciseManagementScreen() {
                         <ButtonText variant="ghost" className="text-base text-foreground">返回</ButtonText>
                     </Button>
                     <Text className="text-lg font-black">动作库</Text>
-                    <View style={{ width: 60 }} />
+                    <View className="w-[60px]" />
                 </View>
             </AnimatedEnter>
 
@@ -203,7 +203,7 @@ export default function ExerciseManagementScreen() {
                         </Button>
                     </View>
 
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20, paddingHorizontal: 20 }}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-5 px-5">
                         <View className="flex-row gap-2 pb-2 pr-5">
                             {categories.map((cat) => {
                                 const isSelected = selectedCategory === cat;
@@ -238,7 +238,7 @@ export default function ExerciseManagementScreen() {
                                     placeholder="例如：杠铃卧推"
                                     className="mb-2.5 h-[42px] font-extrabold"
                                 />
-                                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
+                                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3">
                                     <View className="flex-row gap-2">
                                         {STRENGTH_CATEGORIES.map((tag) => {
                                             const visual = getStrengthCategoryVisual(tag, colors);
