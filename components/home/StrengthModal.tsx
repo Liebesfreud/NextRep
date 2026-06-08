@@ -7,6 +7,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem, type StrengthPresetItem } from "@/db/services/workout";
 import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
 import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
+import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
@@ -341,27 +342,15 @@ export function StrengthModal({
                                         const accent = visual?.accent ?? colors.blue;
                                         const backgroundColor = isSelected ? (visual?.iconBg ?? `${colors.blue}08`) : (visual?.chipBg ?? `${colors.blue}06`);
                                         return (
-                                            <Pressable
-                                                key={cat}
-                                                onPress={() => setSelectedCategory(cat)}
-                                                style={{
-                                                    backgroundColor,
-                                                    borderColor: isSelected ? accent : `${accent}40`,
-                                                    borderWidth: 0.75,
-                                                    paddingHorizontal: 16,
-                                                    paddingVertical: 8,
-                                                    borderRadius: 9999,
-                                                }}
-                                            >
-                                                <Text
-                                                    style={{
-                                                        color: colors.white,
-                                                        fontWeight: isSelected ? '800' : '700',
-                                                        fontSize: 14,
-                                                    }}
+                                            <Pressable key={cat} onPress={() => setSelectedCategory(cat)}>
+                                                <Badge
+                                                    style={{ backgroundColor, borderColor: isSelected ? accent : `${accent}40`, borderWidth: 0.75 }}
+                                                    className="px-4 py-2"
                                                 >
+                                                    <BadgeText style={{ color: colors.white, fontWeight: isSelected ? "800" : "700", fontSize: 14 }}>
                                                     {cat}
-                                                </Text>
+                                                    </BadgeText>
+                                                </Badge>
                                             </Pressable>
                                         );
                                     })}
