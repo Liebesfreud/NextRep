@@ -269,12 +269,12 @@ export function TodayWorkouts({
                     {/* 标题 / 已选日期 */}
                     <AnimatedPressable
                         onPress={() => setShowDatePicker(true)}
-                        style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+                        className="flex-row items-center gap-1.5"
                     >
                         <Text className="text-lg font-bold tracking-tight">
                             {titleText}
                         </Text>
-                        <View style={{ backgroundColor: isToday ? colors.border : `${colors.green}33`, borderRadius: 6, padding: 4 }}>
+                        <View className="rounded-md p-1" style={{ backgroundColor: isToday ? colors.border : `${colors.green}33` }}>
                             <Calendar size={13} color={isToday ? colors.gray4 : colors.green} />
                         </View>
                     </AnimatedPressable>
@@ -375,7 +375,7 @@ export function TodayWorkouts({
                     )}
                 </View>
             ) : (
-                <View className="items-center justify-center py-8" style={{ opacity: 0.6 }}>
+                <View className="items-center justify-center py-8 opacity-60">
                     <Dumbbell size={40} color={colors.gray4} />
                     <Text variant="muted" className="mt-3 font-bold">
                         {isToday ? "今天还没有记录运动" : "这一天暂无运动记录"}
