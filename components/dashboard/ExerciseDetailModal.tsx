@@ -41,7 +41,7 @@ function StatTile({
     icon: ReactNode;
 }) {
     return (
-        <View style={{ width: "50%", padding: 5 }}>
+        <View className="w-1/2 p-[5px]">
             <Card className="min-h-[82px] rounded-xl bg-secondary p-3">
                 <View className="flex-row items-center gap-1.5 mb-2">
                     {icon}
@@ -100,7 +100,7 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
-                <View style={{ marginHorizontal: -5, flexDirection: "row", flexWrap: "wrap", marginBottom: 8 }}>
+                <View className="-mx-[5px] mb-2 flex-row flex-wrap">
                     <StatTile label="历史最高" value={formatWeight(exercise.maxWeightKg)} icon={<Dumbbell size={14} color={visual.accent} />} />
                     <StatTile label="重量突破" value={`${realBreakthroughs.length} 次`} icon={<TrendingUp size={14} color={colors.green} />} />
                     <StatTile label="训练天数" value={`${exercise.trainingDays} 天`} icon={<Calendar size={14} color={colors.blue} />} />
