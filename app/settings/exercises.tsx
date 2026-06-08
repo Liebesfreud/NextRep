@@ -156,9 +156,9 @@ export default function ExerciseManagementScreen() {
     };
 
     const renderEmptyList = () => (
-        <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 40, opacity: 0.6 }}>
-            <Dumbbell size={40} color={colors.gray4} style={{ marginBottom: 12 }} />
-            <Text style={{ color: colors.gray4, fontWeight: "bold" }}>没有找到动作</Text>
+        <View className="items-center justify-center gap-3 py-10 opacity-60">
+            <Dumbbell size={40} color={colors.gray4} />
+            <Text variant="muted" className="font-bold">没有找到动作</Text>
         </View>
     );
 
