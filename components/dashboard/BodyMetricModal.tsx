@@ -310,6 +310,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                                         const isPad = i < mStart || i >= mStart + mDays;
                                         const dayN = i - mStart + 1;
                                         const val = isPad ? null : recordsMap.get(dayN);
+                                        const hasValue = val != null;
                                         return (
                                             <Pressable
                                                 key={i}
@@ -318,7 +319,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                                                     if (!isPad) {
                                                         const ds = `${mYear}-${String(mMonth + 1).padStart(2, "0")}-${String(dayN).padStart(2, "0")}`;
                                                         setFormDate(ds);
-                                                        if (val) setFormValue(String(val));
+                                                        if (hasValue) setFormValue(String(val));
                                                     }
                                                 }}
                                             >
@@ -328,14 +329,14 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                                                         borderRadius: 8,
                                                         alignItems: "center",
                                                         justifyContent: "center",
-                                                        backgroundColor: val ? `${colors.green}33` : colors.border,
+                                                        backgroundColor: hasValue ? `${colors.green}33` : colors.border,
                                                         borderWidth: 1,
-                                                        borderColor: val ? `${colors.green}40` : `${colors.gray3}33`,
+                                                        borderColor: hasValue ? `${colors.green}40` : `${colors.gray3}33`,
                                                     }}>
-                                                        <Text style={{ color: val ? colors.green : colors.white, fontSize: 11, fontWeight: val ? "700" : "400", opacity: val ? 1 : 0.8 }}>
+                                                        <Text style={{ color: hasValue ? colors.green : colors.white, fontSize: 11, fontWeight: hasValue ? "700" : "400", opacity: hasValue ? 1 : 0.8 }}>
                                                             {dayN}
                                                         </Text>
-                                                        {val && (
+                                                        {hasValue && (
                                                             <Text style={{ color: colors.green, fontSize: 8, fontWeight: "800" }}>{val}</Text>
                                                         )}
                                                     </View>
