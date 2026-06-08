@@ -116,7 +116,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                 </Pressable>
 
                 {/* 右侧辅助卡片区 */}
-                <View style={{ flex: 1, flexDirection: "column", gap: 10 }}>
+                <View className="flex-1 gap-2.5">
 
                     {/* 右上卡片（体脂率） */}
                     <Pressable
@@ -157,16 +157,12 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                     </Pressable>
 
                     {/* 右下卡片（BMI） */}
-                    <View
+                    <Card
                         style={{
-                            flex: 1,
                             backgroundColor: colors.gray3,
                             borderColor: colors.border,
-                            borderWidth: 1,
-                            padding: 9,
-                            borderRadius: 16,
-                            justifyContent: "space-between"
                         }}
+                        className="flex-1 justify-between rounded-2xl border p-[9px]"
                     >
                         <Text style={{ color: colors.white, opacity: 0.8, fontSize: 11, fontWeight: "600" }}>
                             BMI
@@ -181,7 +177,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                                 </Text>
                             </View>
                         </View>
-                    </View>
+                    </Card>
 
                 </View>
             </View>
