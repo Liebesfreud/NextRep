@@ -247,11 +247,11 @@ export function StrengthModal({
                     marginBottom: 10,
                 }}
             >
-                <View style={{ backgroundColor: visual.iconBg, width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 16 }}>
+                <View style={{ backgroundColor: visual.iconBg }} className="mr-4 h-12 w-12 items-center justify-center rounded-2xl">
                     <Icon size={20} color={visual.accent} />
                 </View>
-                <View style={{ flex: 1, justifyContent: "center" }}>
-                    <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold", marginBottom: 6 }}>{ex.name}</Text>
+                <View className="flex-1 justify-center">
+                    <Text className="mb-1.5 text-base font-bold">{ex.name}</Text>
                     <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>
                         {ex.tag || "力量训练"}
                     </Text>
@@ -262,12 +262,12 @@ export function StrengthModal({
     };
 
     const renderExerciseEmpty = () => (
-        <View style={{ paddingVertical: 48, alignItems: "center", justifyContent: "center", opacity: 0.6 }}>
-            <Dumbbell size={40} color={colors.gray4} style={{ marginBottom: 16 }} />
-            <Text style={{ color: colors.gray4, fontSize: 14, fontWeight: "bold", textAlign: "center", marginBottom: 8 }}>
+        <View className="items-center justify-center gap-2 py-12 opacity-60">
+            <Dumbbell size={40} color={colors.gray4} />
+            <Text variant="muted" className="text-center font-bold">
                 没有找到相关动作
             </Text>
-            <Text style={{ color: colors.gray4, fontSize: 12, textAlign: "center" }}>
+            <Text variant="caption" className="text-center">
                 请前往“设置 {'->'} 数据与备份”新增你的自定义动作库
             </Text>
         </View>
@@ -387,14 +387,14 @@ export function StrengthModal({
                             <View style={{ backgroundColor: `${colors.green}33`, width: 48, height: 48, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
                                 <Dumbbell size={24} color={colors.green} />
                             </View>
-                            <Text style={{ color: colors.white, fontSize: 20, fontWeight: "bold" }}>{selectedExercise}</Text>
+                            <Text variant="subheading">{selectedExercise}</Text>
                         </View>
 
                         {/* Set-by-Set Header */}
                         <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 4, paddingHorizontal: 4 }}>
-                            <Text style={{ color: colors.gray4, width: 40, fontSize: 10, fontWeight: "bold", textAlign: "center", textTransform: "uppercase", letterSpacing: 1 }}>组次</Text>
-                            <Text style={{ color: colors.gray4, flex: 1, fontSize: 10, fontWeight: "bold", textAlign: "center", textTransform: "uppercase", letterSpacing: 1 }}>重量 (kg)</Text>
-                            <Text style={{ color: colors.gray4, flex: 1, fontSize: 10, fontWeight: "bold", textAlign: "center", textTransform: "uppercase", letterSpacing: 1 }}>次数</Text>
+                            <Text variant="caption" className="w-10 text-center text-[10px] font-bold uppercase tracking-[1px]">组次</Text>
+                            <Text variant="caption" className="flex-1 text-center text-[10px] font-bold uppercase tracking-[1px]">重量 (kg)</Text>
+                            <Text variant="caption" className="flex-1 text-center text-[10px] font-bold uppercase tracking-[1px]">次数</Text>
                             <View style={{ width: 40 }} />
                         </View>
 
