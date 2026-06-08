@@ -4,6 +4,7 @@ import { Activity, BarChart2, Calendar, Dumbbell, Flame, TrendingUp } from "luci
 import { useTheme } from "@/hooks/useTheme";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { PaginationDots } from "@/components/ui/pagination-dots";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
@@ -415,23 +416,15 @@ export function TrainingOverview({
                         ))}
                     </ScrollView>
 
-                    <View className="flex-row items-center justify-center gap-2 pt-1">
-                        {reviewPages.map((page, index) => (
-                            <Pressable
-                                key={page.key}
-                                onPress={() => {
-                                    setActiveReviewPage(index);
-                                    reviewScrollRef.current?.scrollTo({ x: index * reviewSnapInterval, animated: true });
-                                }}
-                                style={{
-                                    width: activeReviewPage === index ? 18 : 6,
-                                    height: 6,
-                                    borderRadius: 999,
-                                    backgroundColor: activeReviewPage === index ? colors.blue : colors.border,
-                                }}
-                            />
-                        ))}
-                    </View>
+                    <PaginationDots
+                        className="pt-1"
+                        count={reviewPages.length}
+                        activeIndex={activeReviewPage}
+                        onSelect={(index) => {
+                            setActiveReviewPage(index);
+                            reviewScrollRef.current?.scrollTo({ x: index * reviewSnapInterval, animated: true });
+                        }}
+                    />
                 </>
             ) : null}
         </Card>
