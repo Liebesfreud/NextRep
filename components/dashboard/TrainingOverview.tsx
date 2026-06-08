@@ -275,7 +275,7 @@ export function TrainingOverview({
                     <View className="flex-row flex-wrap">
                         {WEEKDAY_LABELS.map((weekday) => (
                             <View key={weekday} style={{ width: DAY_CELL_WIDTH }} className="items-center mb-2">
-                                <Text style={{ color: colors.gray4 }} className="text-[11px] font-bold">
+                                <Text className="text-[11px] font-bold text-muted-foreground">
                                     {weekday}
                                 </Text>
                             </View>
