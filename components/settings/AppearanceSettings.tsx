@@ -25,10 +25,7 @@ export function AppearanceSettings() {
 
             {/* Dark Mode Row */}
             <View className="flex-row items-center px-3.5 py-3.5">
-                <View
-                    className="mr-3 h-[34px] w-[34px] items-center justify-center rounded-[10px]"
-                    style={{ backgroundColor: isDark ? `${colors.green}1A` : `${colors.orange}1A` }}
-                >
+                <View className="mr-3 h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-accent/10">
                     {isDark
                         ? <Moon size={16} color={colors.green} />
                         : <Sun size={16} color={colors.orange} />}

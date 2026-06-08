@@ -37,7 +37,7 @@ function ActionRow({ icon, iconClassName, label, desc, destructive, onPress, dis
                     {desc}
                 </Text>
             </View>
-            <ChevronRight size={16} color={destructive ? "#FFFFFF" : colors.gray4} style={{ opacity: destructive ? 0.8 : 0.5 }} />
+            <ChevronRight size={16} color={destructive ? "#FFFFFF" : colors.gray4} className={destructive ? "opacity-80" : "opacity-50"} />
         </>
     );
 
