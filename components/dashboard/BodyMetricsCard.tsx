@@ -3,6 +3,7 @@ import { Scale } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
+import { cn } from "@/lib/utils";
 
 type Props = {
     data: any;
@@ -67,11 +68,10 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                 {/* 左侧核心卡片（体重） */}
                 <Pressable
                     onPress={() => setExpandedMetric(expandedMetric === "weight" ? null : "weight")}
-                    className="min-h-[106px] flex-[1.3] justify-between rounded-2xl border p-3"
-                    style={{
-                        backgroundColor: colors.gray3,
-                        borderColor: expandedMetric === "weight" ? `${colors.red}80` : colors.border,
-                    }}
+                    className={cn(
+                        "min-h-[106px] flex-[1.3] justify-between rounded-2xl border bg-muted p-3",
+                        expandedMetric === "weight" ? "border-destructive/50" : "border-border"
+                    )}
                 >
                     <View className="flex-row items-center">
                         <Text variant="caption" className="font-semibold text-foreground opacity-80">
@@ -108,11 +108,10 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                     {/* 右上卡片（体脂率） */}
                     <Pressable
                         onPress={() => setExpandedMetric(expandedMetric === "bodyFat" ? null : "bodyFat")}
-                        className="flex-1 justify-between rounded-2xl border p-[9px]"
-                        style={{
-                            backgroundColor: colors.gray3,
-                            borderColor: expandedMetric === "bodyFat" ? `${colors.red}80` : colors.border,
-                        }}
+                        className={cn(
+                            "flex-1 justify-between rounded-2xl border bg-muted p-[9px]",
+                            expandedMetric === "bodyFat" ? "border-destructive/50" : "border-border"
+                        )}
                     >
                         <Text className="text-[11px] font-semibold text-foreground opacity-80">
                             体脂率
@@ -141,11 +140,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
 
                     {/* 右下卡片（BMI） */}
                     <Card
-                        style={{
-                            backgroundColor: colors.gray3,
-                            borderColor: colors.border,
-                        }}
-                        className="flex-1 justify-between rounded-2xl border p-[9px]"
+                        className="flex-1 justify-between rounded-2xl border border-border bg-muted p-[9px]"
                     >
                         <Text className="text-[11px] font-semibold text-foreground opacity-80">
                             BMI
