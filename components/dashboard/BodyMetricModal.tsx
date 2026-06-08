@@ -245,7 +245,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                 </View>
 
                 {error && (
-                    <Text style={{ color: colors.red }} className="text-xs font-bold px-1 mb-2">{error}</Text>
+                    <Text className="mb-2 px-1 text-xs font-bold text-destructive">{error}</Text>
                 )}
 
                 <Button
