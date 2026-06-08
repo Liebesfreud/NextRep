@@ -172,8 +172,8 @@ export default function ExerciseManagementScreen() {
             </AnimatedEnter>
 
             <AnimatedEnter delay={50} distance={12}>
-                <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 10 }}>
-                    <View style={{ flexDirection: "row", gap: 10, marginBottom: 12 }}>
+                <View className="px-5 pb-2.5 pt-4">
+                    <View className="mb-3 flex-row gap-2.5">
                         <View className="h-11 flex-1 flex-row items-center rounded-bento-sm bg-secondary px-3.5">
                             <Search size={18} color={colors.gray4} />
                             <Input
@@ -204,7 +204,7 @@ export default function ExerciseManagementScreen() {
                     </View>
 
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20, paddingHorizontal: 20 }}>
-                        <View style={{ flexDirection: "row", gap: 8, paddingRight: 20, paddingBottom: 8 }}>
+                        <View className="flex-row gap-2 pb-2 pr-5">
                             {categories.map((cat) => {
                                 const isSelected = selectedCategory === cat;
                                 const visual = cat === "全部" ? null : getStrengthCategoryVisual(cat, colors);
@@ -239,7 +239,7 @@ export default function ExerciseManagementScreen() {
                                     className="mb-2.5 h-[42px] font-extrabold"
                                 />
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
-                                    <View style={{ flexDirection: "row", gap: 8 }}>
+                                    <View className="flex-row gap-2">
                                         {STRENGTH_CATEGORIES.map((tag) => {
                                             const visual = getStrengthCategoryVisual(tag, colors);
                                             const isSelected = tag === newTag;
