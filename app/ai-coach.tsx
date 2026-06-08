@@ -226,23 +226,23 @@ export default function AiCoachScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: colors.bg }}>
+        <View className="flex-1 bg-background">
             <View style={{ paddingTop: 60, paddingHorizontal: 16, paddingBottom: 12, backgroundColor: `${colors.bg}F2`, borderBottomWidth: 0.5, borderBottomColor: colors.border }}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
                     <View style={{ width: 42, height: 42, borderRadius: 21, alignItems: "center", justifyContent: "center", backgroundColor: `${colors.green}22` }}>
                         <Sparkles size={20} color={colors.green} />
                     </View>
                     <View style={{ flex: 1 }}>
-                        <Text style={{ color: colors.white, fontSize: 24, fontWeight: "900" }}>AI 教练</Text>
-                        <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "700", marginTop: 2 }}>今天练什么</Text>
+                        <Text variant="heading">AI 教练</Text>
+                        <Text variant="caption" className="mt-0.5 font-bold">今天练什么</Text>
                     </View>
                 </View>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 14 }}>
                 <Card>
-                    <Text style={{ color: colors.green, fontSize: 11, fontWeight: "800", letterSpacing: 1.2 }}>今日状态</Text>
-                    <Text style={{ color: colors.white, fontSize: 20, fontWeight: "900", marginTop: 8 }}>先选一下今天的状态</Text>
+                    <Text variant="caption" className="text-[11px] font-extrabold tracking-[1.2px] text-accent">今日状态</Text>
+                    <Text variant="subheading" className="mt-2">先选一下今天的状态</Text>
 
                     <View style={{ gap: 12, marginTop: 16 }}>
                         <FilterRow
@@ -278,29 +278,29 @@ export default function AiCoachScreen() {
                 </Card>
 
                 <Card>
-                    <Text style={{ color: colors.green, fontSize: 11, fontWeight: "800", letterSpacing: 1.2 }}>AI 建议</Text>
+                    <Text variant="caption" className="text-[11px] font-extrabold tracking-[1.2px] text-accent">AI 建议</Text>
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, marginTop: 8 }}>
-                        <Text style={{ color: colors.white, fontSize: 20, fontWeight: "900", flex: 1 }}>今天的建议</Text>
+                        <Text variant="subheading" className="flex-1">今天的建议</Text>
                         <View style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: `${colors.orange}18` }}>
-                            <Text style={{ color: colors.orange, fontSize: 12, fontWeight: "900" }}>{reportData?.intensityScore ?? 0} / 100</Text>
+                            <Text className="text-xs font-black text-primary">{reportData?.intensityScore ?? 0} / 100</Text>
                         </View>
                     </View>
 
                     <View style={{ marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: `${colors.gray3}55` }}>
-                        <Text style={{ color: colors.white, fontSize: 16, fontWeight: "800" }}>{coachLine}</Text>
-                        <Text style={{ color: colors.gray4, fontSize: 14, lineHeight: 22, marginTop: 8 }}>
+                        <Text className="text-base font-extrabold">{coachLine}</Text>
+                        <Text variant="muted" className="mt-2 leading-[22px]">
                             {reportData?.overallEvaluation || "生成建议后，这里会显示 AI 对你今天训练的判断。"}
                         </Text>
                     </View>
                 </Card>
 
                 <Card>
-                    <Text style={{ color: colors.green, fontSize: 11, fontWeight: "800", letterSpacing: 1.2 }}>今日计划</Text>
-                    <Text style={{ color: colors.white, fontSize: 20, fontWeight: "900", marginTop: 8 }}>今天的训练计划</Text>
+                    <Text variant="caption" className="text-[11px] font-extrabold tracking-[1.2px] text-accent">今日计划</Text>
+                    <Text variant="subheading" className="mt-2">今天的训练计划</Text>
 
                     {adjustedPlan.length === 0 ? (
                         <View style={{ marginTop: 14, padding: 16, borderRadius: 14, backgroundColor: `${colors.gray3}44` }}>
-                            <Text style={{ color: colors.gray4, fontSize: 14, lineHeight: 22 }}>先生成建议，这里会给你 2 到 3 个今天该做的训练项。</Text>
+                            <Text variant="muted" className="leading-[22px]">先生成建议，这里会给你 2 到 3 个今天该做的训练项。</Text>
                         </View>
                     ) : (
                         <View style={{ gap: 10, marginTop: 14 }}>
@@ -308,10 +308,10 @@ export default function AiCoachScreen() {
                                 <View key={`${plan.name}-${index}`} style={{ borderRadius: 14, padding: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: `${colors.bg}66` }}>
                                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
                                         <View style={{ flex: 1 }}>
-                                            <Text style={{ color: colors.white, fontSize: 16, fontWeight: "800" }}>{plan.name}</Text>
-                                            <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "700", marginTop: 4 }}>{getPlanTypeLabel(plan.type)}</Text>
+                                            <Text className="text-base font-extrabold">{plan.name}</Text>
+                                            <Text variant="caption" className="mt-1 font-bold">{getPlanTypeLabel(plan.type)}</Text>
                                         </View>
-                                        <Text style={{ color: colors.green, fontSize: 12, fontWeight: "900" }}>{plan.sets || plan.stats || "自定义"}</Text>
+                                        <Text className="text-xs font-black text-accent">{plan.sets || plan.stats || "自定义"}</Text>
                                     </View>
                                 </View>
                             ))}
@@ -332,7 +332,7 @@ export default function AiCoachScreen() {
 
                 {error && (
                     <Card style={{ backgroundColor: `${colors.red}14`, borderColor: `${colors.red}33` }} className="p-3.5">
-                        <Text style={{ color: colors.red, fontSize: 13, lineHeight: 20, fontWeight: "700" }}>{error}</Text>
+                        <Text className="text-[13px] font-bold leading-5 text-destructive">{error}</Text>
                     </Card>
                 )}
             </ScrollView>
@@ -345,7 +345,7 @@ function FilterRow({ title, icon, options, value, onChange, colors }: { title: s
         <View>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8 }}>
                 {icon}
-                <Text style={{ color: colors.white, fontSize: 13, fontWeight: "800" }}>{title}</Text>
+                <Text className="text-[13px] font-extrabold">{title}</Text>
             </View>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                 {options.map((option) => {
