@@ -54,7 +54,7 @@ export function ExerciseAnalytics({ data }: Props) {
                     </Button>
                 </View>
 
-                <View style={{ backgroundColor: colors.gray3, borderWidth: 1, borderColor: colors.border, padding: 8, minHeight: 112, borderRadius: 14 }}>
+                <Card className="min-h-[112px] rounded-[14px] border border-border bg-muted p-2">
                     {analytics.length === 0 ? (
                         <View className="items-center justify-center p-5">
                             <Text variant="muted" className="italic">暂无力量动作分析数据</Text>
@@ -67,16 +67,15 @@ export function ExerciseAnalytics({ data }: Props) {
                             <Pressable
                                 key={exercise.name}
                                 onPress={() => setSelectedExercise(exercise)}
-                                style={{ borderRadius: 12, padding: 10 }}
-                                className="flex-row items-center justify-between gap-3"
+                                className="flex-row items-center justify-between gap-3 rounded-xl p-2.5"
                             >
                                 <View className="flex-row items-center gap-3 flex-1">
-                                    <View style={{ width: 28, alignItems: "center" }}>
+                                    <View className="w-7 items-center">
                                         <Text style={{ color: visual.accent }} className="text-base font-black">
                                             {idx + 1}
                                         </Text>
                                     </View>
-                                    <View style={{ backgroundColor: visual.iconBg, width: 36, height: 36, borderRadius: 10, alignItems: "center", justifyContent: "center" }}>
+                                    <View style={{ backgroundColor: visual.iconBg }} className="h-9 w-9 items-center justify-center rounded-[10px]">
                                         <Icon size={18} color={visual.accent} />
                                     </View>
                                     <View className="flex-1">
@@ -97,7 +96,7 @@ export function ExerciseAnalytics({ data }: Props) {
                             </Pressable>
                         );
                     })}
-                </View>
+                </Card>
             </Card>
 
             <ExerciseDetailModal
