@@ -281,12 +281,12 @@ export default function AiCoachScreen() {
                     <Text variant="caption" className="text-[11px] font-extrabold tracking-[1.2px] text-accent">AI 建议</Text>
                     <View className="mt-2 flex-row items-center justify-between gap-3">
                         <Text variant="subheading" className="flex-1">今天的建议</Text>
-                        <View className="rounded-full px-2.5 py-1.5" style={{ backgroundColor: `${colors.orange}18` }}>
+                        <View className="rounded-full bg-accent/10 px-2.5 py-1.5">
                             <Text className="text-xs font-black text-primary">{reportData?.intensityScore ?? 0} / 100</Text>
                         </View>
                     </View>
 
-                    <View className="mt-3.5 rounded-[14px] p-3.5" style={{ backgroundColor: `${colors.gray3}55` }}>
+                    <View className="mt-3.5 rounded-[14px] bg-muted/50 p-3.5">
                         <Text className="text-base font-extrabold">{coachLine}</Text>
                         <Text variant="muted" className="mt-2 leading-[22px]">
                             {reportData?.overallEvaluation || "生成建议后，这里会显示 AI 对你今天训练的判断。"}
@@ -299,13 +299,13 @@ export default function AiCoachScreen() {
                     <Text variant="subheading" className="mt-2">今天的训练计划</Text>
 
                     {adjustedPlan.length === 0 ? (
-                        <View className="mt-3.5 rounded-[14px] p-4" style={{ backgroundColor: `${colors.gray3}44` }}>
+                        <View className="mt-3.5 rounded-[14px] bg-muted/40 p-4">
                             <Text variant="muted" className="leading-[22px]">先生成建议，这里会给你 2 到 3 个今天该做的训练项。</Text>
                         </View>
                     ) : (
                         <View className="mt-3.5 gap-2.5">
                             {adjustedPlan.map((plan, index) => (
-                                <View key={`${plan.name}-${index}`} className="rounded-[14px] border p-3.5" style={{ borderColor: colors.border, backgroundColor: `${colors.bg}66` }}>
+                                <View key={`${plan.name}-${index}`} className="rounded-[14px] border border-border bg-card/60 p-3.5">
                                     <View className="flex-row items-center justify-between gap-2.5">
                                         <View className="flex-1">
                                             <Text className="text-base font-extrabold">{plan.name}</Text>
