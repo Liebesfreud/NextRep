@@ -230,22 +230,17 @@ export function StrengthModal({
         const Icon = visual.icon;
 
         return (
-            <Pressable
+            <Button
                 onPress={() => {
                     setSelectedExercise(ex.name);
                     setModalStep("form");
                 }}
                 style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingVertical: 12,
-                    paddingHorizontal: 12,
-                    borderWidth: 0.75,
                     borderColor: `${visual.accent}26`,
                     backgroundColor: visual.cardBg ?? colors.gray2,
-                    borderRadius: 18,
-                    marginBottom: 10,
                 }}
+                variant="ghost"
+                className="mb-2.5 h-auto justify-start rounded-[18px] border px-3 py-3"
             >
                 <View style={{ backgroundColor: visual.iconBg }} className="mr-4 h-12 w-12 items-center justify-center rounded-2xl">
                     <Icon size={20} color={visual.accent} />
@@ -257,7 +252,7 @@ export function StrengthModal({
                     </Text>
                 </View>
                 <Plus size={20} color={visual.accent} style={{ opacity: 0.7, marginLeft: 8 }} />
-            </Pressable>
+            </Button>
         );
     };
 
