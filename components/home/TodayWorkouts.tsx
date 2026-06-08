@@ -305,28 +305,26 @@ export function TodayWorkouts({
                 <View className="gap-bento">
                     {/* Cardio */}
                     {cardioWorkouts.length > 0 && (
-                        <Card style={{ backgroundColor: `${colors.orange}1A`, borderColor: `${colors.orange}33` }}
-                            className="rounded-bento-sm p-3 gap-2">
+                        <Card className="gap-2 rounded-bento-sm border-primary/20 bg-primary/10 p-3">
                             <View className="flex-row justify-between items-center ml-1">
                                 <Text className="text-xs font-extrabold uppercase tracking-widest text-accent opacity-90">
                                     有氧训练
                                 </Text>
                                 <AnimatedPressable onPress={handleOpenCardio}
-                                    style={{ backgroundColor: `${colors.orange}33` }}
-                                    className="w-6 h-6 rounded-md items-center justify-center">
+                                    className="h-6 w-6 items-center justify-center rounded-md bg-primary/20">
                                     <Plus size={14} color={colors.orange} strokeWidth={3} />
                                 </AnimatedPressable>
                             </View>
                             {cardioWorkouts.map((w) => (
                                 <AnimatedPressable key={w.id} onPress={() => openEditModal(w)}
                                     className="flex-row items-center gap-2.5 p-1.5 -mx-1.5 rounded-lg">
-                                    <View style={{ backgroundColor: `${colors.orange}33` }} className="w-9 h-9 rounded-lg items-center justify-center">
+                                    <View className="h-9 w-9 items-center justify-center rounded-lg bg-primary/20">
                                         <Activity size={16} color={colors.orange} />
                                     </View>
                                     <View className="flex-1">
                                         <View className="flex-row justify-between items-center">
                                             <Text className="text-sm font-bold">{w.name}</Text>
-                                            <View style={{ backgroundColor: `${colors.orange}1A` }} className="px-2 py-0.5 rounded-md">
+                                            <View className="rounded-md bg-primary/10 px-2 py-0.5">
                                                 <Text className="text-xs font-semibold text-accent">{formatTime(w.createdAt)}</Text>
                                             </View>
                                         </View>
