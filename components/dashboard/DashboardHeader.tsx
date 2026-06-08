@@ -1,6 +1,7 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { LayoutDashboard } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
+import { Text } from "@/components/ui/text";
 
 export function DashboardHeader() {
     const { colors } = useTheme();
@@ -12,8 +13,8 @@ export function DashboardHeader() {
                     <LayoutDashboard size={20} color={colors.green} />
                 </View>
                 <View>
-                    <Text style={{ color: colors.white }} className="text-2xl font-black leading-none">数据看板</Text>
-                    <Text style={{ color: colors.gray4, opacity: 0.8 }} className="text-[10px] font-bold tracking-widest mt-1 uppercase">
+                    <Text variant="heading" className="leading-none">数据看板</Text>
+                    <Text variant="caption" className="mt-1 text-[10px] font-bold uppercase tracking-widest opacity-80">
                         Dashboard
                     </Text>
                 </View>

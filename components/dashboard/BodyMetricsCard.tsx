@@ -1,6 +1,8 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
 import { Scale } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
+import { Card } from "@/components/ui/card";
+import { Text } from "@/components/ui/text";
 
 type Props = {
     data: any;
@@ -49,7 +51,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
     const bodyFatGap = bodyFatVal != null && targetBodyFat != null ? bodyFatVal - targetBodyFat : null;
 
     return (
-        <View style={{ backgroundColor: colors.bento, borderColor: colors.border, borderWidth: 1, padding: 12, borderRadius: 16, flexDirection: "column", gap: 10 }}>
+        <Card style={{ flexDirection: "column", gap: 10 }} className="p-3">
             {/* Header */}
             <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 2 }}>
                 <Scale size={16} color={colors.red} />
@@ -183,6 +185,6 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
 
                 </View>
             </View>
-        </View>
+        </Card>
     );
 }
