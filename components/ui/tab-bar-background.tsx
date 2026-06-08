@@ -1,5 +1,36 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, type ViewStyle } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
+
+const TAB_BAR_HEIGHT = 70;
+const TAB_BAR_RADIUS = 16;
+
+function getTabBarStyle(borderColor: string): ViewStyle {
+    return {
+        position: "absolute",
+        bottom: 32,
+        marginHorizontal: 20,
+        left: 0,
+        right: 0,
+        backgroundColor: "transparent",
+        borderColor,
+        borderTopColor: borderColor,
+        borderWidth: 1,
+        borderTopWidth: 1,
+        borderRadius: TAB_BAR_RADIUS,
+        height: TAB_BAR_HEIGHT,
+        paddingBottom: 0,
+        paddingTop: 0,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 16 },
+        shadowOpacity: 0.08,
+        shadowRadius: 32,
+        elevation: 8,
+    };
+}
+
+const TAB_BAR_ITEM_STYLE: ViewStyle = {
+    height: TAB_BAR_HEIGHT,
+};
 
 export function TabBarBackground() {
     const { colors } = useTheme();
@@ -9,7 +40,7 @@ export function TabBarBackground() {
             style={{
                 ...StyleSheet.absoluteFillObject,
                 backgroundColor: colors.bento,
-                borderRadius: 16,
+                borderRadius: TAB_BAR_RADIUS,
                 overflow: "hidden",
             }}
         >
@@ -43,3 +74,5 @@ export function TabBarBackground() {
         </View>
     );
 }
+
+export { getTabBarStyle, TAB_BAR_ITEM_STYLE };

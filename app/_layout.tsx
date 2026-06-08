@@ -8,7 +8,7 @@ import { initDatabase } from "@/db/client";
 import * as SplashScreen from "expo-splash-screen";
 import { ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from "@react-navigation/native";
 import { Button, ButtonText } from "@/components/ui/button";
-import { TabBarBackground } from "@/components/ui/tab-bar-background";
+import { getTabBarStyle, TabBarBackground, TAB_BAR_ITEM_STYLE } from "@/components/ui/tab-bar-background";
 import { Text } from "@/components/ui/text";
 import "../global.css";
 
@@ -78,35 +78,13 @@ function TabLayout() {
                 safeAreaInsets={{ bottom: 0 }}
                 screenOptions={{
                     headerShown: false,
-                    tabBarStyle: {
-                        position: 'absolute',
-                        bottom: 32,
-                        marginHorizontal: 20,
-                        left: 0,
-                        right: 0,
-                        backgroundColor: 'transparent',
-                        borderColor: colors.border,
-                        borderTopColor: colors.border,
-                        borderWidth: 1,
-                        borderTopWidth: 1,
-                        borderRadius: 16, // match rounded-bento-lg (16px)
-                        height: 70,
-                        paddingBottom: 0,
-                        paddingTop: 0,
-                        shadowColor: "#000",
-                        shadowOffset: { width: 0, height: 16 },
-                        shadowOpacity: 0.08, // 降低阴影突兀感
-                        shadowRadius: 32,    // 极大的模糊半径让阴影更柔和
-                        elevation: 8,
-                    },
+                    tabBarStyle: getTabBarStyle(colors.border),
                     tabBarBackground: () => <TabBarBackground />,
                     tabBarShowLabel: false,
                     tabBarLabelPosition: 'beside-icon',
                     tabBarActiveTintColor: colors.white,
                     tabBarInactiveTintColor: colors.gray4,
-                    tabBarItemStyle: {
-                        height: 70,
-                    },
+                    tabBarItemStyle: TAB_BAR_ITEM_STYLE,
                 }}
             >
                 <Tabs.Screen
