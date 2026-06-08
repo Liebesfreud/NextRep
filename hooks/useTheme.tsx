@@ -50,22 +50,25 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         });
     }, []);
 
-    const setTheme = (t: ThemePreference) => {
+    const setTheme = React.useCallback((t: ThemePreference) => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setPreference(t);
         AsyncStorage.setItem(STORAGE_KEY, t);
-    };
+    }, []);
 
-    const toggleTheme = () => {
+    const toggleTheme = React.useCallback(() => {
         const nextPreference = preference === "dark" ? "light" : "dark";
         setTheme(nextPreference);
-    };
+    }, [preference, setTheme]);
+
+    const value = React.useMemo(
+        () => ({ theme, preference, colors: Colors[theme] as ColorTheme, toggleTheme, setTheme }),
+        [theme, preference, toggleTheme, setTheme]
+    );
 
     return (
-        <ThemeContext.Provider
-            value={{ theme, preference, colors: Colors[theme] as ColorTheme, toggleTheme, setTheme }}
-        >
-            <View className={theme} style={{ flex: 1 }}>
+        <ThemeContext.Provider value={value}>
+            <View className={`${theme} flex-1`}>
                 {children}
             </View>
         </ThemeContext.Provider>

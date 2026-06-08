@@ -28,6 +28,20 @@ function rowToValues(row: Record<string, unknown>): unknown[] {
 
 type AppDatabase = ReturnType<typeof drizzleExpo<typeof schema>>;
 
+async function addColumnIfMissing(
+  database: SQLite.SQLiteDatabase,
+  tableName: string,
+  columnName: string,
+  definition: string,
+): Promise<void> {
+  const columns = await database.getAllAsync<{ name: string }>(
+    `PRAGMA table_info("${tableName}")`,
+  );
+
+  if (columns.some((column) => column.name === columnName)) return;
+  await database.execAsync(`ALTER TABLE "${tableName}" ADD COLUMN "${columnName}" ${definition};`);
+}
+
 export const db: AppDatabase = (
   Platform.OS === "web"
     ? drizzleProxy(
@@ -135,41 +149,18 @@ export async function initDatabase(): Promise<void> {
     );
   `);
 
-  // Safe migrations for early adopters
-  try {
-    await database.execAsync(`
-          ALTER TABLE "UserProfile" ADD COLUMN "aiConfigs" TEXT;
-          ALTER TABLE "UserProfile" ADD COLUMN "activeAiConfigId" TEXT;
-          ALTER TABLE "UserProfile" ADD COLUMN "aiTokensTotal" INTEGER DEFAULT 0;
-          ALTER TABLE "UserProfile" ADD COLUMN "aiTokensToday" INTEGER DEFAULT 0;
-          ALTER TABLE "UserProfile" ADD COLUMN "aiTokensDate" TEXT;
-      `);
-  } catch (e) {
-    // Columns likely already exist
-  }
-
-  try {
-    await database.execAsync(`
-      ALTER TABLE "UserProfile" ADD COLUMN "targetWeight" REAL;
-    `);
-  } catch (e) {
-    // Column likely already exists
-  }
-
-  try {
-    await database.execAsync(`
-      ALTER TABLE "UserProfile" ADD COLUMN "targetBodyFat" REAL;
-    `);
-  } catch (e) {
-    // Column likely already exists
-  }
-
-  // Migrate DailyCheckin: add aiEstimatedCal column
-  try {
-    await database.execAsync(`
-      ALTER TABLE "DailyCheckin" ADD COLUMN "aiEstimatedCal" INTEGER;
-    `);
-  } catch (e) {
-    // Column likely already exists
+  // Safe migrations for early adopters. Run one column at a time so an
+  // already-existing column does not prevent later columns from being added.
+  for (const [tableName, columnName, definition] of [
+    ["UserProfile", "aiConfigs", "TEXT"],
+    ["UserProfile", "activeAiConfigId", "TEXT"],
+    ["UserProfile", "aiTokensTotal", "INTEGER DEFAULT 0"],
+    ["UserProfile", "aiTokensToday", "INTEGER DEFAULT 0"],
+    ["UserProfile", "aiTokensDate", "TEXT"],
+    ["UserProfile", "targetWeight", "REAL"],
+    ["UserProfile", "targetBodyFat", "REAL"],
+    ["DailyCheckin", "aiEstimatedCal", "INTEGER"],
+  ] as const) {
+    await addColumnIfMissing(database, tableName, columnName, definition);
   }
 }

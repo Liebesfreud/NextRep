@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { View, ScrollView } from "react-native";
 import { useFocusEffect } from "expo-router";
 import ConfettiCannon from "react-native-confetti-cannon";
@@ -137,11 +137,31 @@ export default function HomeScreen() {
 
     // ─── Computed ──────────────────────────────────────────────────────────────
 
-    const strengthWorkouts = workouts.filter((w) => w.type === "strength");
-    const cardioWorkouts = workouts.filter((w) => w.type === "cardio");
-    const totalSets = strengthWorkouts.reduce((s, w) => s + parseSetsCount(w.sets), 0);
-    const cardioCalories = cardioWorkouts.reduce((s, w) => s + parseKcal(w.stats), 0);
-    const fallbackCal = totalSets * 8 + cardioCalories;
+    const workoutSummary = useMemo(() => {
+        const strengthWorkouts: WorkoutItem[] = [];
+        const cardioWorkouts: WorkoutItem[] = [];
+        let totalSets = 0;
+        let cardioCalories = 0;
+
+        workouts.forEach((workout) => {
+            if (workout.type === "strength") {
+                strengthWorkouts.push(workout);
+                totalSets += parseSetsCount(workout.sets);
+            } else if (workout.type === "cardio") {
+                cardioWorkouts.push(workout);
+                cardioCalories += parseKcal(workout.stats);
+            }
+        });
+
+        return {
+            strengthWorkouts,
+            cardioWorkouts,
+            totalSets,
+            fallbackCal: totalSets * 8 + cardioCalories,
+        };
+    }, [workouts]);
+
+    const { strengthWorkouts, cardioWorkouts, totalSets, fallbackCal } = workoutSummary;
     const displayCal = aiEstimatedCal !== null ? aiEstimatedCal : fallbackCal;
 
     // ─── Handlers ───────────────────────────────────────────────────────────────

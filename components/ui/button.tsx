@@ -2,6 +2,7 @@ import * as React from "react";
 import { ActivityIndicator, Pressable, type PressableProps, Text as RNText } from "react-native";
 import { Slot } from "@rn-primitives/slot";
 import { cva, type VariantProps } from "class-variance-authority";
+import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
@@ -60,16 +61,17 @@ type ButtonProps = PressableProps &
         indicatorColor?: string;
     };
 
-function getIndicatorColor(variant: ButtonProps["variant"]) {
-    if (variant === "default") return "#000000";
-    if (variant === "destructive") return "#FFFFFF";
-    return "#FF9F0A";
+function getIndicatorColor(variant: ButtonProps["variant"], colors: ReturnType<typeof useTheme>["colors"]) {
+    if (variant === "default") return colors.primaryForeground;
+    if (variant === "destructive") return colors.destructiveForeground;
+    return colors.orange;
 }
 
 const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>(
     ({ className, variant, size, asChild = false, loading = false, indicatorColor, disabled, children, ...props }, ref) => {
         const Component = asChild ? Slot : Pressable;
         const isDisabled = disabled || loading;
+        const { colors } = useTheme();
 
         return (
             <Component
@@ -80,7 +82,7 @@ const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>
                 accessibilityState={{ disabled: isDisabled }}
                 {...props}
             >
-                {loading ? <ActivityIndicator size="small" color={indicatorColor ?? getIndicatorColor(variant)} /> : children}
+                {loading ? <ActivityIndicator size="small" color={indicatorColor ?? getIndicatorColor(variant, colors)} /> : children}
             </Component>
         );
     }

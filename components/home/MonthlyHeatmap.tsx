@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { View, Pressable, PanResponder, Modal, ScrollView, Animated } from "react-native";
 import { X, CalendarCheck } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
@@ -11,53 +11,69 @@ type Props = {
     refreshKey?: string;
 };
 
+const MONTH_FORMATTER = new Intl.DateTimeFormat("zh-CN", { month: "long" });
+
 export function MonthlyHeatmap({ refreshKey }: Props) {
     const { colors } = useTheme();
     const now = new Date();
-    const [year, setYear] = useState(now.getFullYear());
-    const [month, setMonth] = useState(now.getMonth());
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    const currentDate = now.getDate();
+    const [year, setYear] = useState(() => currentYear);
+    const [month, setMonth] = useState(() => currentMonth);
     const [checkins, setCheckins] = useState<Record<number, boolean>>({});
     const [workoutDays, setWorkoutDays] = useState<Record<number, number>>({});
     const [isPickerVisible, setIsPickerVisible] = useState(false);
+    const currentMonthRef = useRef({ year: currentYear, month: currentMonth });
+    const loadSeqRef = useRef(0);
 
     // Fade animation for swipe transitions
     const fadeAnim = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
+        currentMonthRef.current = { year, month };
+    }, [year, month]);
+
+    useEffect(() => {
+        const requestId = ++loadSeqRef.current;
+
         Promise.all([
             getCheckinsByMonth(year, month),
             getWorkoutsByMonth(year, month),
         ]).then(([c, w]) => {
+            if (requestId !== loadSeqRef.current) return;
             setCheckins(c);
             setWorkoutDays(w);
-        });
+        }).catch(console.error);
     }, [year, month, refreshKey]);
 
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDay = new Date(year, month, 1).getDay();
-    const monthName = new Intl.DateTimeFormat("zh-CN", { month: "long" }).format(new Date(year, month));
+    const monthName = useMemo(() => MONTH_FORMATTER.format(new Date(year, month)), [year, month]);
 
-    const goToPrev = () => {
+    const playSwipeTransition = useCallback(() => {
         Animated.sequence([
             Animated.timing(fadeAnim, { toValue: 0.5, duration: 100, useNativeDriver: true }),
             Animated.timing(fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true })
         ]).start();
-        if (month === 0) { setYear(y => y - 1); setMonth(11); }
-        else setMonth(m => m - 1);
-    };
-    const goToNext = () => {
-        if (year === now.getFullYear() && month === now.getMonth()) return; // Prevent future months
-        Animated.sequence([
-            Animated.timing(fadeAnim, { toValue: 0.5, duration: 100, useNativeDriver: true }),
-            Animated.timing(fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true })
-        ]).start();
-        if (month === 11) { setYear(y => y + 1); setMonth(0); }
-        else setMonth(m => m + 1);
-    };
+    }, [fadeAnim]);
+
+    const navigateMonth = useCallback((direction: -1 | 1) => {
+        const current = currentMonthRef.current;
+        const next = new Date(current.year, current.month + direction, 1);
+        if (next > new Date(currentYear, currentMonth, 1)) return;
+
+        playSwipeTransition();
+        setYear(next.getFullYear());
+        setMonth(next.getMonth());
+    }, [currentMonth, currentYear, playSwipeTransition]);
+
+    const goToPrev = useCallback(() => navigateMonth(-1), [navigateMonth]);
+    const goToNext = useCallback(() => navigateMonth(1), [navigateMonth]);
 
     // PanResponder for swipe gestures
-    const panResponder = useRef(
-        PanResponder.create({
+    const panResponder = useMemo(
+        () => PanResponder.create({
             onStartShouldSetPanResponder: () => false,
             onMoveShouldSetPanResponder: (evt, gestureState) => {
                 return Math.abs(gestureState.dx) > 20 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy);
@@ -69,19 +85,21 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                     goToNext(); // Swipe left -> next month
                 }
             },
-        })
-    ).current;
+        }),
+        [goToNext, goToPrev]
+    );
 
     const totalCells = 42; // Strictly 6 weeks * 7 days to maintain fixed height
-    const todayNum = (year === now.getFullYear() && month === now.getMonth()) ? now.getDate() : -1;
+    const todayNum = (year === currentYear && month === currentMonth) ? currentDate : -1;
     const monthlyCheckinCount = Object.values(checkins).filter(Boolean).length;
 
     // Compute week alignment (Monday = 0)
     const firstDayIndex = firstDay === 0 ? 6 : firstDay - 1;
 
     // Allowed selection range
-    const years = Array.from({ length: 5 }, (_, i) => now.getFullYear() - i);
-    const months = Array.from({ length: 12 }, (_, i) => i);
+    const years = useMemo(() => Array.from({ length: 5 }, (_, i) => currentYear - i), [currentYear]);
+    const months = useMemo(() => Array.from({ length: 12 }, (_, i) => i), []);
+    const monthLabels = useMemo(() => months.map((m) => MONTH_FORMATTER.format(new Date(year, m))), [months, year]);
 
     return (
         <View className="flex-row justify-between items-center w-full" {...panResponder.panHandlers}>
@@ -189,8 +207,8 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                             {/* Month Scroll */}
                             <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
                                 {months.map(m => {
-                                    const mName = new Intl.DateTimeFormat("zh-CN", { month: "long" }).format(new Date(year, m));
-                                    const isFuture = year === now.getFullYear() && m > now.getMonth();
+                                    const mName = monthLabels[m];
+                                    const isFuture = year === currentYear && m > currentMonth;
                                     return (
                                         <Button
                                             key={m}

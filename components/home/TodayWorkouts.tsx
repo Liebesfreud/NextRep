@@ -146,7 +146,7 @@ function DatePickerModal({
                     {/* 日期格子 */}
                     <View className="flex-row flex-wrap">
                         {cells.map((day, idx) => {
-                            if (!day) return <View key={idx} style={{ width: `${100 / 7}%`, aspectRatio: 1 }} />;
+                            if (!day) return <View key={`blank-${viewYear}-${viewMonth}-${idx}`} style={{ width: `${100 / 7}%`, aspectRatio: 1 }} />;
 
                             const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
                             const isToday = dateStr === today;
@@ -156,7 +156,7 @@ function DatePickerModal({
 
                             return (
                                 <Pressable
-                                    key={idx}
+                                    key={dateStr}
                                     style={{ width: `${100 / 7}%`, aspectRatio: 1, padding: 2 }}
                                     onPress={() => {
                                         if (!isFuture) {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { StyleSheet, ViewStyle } from 'react-native';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
@@ -42,8 +42,7 @@ export function LightEffect({
     // Clamp opacity to ensure it is very subtle, max 0.15 just in case but usually stay <= 0.1
     const clampedOpacity = Math.max(0.01, Math.min(opacity, 0.15));
 
-    // Unique ID for the gradient definition to prevent collision
-    const gradientId = `light-grad-${Math.random().toString(36).substring(2, 9)}`;
+    const gradientId = `light-grad-${useId().replace(/:/g, '')}`;
 
     return (
         <Svg

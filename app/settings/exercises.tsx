@@ -45,6 +45,9 @@ export default function ExerciseManagementScreen() {
 
     const categories = useMemo(() => ["全部", ...STRENGTH_CATEGORIES], []);
     const presetNames = useMemo(() => new Set(presets.map((preset) => preset.name)), [presets]);
+    const normalizedSearchQuery = useMemo(() => searchQuery.trim().toLowerCase(), [searchQuery]);
+    const libraryCount = presets.length;
+    const trainedCount = useMemo(() => analytics.filter((item) => item.records > 0).length, [analytics]);
 
     const loadData = useCallback(async () => {
         const [presetData, analyticsData] = await Promise.all([
@@ -59,10 +62,10 @@ export default function ExerciseManagementScreen() {
         loadData().catch(console.error);
     }, [loadData]));
 
-    const handleAdd = async () => {
+    const handleAdd = useCallback(async () => {
         const name = newName.trim();
         if (!name) return;
-        if (presets.some((p) => p.name === name)) {
+        if (presetNames.has(name)) {
             Alert.alert("动作已存在");
             return;
         }
@@ -72,9 +75,9 @@ export default function ExerciseManagementScreen() {
         setNewTag(null);
         setIsCreating(false);
         await loadData();
-    };
+    }, [loadData, newName, newTag, presetNames]);
 
-    const handleDelete = (name: string) => {
+    const handleDelete = useCallback((name: string) => {
         Alert.alert("删除动作", `确定要从动作库删除 "${name}" 吗？历史训练记录不会被删除。`, [
             { text: "取消", style: "cancel" },
             {
@@ -86,15 +89,18 @@ export default function ExerciseManagementScreen() {
                 }
             }
         ]);
-    };
+    }, [loadData]);
 
-    const filteredExercises = analytics.filter((item) => {
-        const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchCategory = selectedCategory === "全部" || item.tag === selectedCategory;
-        return matchSearch && matchCategory;
-    });
+    const filteredExercises = useMemo(
+        () => analytics.filter((item) => {
+            const matchSearch = !normalizedSearchQuery || item.name.toLowerCase().includes(normalizedSearchQuery);
+            const matchCategory = selectedCategory === "全部" || item.tag === selectedCategory;
+            return matchSearch && matchCategory;
+        }),
+        [analytics, normalizedSearchQuery, selectedCategory]
+    );
 
-    const renderExerciseItem = ({ item }: { item: StrengthExerciseAnalytics }) => {
+    const renderExerciseItem = useCallback(({ item }: { item: StrengthExerciseAnalytics }) => {
         const visual = getStrengthCategoryVisual(item.tag, colors);
         const Icon = visual.icon;
         const isPreset = presetNames.has(item.name);
@@ -148,14 +154,17 @@ export default function ExerciseManagementScreen() {
                 ) : null}
             </Card>
         );
-    };
+    }, [colors, handleDelete, presetNames]);
 
-    const renderEmptyList = () => (
-        <View className="items-center justify-center gap-3 py-10 opacity-60">
+    const renderEmptyList = useCallback(() => (
+        <View className="items-center justify-center gap-3 rounded-bento-lg border border-border bg-card/60 px-6 py-10 opacity-80">
             <Dumbbell size={40} color={colors.gray4} />
-            <Text variant="muted" className="font-bold">没有找到动作</Text>
+            <Text variant="label" className="text-center">没有找到动作</Text>
+            <Text variant="caption" className="text-center font-semibold">
+                {searchQuery || selectedCategory !== "全部" ? "试试清空搜索或切换分类" : "点击右上角 + 添加你的第一个力量动作"}
+            </Text>
         </View>
-    );
+    ), [colors.gray4, searchQuery, selectedCategory]);
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 bg-background">
@@ -200,6 +209,21 @@ export default function ExerciseManagementScreen() {
                         >
                             {isCreating ? <X size={20} color={colors.green} /> : <Plus size={20} color={colors.white} />}
                         </Button>
+                    </View>
+
+                    <View className="mb-3 flex-row gap-2.5">
+                        <Card className="flex-1 p-3">
+                            <Text variant="caption" className="font-extrabold uppercase tracking-widest">动作库</Text>
+                            <Text className="mt-1 text-xl font-black">{libraryCount}</Text>
+                        </Card>
+                        <Card className="flex-1 p-3">
+                            <Text variant="caption" className="font-extrabold uppercase tracking-widest">已训练</Text>
+                            <Text className="mt-1 text-xl font-black">{trainedCount}</Text>
+                        </Card>
+                        <Card className="flex-1 p-3">
+                            <Text variant="caption" className="font-extrabold uppercase tracking-widest">筛选后</Text>
+                            <Text className="mt-1 text-xl font-black">{filteredExercises.length}</Text>
+                        </Card>
                     </View>
 
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-5 px-5">
@@ -283,6 +307,10 @@ export default function ExerciseManagementScreen() {
                     ListEmptyComponent={renderEmptyList}
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
+                    initialNumToRender={10}
+                    maxToRenderPerBatch={8}
+                    removeClippedSubviews={Platform.OS !== "web"}
+                    windowSize={7}
                     contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: 110 }}
                 />
             </AnimatedEnter>
