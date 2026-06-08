@@ -187,6 +187,18 @@ export function StrengthModal({
         onClose();
     };
 
+    const handleDeleteWorkout = () => {
+        if (!initialWorkout || isPending) return;
+        Alert.alert("删除训练", `确定要删除「${initialWorkout.name}」吗？`, [
+            { text: "取消", style: "cancel" },
+            {
+                text: "删除",
+                style: "destructive",
+                onPress: () => onDelete(initialWorkout.id),
+            },
+        ]);
+    };
+
     const deleteSet = (id: string) => {
         if (sets.length === 1) {
             // If it's the last set, just clear it
@@ -446,7 +458,7 @@ export function StrengthModal({
 
                         <View style={{ flexDirection: "row", gap: 8, marginTop: 16, paddingTop: 8, borderTopWidth: 1, borderTopColor: `${colors.gray3}4D` }}>
                             {initialWorkout && (
-                                <Button onPress={() => onDelete(initialWorkout.id)} disabled={isPending} variant="destructive" className="w-16 bg-destructive/10 py-4">
+                                <Button onPress={handleDeleteWorkout} disabled={isPending} variant="destructive" className="w-16 bg-destructive/10 py-4">
                                     <Trash2 size={20} color={colors.red} />
                                 </Button>
                             )}
