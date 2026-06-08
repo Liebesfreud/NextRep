@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { View, ScrollView, Pressable, Alert, KeyboardAvoidingView, Platform, FlatList } from "react-native";
+import { View, ScrollView, Alert, KeyboardAvoidingView, Platform, FlatList } from "react-native";
 import { ChevronLeft, ChevronRight, Dumbbell, Plus, Search, Trash2, X } from "lucide-react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
@@ -113,16 +113,17 @@ export default function ExerciseManagementScreen() {
                 }}
                 className="p-0"
             >
-                <Pressable
+                <Button
                     onPress={() => setSelectedExercise(item)}
-                    style={{ flexDirection: "row", alignItems: "center", flex: 1, paddingVertical: 12, paddingLeft: 12, paddingRight: 4 }}
+                    variant="ghost"
+                    className="flex-1 justify-start rounded-none py-3 pl-3 pr-1"
                 >
                     <View style={{ backgroundColor: visual.iconBg, width: 42, height: 42, borderRadius: 12, alignItems: "center", justifyContent: "center", marginRight: 12 }}>
                         <Icon size={19} color={visual.accent} />
                     </View>
                     <View style={{ flex: 1 }}>
                         <View className="flex-row items-center gap-2">
-                            <Text style={{ color: colors.white, flex: 1 }} className="text-[15px] font-black" numberOfLines={1}>
+                            <Text className="flex-1 text-[15px] font-black" numberOfLines={1}>
                                 {item.name}
                             </Text>
                             {!isPreset ? (
@@ -139,7 +140,7 @@ export default function ExerciseManagementScreen() {
                         </Text>
                     </View>
                     <ChevronRight size={18} color={colors.gray4} style={{ marginLeft: 6 }} />
-                </Pressable>
+                </Button>
                 {isPreset ? (
                     <Button
                         onPress={() => handleDelete(item.name)}
