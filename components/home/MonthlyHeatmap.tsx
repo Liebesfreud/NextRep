@@ -4,6 +4,7 @@ import { X, CalendarCheck } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { getCheckinsByMonth, getWorkoutsByMonth } from "@/db/services/workout";
 import { Button, ButtonText } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 
 type Props = {
@@ -152,7 +153,8 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
             <Modal visible={isPickerVisible} animationType="slide" transparent onRequestClose={() => setIsPickerVisible(false)}>
                 <Pressable style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" }}
                     onPress={() => setIsPickerVisible(false)}>
-                    <Pressable onPress={() => { }} style={{ backgroundColor: colors.bento, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: 48, maxHeight: "50%" }}>
+                    <Pressable onPress={() => { }}>
+                        <Card className="max-h-[50%] rounded-b-none rounded-t-[24px] p-6 pb-12">
                         <View className="flex-row justify-between items-center mb-6">
                             <Text variant="subheading" className="tracking-tight">选择时间</Text>
                             <Button onPress={() => setIsPickerVisible(false)}
@@ -209,6 +211,7 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                                 })}
                             </ScrollView>
                         </View>
+                        </Card>
                     </Pressable>
                 </Pressable>
             </Modal>
