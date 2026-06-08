@@ -227,9 +227,9 @@ export default function AiCoachScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            <View className="border-b px-4 pb-3 pt-[60px]" style={{ backgroundColor: `${colors.bg}F2`, borderBottomColor: colors.border }}>
+            <View className="border-b border-border bg-background/95 px-4 pb-3 pt-[60px]">
                 <View className="flex-row items-center gap-3">
-                    <View className="h-[42px] w-[42px] items-center justify-center rounded-full" style={{ backgroundColor: `${colors.green}22` }}>
+                    <View className="h-[42px] w-[42px] items-center justify-center rounded-full bg-accent/10">
                         <Sparkles size={20} color={colors.green} />
                     </View>
                     <View className="flex-1">
