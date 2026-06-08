@@ -42,12 +42,15 @@ export function BottomSheetModal({
     const sheetTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
     useEffect(() => {
+        let cancelled = false;
+        let animation: Animated.CompositeAnimation | null = null;
+
         if (visible) {
             setIsMounted(true);
             backdropOpacity.setValue(0);
             sheetTranslateY.setValue(SCREEN_HEIGHT);
             // 打开：遮罩淡入 + 卡片上滑（cubic ease-out，顺滑无超调）
-            Animated.parallel([
+            animation = Animated.parallel([
                 Animated.timing(backdropOpacity, {
                     toValue: 1,
                     duration: 220,
@@ -60,11 +63,12 @@ export function BottomSheetModal({
                     easing: Easing.out(Easing.cubic),
                     useNativeDriver: true,
                 }),
-            ]).start();
+            ]);
+            animation.start();
         } else if (isMounted) {
             // 关闭：卡片快速下滑 + 遮罩淡出
             Keyboard.dismiss();
-            Animated.parallel([
+            animation = Animated.parallel([
                 Animated.timing(backdropOpacity, {
                     toValue: 0,
                     duration: 180,
@@ -77,10 +81,16 @@ export function BottomSheetModal({
                     easing: Easing.in(Easing.cubic),
                     useNativeDriver: true,
                 }),
-            ]).start(({ finished }) => {
-                if (finished) setIsMounted(false);
+            ]);
+            animation.start(({ finished }) => {
+                if (!cancelled && finished) setIsMounted(false);
             });
         }
+
+        return () => {
+            cancelled = true;
+            animation?.stop();
+        };
     }, [visible]);
 
     const sheetHeightStyle =

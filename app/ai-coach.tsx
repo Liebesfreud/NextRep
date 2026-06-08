@@ -201,7 +201,7 @@ export default function AiCoachScreen() {
     };
 
     const handleApplyTodaysPlan = async () => {
-        if (adjustedPlan.length === 0) return;
+        if (isApplying || adjustedPlan.length === 0) return;
 
         setIsApplying(true);
         try {

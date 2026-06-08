@@ -43,11 +43,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     // Load persisted preference on mount
     useEffect(() => {
+        let isActive = true;
+
         AsyncStorage.getItem(STORAGE_KEY).then((saved) => {
-            if (saved === "dark" || saved === "light" || saved === "system") {
+            if (isActive && (saved === "dark" || saved === "light" || saved === "system")) {
                 setPreference(saved as ThemePreference);
             }
         });
+
+        return () => {
+            isActive = false;
+        };
     }, []);
 
     const setTheme = React.useCallback((t: ThemePreference) => {

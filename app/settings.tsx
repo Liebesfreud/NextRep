@@ -16,6 +16,7 @@ import { Text } from "@/components/ui/text";
 export default function SettingsScreen() {
     const { colors } = useTheme();
     const mountedRef = useRef(true);
+    const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [isSaved, setIsSaved] = useState(false);
     const [isPending, setIsPending] = useState(false);
 
@@ -50,6 +51,7 @@ export default function SettingsScreen() {
 
         return () => {
             mountedRef.current = false;
+            if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
         };
     }, []);
 
@@ -59,7 +61,9 @@ export default function SettingsScreen() {
             await updateUserProfile(profile);
             if (!mountedRef.current) return;
             setIsSaved(true);
-            setTimeout(() => {
+            if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+            saveTimerRef.current = setTimeout(() => {
+                saveTimerRef.current = null;
                 if (mountedRef.current) setIsSaved(false);
             }, 2000);
         } finally {

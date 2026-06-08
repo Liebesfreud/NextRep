@@ -1,11 +1,12 @@
-import { useState, useEffect, useMemo } from "react";
-import { View, Pressable, ScrollView } from "react-native";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { View, ScrollView } from "react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, ChevronRight, Save } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { type BodyMetricPoint } from "@/db/services/dashboard";
 import Svg, { Circle, Path } from "react-native-svg";
 import { Button, ButtonText } from "@/components/ui/button";
+import { CalendarDayCell } from "@/components/ui/calendar-day-cell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
@@ -28,6 +29,13 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [trendRange, setTrendRange] = useState<7 | 30 | 90>(30);
+    const saveSeqRef = useRef(0);
+    const mountedRef = useRef(true);
+
+    useEffect(() => () => {
+        mountedRef.current = false;
+        saveSeqRef.current += 1;
+    }, []);
 
     const metricSummary = metricType ? data?.bodyMetrics?.[metricType] : null;
     const chartUnit = metricType === "weight" ? "kg" : "%";
@@ -101,7 +109,8 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
     }, [visible, metricType]);
 
     const handleSave = async () => {
-        if (!metricType) return;
+        if (!metricType || isSaving) return;
+        const requestId = ++saveSeqRef.current;
         setError(null);
         const val = Number(formValue.trim());
         if (!Number.isFinite(val) || val <= 0) {
@@ -111,11 +120,12 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
         setIsSaving(true);
         try {
             await onSave(metricType, formValue, formDate);
+            if (!mountedRef.current || requestId !== saveSeqRef.current) return;
             onClose();
         } catch (e) {
-            setError("保存失败，请重试");
+            if (mountedRef.current && requestId === saveSeqRef.current) setError("保存失败，请重试");
         } finally {
-            setIsSaving(false);
+            if (mountedRef.current && requestId === saveSeqRef.current) setIsSaving(false);
         }
     };
 
@@ -309,37 +319,22 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                                         const dayN = i - mStart + 1;
                                         const val = isPad ? null : recordsMap.get(dayN);
                                         const hasValue = val != null;
+                                        if (isPad) return <View key={`pad-${i}`} style={{ width: `${100 / 7}%`, aspectRatio: 1 }} />;
+
                                         return (
-                                            <Pressable
-                                                key={i}
-                                                style={{ width: `${100 / 7}%`, aspectRatio: 1, padding: 2 }}
-                                                onPress={() => {
-                                                    if (!isPad) {
+                                            <View key={dayN} style={{ width: `${100 / 7}%`, aspectRatio: 1, padding: 2 }}>
+                                                <CalendarDayCell
+                                                    day={dayN}
+                                                    size={40}
+                                                    marked={hasValue}
+                                                    valueLabel={hasValue ? val : null}
+                                                    onPress={() => {
                                                         const ds = `${mYear}-${String(mMonth + 1).padStart(2, "0")}-${String(dayN).padStart(2, "0")}`;
                                                         setFormDate(ds);
                                                         if (hasValue) setFormValue(String(val));
-                                                    }
-                                                }}
-                                            >
-                                                {!isPad && (
-                                                    <View style={{
-                                                        flex: 1,
-                                                        borderRadius: 8,
-                                                        alignItems: "center",
-                                                        justifyContent: "center",
-                                                        backgroundColor: hasValue ? `${colors.green}33` : colors.border,
-                                                        borderWidth: 1,
-                                                        borderColor: hasValue ? `${colors.green}40` : `${colors.gray3}33`,
-                                                    }}>
-                                                        <Text style={{ color: hasValue ? colors.green : colors.white, fontSize: 11, fontWeight: hasValue ? "700" : "400", opacity: hasValue ? 1 : 0.8 }}>
-                                                            {dayN}
-                                                        </Text>
-                                                        {hasValue && (
-                                                            <Text style={{ color: colors.green, fontSize: 8, fontWeight: "800" }}>{val}</Text>
-                                                        )}
-                                                    </View>
-                                                )}
-                                            </Pressable>
+                                                    }}
+                                                />
+                                            </View>
                                         );
                                     })}
                                 </View>

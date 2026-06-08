@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { View, Pressable, PanResponder, Modal, ScrollView, Animated } from "react-native";
+import { View, PanResponder, ScrollView, Animated } from "react-native";
 import { X, CalendarCheck } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { getCheckinsByMonth, getWorkoutsByMonth } from "@/db/services/workout";
 import { Button, ButtonText } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
 
 type Props = {
@@ -106,14 +106,20 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
             {/* Left Panel: Summary */}
             <View className="justify-center" style={{ paddingVertical: 2 }}>
                 <View>
-                    <Pressable onPress={() => setIsPickerVisible(true)}>
-                        <Text variant="caption" className="mb-0.5 font-bold tracking-wider">
-                            {year}
-                        </Text>
-                        <Text className="text-[22px] font-black">
-                            {monthName}
-                        </Text>
-                    </Pressable>
+                    <Button
+                        onPress={() => setIsPickerVisible(true)}
+                        variant="ghost"
+                        className="h-auto items-start justify-start bg-transparent p-0"
+                    >
+                        <View>
+                            <Text variant="caption" className="mb-0.5 font-bold tracking-wider">
+                                {year}
+                            </Text>
+                            <Text className="text-[22px] font-black">
+                                {monthName}
+                            </Text>
+                        </View>
+                    </Button>
                 </View>
 
                 <View className="mt-4">
@@ -167,13 +173,9 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                 ))}
             </Animated.View>
 
-            {/* Date Picker Modal */}
-            <Modal visible={isPickerVisible} animationType="slide" transparent onRequestClose={() => setIsPickerVisible(false)}>
-                <Pressable style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" }}
-                    onPress={() => setIsPickerVisible(false)}>
-                    <Pressable onPress={() => { }}>
-                        <Card className="max-h-[50%] rounded-b-none rounded-t-[24px] p-6 pb-12">
-                        <View className="flex-row justify-between items-center mb-6">
+            <Sheet visible={isPickerVisible} onClose={() => setIsPickerVisible(false)} sheetHeight="50%" backgroundColor={colors.bento}>
+                <View className="flex-1 p-6 pb-12">
+                        <View className="mb-6 flex-row items-center justify-between">
                             <Text variant="subheading" className="tracking-tight">选择时间</Text>
                             <Button onPress={() => setIsPickerVisible(false)}
                                 variant="secondary"
@@ -229,10 +231,8 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                                 })}
                             </ScrollView>
                         </View>
-                        </Card>
-                    </Pressable>
-                </Pressable>
-            </Modal>
+                </View>
+            </Sheet>
         </View>
     );
 }

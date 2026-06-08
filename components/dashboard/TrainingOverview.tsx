@@ -1,8 +1,9 @@
 import { useMemo, useRef, useState, type ReactNode } from "react";
-import { View, Pressable, ScrollView, useWindowDimensions } from "react-native";
+import { View, ScrollView, useWindowDimensions } from "react-native";
 import { Activity, BarChart2, Calendar, Dumbbell, Flame, TrendingUp } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { Button, ButtonText } from "@/components/ui/button";
+import { CalendarDayCell } from "@/components/ui/calendar-day-cell";
 import { Card } from "@/components/ui/card";
 import { PaginationDots } from "@/components/ui/pagination-dots";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -279,25 +280,16 @@ export function TrainingOverview({
                             const isWorkoutDay = !!data?.dailyData?.[dayNum]?.isWorkout;
 
                             return (
-                                <View key={dayNum} style={{ width: DAY_CELL_WIDTH }} className="items-center mb-2">
-                                    <Pressable
-                                        onPress={() => setSelectedDay(dayNum)}
-                                        style={{
-                                            width: 34,
-                                            height: 34,
-                                            borderRadius: 999,
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            backgroundColor: isSelected ? colors.green : isWorkoutDay ? `${colors.green}18` : "transparent",
-                                            borderWidth: isToday && !isSelected ? 1 : 0,
-                                            borderColor: isToday ? `${colors.green}66` : "transparent",
-                                        }}
-                                    >
-                                        <Text style={{ color: isSelected ? colors.black : isWorkoutDay ? colors.green : colors.white }} className="text-xs font-bold">
-                                            {dayNum}
-                                        </Text>
-                                    </Pressable>
-                                </View>
+                                <CalendarDayCell
+                                    key={dayNum}
+                                    day={dayNum}
+                                    width={DAY_CELL_WIDTH}
+                                    selected={isSelected}
+                                    today={isToday}
+                                    marked={isWorkoutDay}
+                                    onPress={() => setSelectedDay(dayNum)}
+                                    className="mb-2"
+                                />
                             );
                         })}
                     </View>
@@ -309,26 +301,16 @@ export function TrainingOverview({
                         const isWorkoutDay = !!data?.dailyData?.[dayNum]?.isWorkout;
 
                         return (
-                            <View key={dayNum} style={{ width: DAY_CELL_WIDTH }} className="items-center">
-                                <Pressable onPress={() => setSelectedDay(dayNum)} className="items-center gap-1">
-                                    <View
-                                        style={{
-                                            width: 36,
-                                            height: 36,
-                                            borderRadius: 999,
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            backgroundColor: isSelected ? colors.green : isWorkoutDay ? `${colors.green}18` : "transparent",
-                                            borderWidth: dayNum === todayNum && !isSelected ? 1 : 0,
-                                            borderColor: dayNum === todayNum ? `${colors.green}66` : "transparent",
-                                        }}
-                                    >
-                                        <Text style={{ color: isSelected ? colors.black : isWorkoutDay ? colors.green : colors.white }} className="text-sm font-black">
-                                            {dayNum}
-                                        </Text>
-                                    </View>
-                                </Pressable>
-                            </View>
+                            <CalendarDayCell
+                                key={dayNum}
+                                day={dayNum}
+                                width={DAY_CELL_WIDTH}
+                                size={36}
+                                selected={isSelected}
+                                today={dayNum === todayNum}
+                                marked={isWorkoutDay}
+                                onPress={() => setSelectedDay(dayNum)}
+                            />
                         );
                     })}
                 </View>

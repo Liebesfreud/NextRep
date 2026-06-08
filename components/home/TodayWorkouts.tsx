@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Modal, Pressable } from "react-native";
+import { View } from "react-native";
 import { Plus, Dumbbell, Activity, CheckCircle, Calendar, ChevronLeft, ChevronRight, X } from "lucide-react-native";
 import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import { LightEffect } from "@/components/ui/LightEffect";
@@ -8,6 +8,7 @@ import { getCheckinsByMonth, type WorkoutItem } from "@/db/services/workout";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
 
 function formatTime(iso: string) {
@@ -115,12 +116,8 @@ function DatePickerModal({
     });
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-            <Pressable className="flex-1 items-center justify-center bg-black/60" onPress={onClose}>
-                <Pressable onPress={() => { }}>
-                    <Card
-                    className="w-[320px] rounded-[20px] p-5"
-                >
+        <Sheet visible={visible} onClose={onClose} sheetHeight={430} backgroundColor={colors.bento}>
+            <View className="flex-1 px-5 pb-8 pt-5">
                     {/* 月份导航 */}
                     <View className="mb-4 flex-row items-center justify-between">
                         <Button onPress={prevMonth} variant="ghost" size="icon" className="h-8 w-8">
@@ -155,8 +152,10 @@ function DatePickerModal({
                             const isCheckedIn = !!checkins[day];
 
                             return (
-                                <Pressable
+                                <Button
                                     key={dateStr}
+                                    variant="ghost"
+                                    className="h-auto rounded-none p-0"
                                     style={{ width: `${100 / 7}%`, aspectRatio: 1, padding: 2 }}
                                     onPress={() => {
                                         if (!isFuture) {
@@ -202,7 +201,7 @@ function DatePickerModal({
                                             />
                                         )}
                                     </View>
-                                </Pressable>
+                                </Button>
                             );
                         })}
                     </View>
@@ -217,10 +216,8 @@ function DatePickerModal({
                             <ButtonText variant="secondary" className="text-[13px] text-accent">回到今天</ButtonText>
                         </Button>
                     </View>
-                    </Card>
-                </Pressable>
-            </Pressable>
-        </Modal>
+            </View>
+        </Sheet>
     );
 }
 

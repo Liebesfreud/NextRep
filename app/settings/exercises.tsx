@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { View, ScrollView, Alert, KeyboardAvoidingView, Platform, FlatList } from "react-native";
 import { ChevronLeft, ChevronRight, Dumbbell, Plus, Search, Trash2, X } from "lucide-react-native";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -42,6 +42,7 @@ export default function ExerciseManagementScreen() {
     const [isCreating, setIsCreating] = useState(false);
     const [newName, setNewName] = useState("");
     const [newTag, setNewTag] = useState<string | null>(null);
+    const loadSeqRef = useRef(0);
 
     const categories = useMemo(() => ["全部", ...STRENGTH_CATEGORIES], []);
     const presetNames = useMemo(() => new Set(presets.map((preset) => preset.name)), [presets]);
@@ -50,16 +51,21 @@ export default function ExerciseManagementScreen() {
     const trainedCount = useMemo(() => analytics.filter((item) => item.records > 0).length, [analytics]);
 
     const loadData = useCallback(async () => {
+        const requestId = ++loadSeqRef.current;
         const [presetData, analyticsData] = await Promise.all([
             getStrengthPresets(),
             getStrengthExerciseAnalytics(),
         ]);
+        if (requestId !== loadSeqRef.current) return;
         setPresets(presetData);
         setAnalytics(analyticsData);
     }, []);
 
     useFocusEffect(useCallback(() => {
         loadData().catch(console.error);
+        return () => {
+            loadSeqRef.current += 1;
+        };
     }, [loadData]));
 
     const handleAdd = useCallback(async () => {
