@@ -7,6 +7,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { getCheckinsByMonth, type WorkoutItem } from "@/db/services/workout";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
+import { CalendarDayCell } from "@/components/ui/calendar-day-cell";
 import { Card } from "@/components/ui/card";
 import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
@@ -152,56 +153,22 @@ function DatePickerModal({
                             const isCheckedIn = !!checkins[day];
 
                             return (
-                                <Button
-                                    key={dateStr}
-                                    variant="ghost"
-                                    className="h-auto rounded-none p-0"
-                                    style={{ width: `${100 / 7}%`, aspectRatio: 1, padding: 2 }}
-                                    onPress={() => {
-                                        if (!isFuture) {
-                                            onSelect(dateStr);
-                                            onClose();
-                                        }
-                                    }}
-                                    disabled={isFuture}
-                                >
-                                    <View style={{
-                                        flex: 1,
-                                        borderRadius: 8,
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        borderWidth: isCheckedIn && !isSelected ? 1 : 0,
-                                        borderColor: isCheckedIn && !isSelected ? `${colors.green}99` : "transparent",
-                                        backgroundColor: isSelected
-                                            ? colors.green
-                                            : isToday
-                                                ? `${colors.green}33`
-                                                : isCheckedIn
-                                                    ? `${colors.green}1A`
-                                                : "transparent",
-                                        opacity: isFuture ? 0.2 : 1,
-                                    }}>
-                                        <Text style={{
-                                            color: isSelected ? "#000" : isToday ? colors.green : colors.white,
-                                            fontSize: 13,
-                                            fontWeight: isSelected || isToday ? "800" : "500",
-                                        }}>
-                                            {day}
-                                        </Text>
-                                        {isCheckedIn && (
-                                            <View
-                                                style={{
-                                                    position: "absolute",
-                                                    bottom: 5,
-                                                    width: 4,
-                                                    height: 4,
-                                                    borderRadius: 2,
-                                                    backgroundColor: isSelected ? "#000" : colors.green,
-                                                }}
-                                            />
-                                        )}
-                                    </View>
-                                </Button>
+                                <View key={dateStr} style={{ width: `${100 / 7}%`, aspectRatio: 1, padding: 2 }}>
+                                    <CalendarDayCell
+                                        day={day}
+                                        selected={isSelected}
+                                        today={isToday}
+                                        marked={isCheckedIn}
+                                        disabled={isFuture}
+                                        size={38}
+                                        onPress={() => {
+                                            if (!isFuture) {
+                                                onSelect(dateStr);
+                                                onClose();
+                                            }
+                                        }}
+                                    />
+                                </View>
                             );
                         })}
                     </View>
@@ -424,7 +391,7 @@ export function TodayWorkouts({
                     disabled={isPending}
                     className="w-full bg-accent py-4"
                 >
-                    <CheckCircle size={18} color="#000" strokeWidth={2.5} />
+                    <CheckCircle size={18} color={colors.accentForeground} strokeWidth={2.5} />
                     <ButtonText className="text-base tracking-widest text-accent-foreground">
                         {isPending ? "打卡中..." : isToday ? "完成今日打卡" : "补打卡"}
                     </ButtonText>

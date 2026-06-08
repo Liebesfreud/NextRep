@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { View, Pressable, ScrollView, Alert, Keyboard, FlatList, Platform } from "react-native";
+import { View, ScrollView, Alert, Keyboard, FlatList, Platform } from "react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, Dumbbell, Trash2, Plus, Check, Search, Library } from "lucide-react-native";
 import { useRouter } from "expo-router";
@@ -32,6 +32,113 @@ type Props = {
     isPending: boolean;
 };
 
+let workoutSetIdSeq = 0;
+
+function createWorkoutSetId() {
+    workoutSetIdSeq += 1;
+    return `set-${Date.now()}-${workoutSetIdSeq}`;
+}
+
+function createWorkoutSet(overrides: Partial<WorkoutSet> = {}): WorkoutSet {
+    return {
+        id: createWorkoutSetId(),
+        setNumber: 1,
+        weight: "",
+        reps: "",
+        isCompleted: false,
+        ...overrides,
+    };
+}
+
+function normalizeWorkoutSet(set: WorkoutSet, index: number): WorkoutSet {
+    return {
+        ...set,
+        id: set.id || createWorkoutSetId(),
+        setNumber: index + 1,
+    };
+}
+
+type StrengthSetRowProps = {
+    item: WorkoutSet;
+    onDelete: (id: string) => void;
+    onToggleComplete: (id: string) => void;
+    onUpdate: (id: string, field: "weight" | "reps", value: string) => void;
+};
+
+const StrengthSetRow = React.memo(function StrengthSetRow({ item, onDelete, onToggleComplete, onUpdate }: StrengthSetRowProps) {
+    const { colors } = useTheme();
+
+    return (
+        <AnimatedPressable
+            onLongPress={() => onDelete(item.id)}
+            delayLongPress={500}
+            activeScale={0.99}
+            activeOpacity={0.9}
+            className={cn(
+                "mb-1 flex-row items-center rounded-[10px] px-1 py-1.5",
+                item.isCompleted && "bg-foreground/[0.03]"
+            )}
+        >
+            <View className="w-10 items-center">
+                <View
+                    className="h-6 w-6 items-center justify-center rounded-md"
+                    style={{
+                        backgroundColor: item.isCompleted ? "transparent" : colors.gray2,
+                        borderColor: item.isCompleted ? colors.green : "transparent",
+                        borderWidth: item.isCompleted ? 1 : 0,
+                    }}
+                >
+                    <Text
+                        className="text-xs font-bold"
+                        style={{ color: item.isCompleted ? colors.green : colors.gray4 }}
+                    >
+                        {item.setNumber}
+                    </Text>
+                </View>
+            </View>
+
+            <View className="flex-1 px-1.5">
+                <Input
+                    keyboardType="decimal-pad"
+                    value={item.weight}
+                    onChangeText={(value) => onUpdate(item.id, "weight", value)}
+                    placeholder="-"
+                    selectTextOnFocus
+                    className="min-h-0 rounded-lg border-0 bg-secondary px-2 py-2 text-center text-sm font-bold"
+                />
+            </View>
+
+            <View className="flex-1 px-1.5">
+                <Input
+                    keyboardType="number-pad"
+                    value={item.reps}
+                    onChangeText={(value) => onUpdate(item.id, "reps", value)}
+                    placeholder="-"
+                    selectTextOnFocus
+                    className="min-h-0 rounded-lg border-0 bg-secondary px-2 py-2 text-center text-sm font-bold"
+                />
+            </View>
+
+            <View className="w-10 items-center">
+                <Button
+                    onPress={() => onToggleComplete(item.id)}
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-lg bg-transparent p-0"
+                >
+                    <View className="h-7 w-7 items-center justify-center rounded-lg" style={{ backgroundColor: item.isCompleted ? colors.green : colors.gray2 }}>
+                        {item.isCompleted ? (
+                            <Check size={16} color={colors.primaryForeground} strokeWidth={3} />
+                        ) : (
+                            <View className="h-3 w-3 rounded-sm bg-foreground/10" />
+                        )}
+                    </View>
+                </Button>
+            </View>
+        </AnimatedPressable>
+    );
+});
+
 export function StrengthModal({
     visible, onClose, initialWorkout,
     presets, onPresetsChange,
@@ -42,13 +149,7 @@ export function StrengthModal({
 
     const [modalStep, setModalStep] = useState<"select" | "form">("select");
     const [selectedExercise, setSelectedExercise] = useState("");
-    const [sets, setSets] = useState<WorkoutSet[]>([{
-        id: Math.random().toString(36).substring(2, 10),
-        setNumber: 1,
-        weight: "",
-        reps: "",
-        isCompleted: false,
-    }]);
+    const [sets, setSets] = useState<WorkoutSet[]>(() => [createWorkoutSet()]);
 
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("全部");
@@ -90,22 +191,19 @@ export function StrengthModal({
 
                     if (setsCount > 0) {
                         for (let i = 0; i < setsCount; i++) {
-                            parsedSets.push({
-                                id: Math.random().toString(36).substring(2, 10) + i,
+                            parsedSets.push(createWorkoutSet({
                                 setNumber: i + 1,
                                 weight: weightVal,
                                 reps: repsVal,
                                 isCompleted: true,
-                            });
+                            }));
                         }
                     } else {
-                        parsedSets.push({
-                            id: Math.random().toString(36).substring(2, 10),
-                            setNumber: 1,
+                        parsedSets.push(createWorkoutSet({
                             weight: weightVal,
                             reps: repsVal,
                             isCompleted: false,
-                        });
+                        }));
                     }
                 }
             } catch (e) {
@@ -113,29 +211,17 @@ export function StrengthModal({
             }
 
             if (parsedSets.length === 0) {
-                parsedSets.push({
-                    id: Math.random().toString(36).substring(2, 10),
-                    setNumber: 1,
-                    weight: "",
-                    reps: "",
-                    isCompleted: false,
-                });
+                parsedSets.push(createWorkoutSet());
             }
 
             // Fix set numbers
-            parsedSets.forEach((s, idx) => s.setNumber = idx + 1);
+            parsedSets = parsedSets.map(normalizeWorkoutSet);
             setSets(parsedSets);
 
         } else {
             setModalStep("select");
             setSelectedExercise("");
-            setSets([{
-                id: Math.random().toString(36).substring(2, 10),
-                setNumber: 1,
-                weight: "",
-                reps: "",
-                isCompleted: false,
-            }]);
+            setSets([createWorkoutSet()]);
         }
     }, [visible, initialWorkout]);
 
@@ -168,24 +254,22 @@ export function StrengthModal({
         onSave(payload);
     };
 
-    const handleAddSet = () => {
-        const lastSet = sets[sets.length - 1];
-        setSets(prev => [...prev, {
-            id: Math.random().toString(36).substring(2, 10),
+    const handleAddSet = useCallback(() => {
+        setSets(prev => [...prev, createWorkoutSet({
             setNumber: prev.length + 1,
-            weight: lastSet ? lastSet.weight : "",
-            reps: lastSet ? lastSet.reps : "",
+            weight: prev[prev.length - 1]?.weight ?? "",
+            reps: prev[prev.length - 1]?.reps ?? "",
             isCompleted: false,
-        }]);
-    };
+        })]);
+    }, []);
 
-    const updateSet = (id: string, field: "weight" | "reps", value: string) => {
+    const updateSet = useCallback((id: string, field: "weight" | "reps", value: string) => {
         setSets(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s));
-    };
+    }, []);
 
-    const toggleSetComplete = (id: string) => {
+    const toggleSetComplete = useCallback((id: string) => {
         setSets(prev => prev.map(s => s.id === id ? { ...s, isCompleted: !s.isCompleted } : s));
-    };
+    }, []);
 
     const dismissKeyboardAndRun = (callback: () => void, delay = 80) => {
         Keyboard.dismiss();
@@ -214,16 +298,10 @@ export function StrengthModal({
         ]);
     };
 
-    const deleteSet = (id: string) => {
+    const deleteSet = useCallback((id: string) => {
         if (sets.length === 1) {
             // If it's the last set, just clear it
-            setSets([{
-                id: Math.random().toString(36).substring(2, 10),
-                setNumber: 1,
-                weight: "",
-                reps: "",
-                isCompleted: false,
-            }]);
+            setSets([createWorkoutSet()]);
             return;
         }
 
@@ -238,7 +316,7 @@ export function StrengthModal({
                 }
             }
         ]);
-    };
+    }, [sets.length]);
 
     const renderExerciseItem = useCallback(({ item: ex }: { item: StrengthPresetItem }) => {
         const visual = getStrengthCategoryVisual(ex.tag, colors);
@@ -291,7 +369,7 @@ export function StrengthModal({
             backgroundColor={colors.bento}
             avoidKeyboard
         >
-            <Pressable onPress={() => { }} className="flex-1">
+            <View className="flex-1">
                 <View className="mb-6 flex-row items-center justify-between">
                     {modalStep === "form" && !initialWorkout ? (
                         <Button
@@ -428,51 +506,13 @@ export function StrengthModal({
                         {/* Set-by-Set Rows */}
                         <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
                             {sets.map((set) => (
-                                <Pressable key={set.id} onLongPress={() => deleteSet(set.id)} delayLongPress={500}>
-                                    <View style={{ backgroundColor: set.isCompleted ? 'rgba(255,255,255,0.03)' : 'transparent', borderRadius: 10, flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 4, marginBottom: 4 }}>
-                                        {/* Set Number */}
-                                        <View style={{ width: 40, alignItems: "center" }}>
-                                            <View style={{ backgroundColor: set.isCompleted ? 'transparent' : colors.gray2, borderColor: set.isCompleted ? colors.green : 'transparent', borderWidth: set.isCompleted ? 1 : 0, width: 24, height: 24, borderRadius: 6, alignItems: "center", justifyContent: "center" }}>
-                                                <Text style={{ color: set.isCompleted ? colors.green : colors.gray4, fontWeight: "bold", fontSize: 12 }}>{set.setNumber}</Text>
-                                            </View>
-                                        </View>
-
-                                        {/* Weight Input */}
-                                        <View style={{ flex: 1, paddingHorizontal: 6 }}>
-                                            <Input
-                                                keyboardType="decimal-pad"
-                                                value={set.weight}
-                                                onChangeText={(val) => updateSet(set.id, "weight", val)}
-                                                placeholder="-"
-                                                selectTextOnFocus
-                                                className="min-h-0 rounded-lg border-0 bg-secondary px-2 py-2 text-center text-sm font-bold"
-                                            />
-                                        </View>
-
-                                        {/* Reps Input */}
-                                        <View style={{ flex: 1, paddingHorizontal: 6 }}>
-                                            <Input
-                                                keyboardType="number-pad"
-                                                value={set.reps}
-                                                onChangeText={(val) => updateSet(set.id, "reps", val)}
-                                                placeholder="-"
-                                                selectTextOnFocus
-                                                className="min-h-0 rounded-lg border-0 bg-secondary px-2 py-2 text-center text-sm font-bold"
-                                            />
-                                        </View>
-
-                                        {/* Complete Checkbox */}
-                                        <Pressable onPress={() => toggleSetComplete(set.id)} style={{ width: 40, alignItems: "center" }}>
-                                            <View style={{ backgroundColor: set.isCompleted ? colors.green : colors.gray2, width: 28, height: 28, borderRadius: 8, alignItems: "center", justifyContent: "center" }}>
-                                                {set.isCompleted ? (
-                                                    <Check size={16} color={colors.white} strokeWidth={3} />
-                                                ) : (
-                                                    <View style={{ width: 12, height: 12, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.1)' }} />
-                                                )}
-                                            </View>
-                                        </Pressable>
-                                    </View>
-                                </Pressable>
+                                <StrengthSetRow
+                                    key={set.id}
+                                    item={set}
+                                    onDelete={deleteSet}
+                                    onToggleComplete={toggleSetComplete}
+                                    onUpdate={updateSet}
+                                />
                             ))}
 
                             {/* Add Set Button */}
@@ -497,7 +537,7 @@ export function StrengthModal({
                         </View>
                     </View>
                 )}
-            </Pressable>
+            </View>
         </BottomSheetModal>
     );
 }
