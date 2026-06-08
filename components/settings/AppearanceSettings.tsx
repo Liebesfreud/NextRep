@@ -25,17 +25,15 @@ export function AppearanceSettings() {
 
             {/* Dark Mode Row */}
             <View className="flex-row items-center px-3.5 py-3.5">
-                <View style={{
-                    width: 34, height: 34, borderRadius: 10,
-                    backgroundColor: isDark ? `${colors.green}1A` : `${colors.orange}1A`,
-                    alignItems: "center", justifyContent: "center",
-                    marginRight: 12,
-                }}>
+                <View
+                    className="mr-3 h-[34px] w-[34px] items-center justify-center rounded-[10px]"
+                    style={{ backgroundColor: isDark ? `${colors.green}1A` : `${colors.orange}1A` }}
+                >
                     {isDark
                         ? <Moon size={16} color={colors.green} />
                         : <Sun size={16} color={colors.orange} />}
                 </View>
-                <View style={{ flex: 1 }}>
+                <View className="flex-1">
                     <Text variant="label">深色模式</Text>
                     <Text variant="caption" className="mt-0.5 font-semibold">
                         {preference === "system" ? `跟随系统 (${isDark ? "暗夜" : "日间"})` : (isDark ? "当前: 暗夜模式" : "当前: 日间模式")}
