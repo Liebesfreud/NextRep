@@ -345,21 +345,20 @@ export function TodayWorkouts({
                                     力量训练
                                 </Text>
                                 <AnimatedPressable onPress={handleOpenStrength}
-                                    style={{ backgroundColor: colors.gray2, borderColor: colors.border }}
-                                    className="h-6 w-6 items-center justify-center rounded-md border">
+                                    className="h-6 w-6 items-center justify-center rounded-md border border-border bg-secondary">
                                     <Plus size={14} color={colors.white} strokeWidth={3} />
                                 </AnimatedPressable>
                             </View>
                             {strengthWorkouts.map((w) => (
                                 <AnimatedPressable key={w.id} onPress={() => openEditModal(w)}
                                     className="flex-row items-center gap-2.5 p-1.5 -mx-1.5 rounded-lg">
-                                    <View style={{ backgroundColor: colors.gray3 }} className="w-9 h-9 rounded-lg items-center justify-center">
+                                    <View className="h-9 w-9 items-center justify-center rounded-lg bg-muted">
                                         <Dumbbell size={16} color={colors.gray4} />
                                     </View>
                                     <View className="flex-1">
                                         <View className="flex-row justify-between items-center">
                                             <Text className="text-sm font-bold">{w.name}</Text>
-                                            <View style={{ backgroundColor: colors.border }} className="px-2 py-0.5 rounded-md">
+                                            <View className="rounded-md bg-border px-2 py-0.5">
                                                 <Text variant="caption" className="text-xs font-semibold">{formatTime(w.createdAt)}</Text>
                                             </View>
                                         </View>
