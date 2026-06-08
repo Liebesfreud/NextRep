@@ -11,6 +11,7 @@ import { generateTrainingReportWithAI, type AiReportData } from "@/db/services/a
 import * as workoutService from "@/db/services/workout";
 import { useTheme } from "@/hooks/useTheme";
 import { Badge, BadgeText } from "@/components/ui/badge";
+import { Button, ButtonText } from "@/components/ui/button";
 
 type EnergyOption = "high" | "medium" | "low";
 type DurationOption = "20" | "40" | "60";
@@ -277,10 +278,10 @@ export default function AiCoachScreen() {
                         />
                     </View>
 
-                    <Pressable onPress={handleGenerateReport} disabled={isLoading} style={{ marginTop: 16, backgroundColor: colors.green, borderRadius: 14, paddingVertical: 14, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 8, opacity: isLoading ? 0.6 : 1 }}>
+                    <Button onPress={handleGenerateReport} disabled={isLoading} className="mt-4 bg-accent py-3.5">
                         {isLoading ? <ActivityIndicator size="small" color={colors.bg} /> : <Sparkles size={16} color={colors.bg} strokeWidth={2.6} />}
-                        <Text style={{ color: colors.bg, fontSize: 15, fontWeight: "900" }}>{isLoading ? "正在生成建议..." : "生成今日建议"}</Text>
-                    </Pressable>
+                        <ButtonText className="text-[15px] text-accent-foreground">{isLoading ? "正在生成建议..." : "生成今日建议"}</ButtonText>
+                    </Button>
                 </View>
 
                 <View style={{ ...sectionCard(colors), padding: 16 }}>
@@ -325,14 +326,14 @@ export default function AiCoachScreen() {
                     )}
 
                     <View style={{ flexDirection: "row", gap: 10, marginTop: 14 }}>
-                        <Pressable onPress={() => setUseLiteMode((prev) => !prev)} disabled={!reportData} style={{ flex: 1, borderRadius: 14, paddingVertical: 12, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: useLiteMode ? colors.green : colors.border, backgroundColor: useLiteMode ? `${colors.green}18` : `${colors.gray3}44`, opacity: reportData ? 1 : 0.5 }}>
-                            <Text style={{ color: useLiteMode ? colors.green : colors.white, fontSize: 13, fontWeight: "900" }}>{useLiteMode ? "已切到轻松版" : "换个更轻松的"}</Text>
-                        </Pressable>
+                        <Button onPress={() => setUseLiteMode((prev) => !prev)} disabled={!reportData} variant="outline" className="flex-1 py-3" style={{ borderColor: useLiteMode ? colors.green : colors.border, backgroundColor: useLiteMode ? `${colors.green}18` : `${colors.gray3}44` }}>
+                            <ButtonText variant="outline" className="text-[13px]" style={{ color: useLiteMode ? colors.green : colors.white }}>{useLiteMode ? "已切到轻松版" : "换个更轻松的"}</ButtonText>
+                        </Button>
 
-                        <Pressable onPress={handleApplyTodaysPlan} disabled={isApplying || adjustedPlan.length === 0} style={{ flex: 1, backgroundColor: colors.green, borderRadius: 14, paddingVertical: 12, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 8, opacity: isApplying || adjustedPlan.length === 0 ? 0.55 : 1 }}>
+                        <Button onPress={handleApplyTodaysPlan} disabled={isApplying || adjustedPlan.length === 0} className="flex-1 bg-accent py-3">
                             {isApplying ? <ActivityIndicator size="small" color={colors.bg} /> : <Plus size={16} color={colors.bg} strokeWidth={2.6} />}
-                            <Text style={{ color: colors.bg, fontSize: 13, fontWeight: "900" }}>应用到今日训练</Text>
-                        </Pressable>
+                            <ButtonText className="text-[13px] text-accent-foreground">应用到今日训练</ButtonText>
+                        </Button>
                     </View>
                 </View>
 
