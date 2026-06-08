@@ -383,7 +383,7 @@ export function StrengthModal({
                             ListEmptyComponent={renderExerciseEmpty}
                             showsVerticalScrollIndicator={false}
                             keyboardShouldPersistTaps="handled"
-                            style={{ flex: 1, marginHorizontal: -24 }}
+                            className="-mx-6 flex-1"
                             contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 100 }}
                         />
                     </View>
@@ -405,7 +405,7 @@ export function StrengthModal({
                         </View>
 
                         {/* Set-by-Set Rows */}
-                        <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+                        <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
                             {sets.map((set) => (
                                 <Pressable key={set.id} onLongPress={() => deleteSet(set.id)} delayLongPress={500}>
                                     <View style={{ backgroundColor: set.isCompleted ? 'rgba(255,255,255,0.03)' : 'transparent', borderRadius: 10, flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 4, marginBottom: 4 }}>
