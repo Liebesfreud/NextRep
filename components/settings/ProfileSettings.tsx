@@ -1,8 +1,8 @@
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { Calendar, Ruler, Target, User, Venus } from "lucide-react-native";
 import { type UserProfileData } from "@/db/services/profile";
 import { useTheme } from "@/hooks/useTheme";
-import { Badge, BadgeText } from "@/components/ui/badge";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -37,11 +37,17 @@ function ChipPicker({
             {options.map((option) => {
                 const isSelected = option.value === value;
                 return (
-                    <Pressable key={option.value} onPress={() => onChange(isSelected ? null : option.value)}>
-                        <Badge variant={isSelected ? "default" : "secondary"} className="rounded-lg px-3 py-1.5">
-                            <BadgeText variant={isSelected ? "default" : "secondary"}>{option.label}</BadgeText>
-                        </Badge>
-                    </Pressable>
+                    <Button
+                        key={option.value}
+                        onPress={() => onChange(isSelected ? null : option.value)}
+                        variant={isSelected ? "default" : "secondary"}
+                        size="sm"
+                        className="h-auto rounded-lg px-3 py-1.5"
+                    >
+                        <ButtonText variant={isSelected ? "default" : "secondary"} size="sm">
+                            {option.label}
+                        </ButtonText>
+                    </Button>
                 );
             })}
         </View>
