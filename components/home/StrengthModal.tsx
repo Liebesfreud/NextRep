@@ -407,27 +407,25 @@ export function StrengthModal({
 
                                         {/* Weight Input */}
                                         <View style={{ flex: 1, paddingHorizontal: 6 }}>
-                                            <TextInput
+                                            <Input
                                                 keyboardType="decimal-pad"
                                                 value={set.weight}
                                                 onChangeText={(val) => updateSet(set.id, "weight", val)}
                                                 placeholder="-"
-                                                placeholderTextColor={`${colors.gray4}4D`}
                                                 selectTextOnFocus
-                                                style={{ color: colors.white, backgroundColor: colors.gray2, paddingVertical: 8, paddingHorizontal: 8, borderRadius: 8, textAlign: 'center', fontWeight: "bold", fontSize: 14 }}
+                                                className="min-h-0 rounded-lg border-0 bg-secondary px-2 py-2 text-center text-sm font-bold"
                                             />
                                         </View>
 
                                         {/* Reps Input */}
                                         <View style={{ flex: 1, paddingHorizontal: 6 }}>
-                                            <TextInput
+                                            <Input
                                                 keyboardType="number-pad"
                                                 value={set.reps}
                                                 onChangeText={(val) => updateSet(set.id, "reps", val)}
                                                 placeholder="-"
-                                                placeholderTextColor={`${colors.gray4}4D`}
                                                 selectTextOnFocus
-                                                style={{ color: colors.white, backgroundColor: colors.gray2, paddingVertical: 8, paddingHorizontal: 8, borderRadius: 8, textAlign: 'center', fontWeight: "bold", fontSize: 14 }}
+                                                className="min-h-0 rounded-lg border-0 bg-secondary px-2 py-2 text-center text-sm font-bold"
                                             />
                                         </View>
 
