@@ -1,10 +1,11 @@
 import { useMemo, useRef, useState, type ReactNode } from "react";
-import { View, Text, Pressable, ScrollView, useWindowDimensions } from "react-native";
+import { View, Pressable, ScrollView, useWindowDimensions } from "react-native";
 import { Activity, BarChart2, Calendar, Dumbbell, Flame, TrendingUp } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Text } from "@/components/ui/text";
 
 type ReviewSummary = {
     workouts: number;
@@ -96,10 +97,6 @@ function getMonthLabel(month: number) {
     return `${month + 1} 月`;
 }
 
-function Divider() {
-    return <Separator />;
-}
-
 function SectionTitle({ icon, title, action }: { icon: ReactNode; title: string; action?: ReactNode }) {
     const { colors } = useTheme();
 
@@ -188,7 +185,7 @@ function ReviewCard({ title, summary }: { title: string; summary?: ReviewSummary
                 ))}
             </View>
 
-            <Divider />
+            <Separator />
 
             <View className="gap-2">
                 <View className="flex-row items-center justify-between gap-3">
@@ -271,7 +268,7 @@ export function TrainingOverview({
                 </View>
             </View>
 
-            <Divider />
+            <Separator />
 
             <SectionTitle
                 icon={<Calendar size={17} color={colors.green} />}
@@ -392,7 +389,7 @@ export function TrainingOverview({
                 )}
             </View>
 
-            <Divider />
+            <Separator />
 
             <SectionTitle
                 icon={<TrendingUp size={17} color={colors.blue} />}
