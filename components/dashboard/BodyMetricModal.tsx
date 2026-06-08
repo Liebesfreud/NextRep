@@ -6,6 +6,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { type BodyMetricPoint } from "@/db/services/dashboard";
 import Svg, { Circle, Path } from "react-native-svg";
 import { Button, ButtonText } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 
@@ -141,7 +142,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Current Value */}
-                <View style={{ backgroundColor: colors.gray2, borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: `${colors.gray3}4D` }}>
+                <Card className="mb-3 rounded-xl bg-secondary p-3">
                     <Text style={{ color: colors.gray4 }} className="text-xs font-bold tracking-wider mb-1 uppercase">
                         当前{metricType === "weight" ? "体重" : "体脂率"}
                     </Text>
@@ -158,9 +159,9 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                             ? `目标 ${targetValue}${chartUnit} · ${targetGap === 0 ? "已达成" : `${targetGap > 0 ? "高于" : "低于"}目标 ${Math.abs(targetGap).toFixed(1)}${chartUnit}`}`
                             : `设置目标${metricType === "weight" ? "体重" : "体脂率"}后显示差距`}
                     </Text>
-                </View>
+                </Card>
 
-                <View style={{ backgroundColor: colors.gray2, borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: `${colors.gray3}4D` }}>
+                <Card className="mb-3 rounded-xl bg-secondary p-3">
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                         <View>
                             <Text style={{ color: colors.white, fontSize: 13, fontWeight: "700" }}>趋势图</Text>
@@ -215,7 +216,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                             <Text style={{ color: colors.gray4, fontSize: 12 }}>至少两条记录后显示趋势图</Text>
                         </View>
                     )}
-                </View>
+                </Card>
 
                 {/* Input Form */}
                 <View className="flex-row gap-3 items-end mb-3">
