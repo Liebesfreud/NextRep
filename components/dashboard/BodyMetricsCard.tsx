@@ -2,8 +2,8 @@ import { View } from "react-native";
 import { Scale } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
-import { Badge, BadgeText } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
 
@@ -93,11 +93,13 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                     </View>
 
                     {/* 趋势标签 */}
-                    <Badge className="rounded-md border-0 px-[7px] py-[3px]" style={{ backgroundColor: trendBgColor }}>
-                        <BadgeText className="text-[10px] font-bold" style={{ color: trendColor }}>
-                            {trendText}
-                        </BadgeText>
-                    </Badge>
+                    <StatusBadge
+                        label={trendText}
+                        color={trendColor}
+                        backgroundColor={trendBgColor}
+                        className="rounded-md border-0 px-[7px] py-[3px]"
+                        textClassName="text-[10px] font-bold"
+                    />
 
                     <Text className="mt-2 text-[10px] font-semibold text-muted-foreground" numberOfLines={2}>
                         {targetWeight != null && weightGap != null
@@ -130,11 +132,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                                 <Text className="ml-0.5 text-[9px] font-semibold text-foreground opacity-50">%</Text>
                             </View>
                             {bodyFatVal && (
-                                <Badge className="rounded border-0 px-1 py-px" style={{ backgroundColor: bodyFatStatusBg }}>
-                                    <BadgeText className="text-[9px] font-bold" style={{ color: bodyFatStatusColor }}>
-                                        {bodyFatStatusText}
-                                    </BadgeText>
-                                </Badge>
+                                <StatusBadge label={bodyFatStatusText} color={bodyFatStatusColor} backgroundColor={bodyFatStatusBg} />
                             )}
                         </View>
                         <Text className="mt-[3px] text-[9px] font-semibold text-muted-foreground" numberOfLines={2}>
@@ -155,11 +153,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                             <Text className="text-[17px] font-extrabold text-foreground">
                                 {loading ? "-" : bmiVal}
                             </Text>
-                            <Badge className="rounded border-0 px-1 py-px" style={{ backgroundColor: bmiStatus.bg }}>
-                                <BadgeText className="text-[9px] font-bold" style={{ color: bmiStatus.color }}>
-                                    {bmiStatus.text}
-                                </BadgeText>
-                            </Badge>
+                            <StatusBadge label={bmiStatus.text} color={bmiStatus.color} backgroundColor={bmiStatus.bg} />
                         </View>
                     </Card>
 

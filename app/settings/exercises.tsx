@@ -8,9 +8,9 @@ import { getStrengthExerciseAnalytics, type StrengthExerciseAnalytics } from "@/
 import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
 import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
 import { ExerciseDetailModal } from "@/components/dashboard/ExerciseDetailModal";
-import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { CategoryBadge } from "@/components/ui/category-badge";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 
@@ -245,13 +245,7 @@ export default function ExerciseManagementScreen() {
                                         variant="ghost"
                                         className="h-auto bg-transparent p-0"
                                     >
-                                        <Badge
-                                            variant={isSelected ? "default" : "secondary"}
-                                            style={isSelected ? { backgroundColor: `${accent}1A`, borderColor: accent } : undefined}
-                                            className={isSelected ? "border px-3 py-2" : "border border-border bg-secondary px-3 py-2"}
-                                        >
-                                            <BadgeText className={isSelected ? "text-white" : "text-muted-foreground"}>{cat}</BadgeText>
-                                        </Badge>
+                                        <CategoryBadge label={cat} selected={isSelected} accentColor={accent} />
                                     </Button>
                                 );
                             })}
@@ -280,13 +274,12 @@ export default function ExerciseManagementScreen() {
                                                     variant="ghost"
                                                     className="h-auto bg-transparent p-0"
                                                 >
-                                                    <Badge
-                                                        variant={isSelected ? "default" : "secondary"}
-                                                        style={isSelected ? { backgroundColor: visual.iconBg, borderColor: visual.accent } : undefined}
-                                                        className={isSelected ? "border px-3 py-2" : "border border-border bg-secondary px-3 py-2"}
-                                                    >
-                                                        <BadgeText className={isSelected ? "text-white" : "text-muted-foreground"}>{tag}</BadgeText>
-                                                    </Badge>
+                                                    <CategoryBadge
+                                                        label={tag}
+                                                        selected={isSelected}
+                                                        accentColor={visual.accent}
+                                                        selectedBackgroundColor={visual.iconBg}
+                                                    />
                                                 </Button>
                                             );
                                         })}

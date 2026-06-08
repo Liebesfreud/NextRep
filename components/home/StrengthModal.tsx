@@ -7,8 +7,8 @@ import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem, type StrengthPresetItem } from "@/db/services/workout";
 import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
 import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
-import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
+import { CategoryBadge } from "@/components/ui/category-badge";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
@@ -445,7 +445,6 @@ export function StrengthModal({
                                         const isSelected = selectedCategory === cat;
                                         const visual = cat === "全部" ? null : getStrengthCategoryVisual(cat, colors);
                                         const accent = visual?.accent ?? colors.blue;
-                                        const backgroundColor = isSelected ? (visual?.iconBg ?? `${colors.blue}08`) : (visual?.chipBg ?? `${colors.blue}06`);
                                         return (
                                             <Button
                                                 key={cat}
@@ -453,17 +452,15 @@ export function StrengthModal({
                                                 variant="ghost"
                                                 className="h-auto bg-transparent p-0"
                                             >
-                                                <Badge
-                                                    style={{ backgroundColor, borderColor: isSelected ? accent : `${accent}40`, borderWidth: 0.75 }}
+                                                <CategoryBadge
+                                                    label={cat}
+                                                    selected={isSelected}
+                                                    accentColor={accent}
+                                                    selectedBackgroundColor={visual?.iconBg}
+                                                    backgroundColor={visual?.chipBg}
                                                     className="px-4 py-2"
-                                                >
-                                                    <BadgeText
-                                                        style={{ color: colors.white }}
-                                                        className={cn("text-sm", isSelected ? "font-extrabold" : "font-bold")}
-                                                    >
-                                                    {cat}
-                                                    </BadgeText>
-                                                </Badge>
+                                                    textClassName="text-sm"
+                                                />
                                             </Button>
                                         );
                                     })}
