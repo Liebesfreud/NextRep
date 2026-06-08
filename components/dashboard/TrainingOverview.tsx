@@ -350,10 +350,10 @@ export function TrainingOverview({
 
             <Card className="gap-3 bg-muted p-3">
                 <View className="flex-row items-center justify-between">
-                    <Text style={{ color: colors.white }} className="text-sm font-bold">
+                    <Text variant="label">
                         {currentMonth + 1} 月 {selectedDay} 日
                     </Text>
-                    <Text style={{ color: colors.gray4 }} className="text-[11px] font-bold">
+                    <Text variant="caption" className="text-[11px] font-bold">
                         {selectedDay === todayNum ? "今天" : hasWorkout ? "训练日" : "休息日"}
                     </Text>
                 </View>
@@ -363,21 +363,21 @@ export function TrainingOverview({
                         {selectedDayData.workouts.slice(0, 3).map((workout) => (
                             <View key={workout.id} className="flex-row items-center justify-between gap-3 py-1">
                                 <View className="flex-1 gap-1">
-                                    <Text style={{ color: colors.white }} className="text-sm font-bold" numberOfLines={1}>
+                                    <Text className="text-sm font-bold" numberOfLines={1}>
                                         {workout.name}
                                     </Text>
-                                    <Text style={{ color: colors.gray4 }} className="text-[11px] font-medium">
+                                    <Text variant="caption" className="text-[11px] font-medium">
                                         {workout.type === "strength" ? "力量训练" : "有氧训练"}
                                     </Text>
                                 </View>
-                                <Text style={{ color: colors.gray4 }} className="text-[11px] font-medium">
+                                <Text variant="caption" className="text-[11px] font-medium">
                                     {formatWorkoutDetail(workout)}
                                 </Text>
                             </View>
                         ))}
                     </View>
                 ) : (
-                    <Text style={{ color: colors.gray4 }} className="text-xs font-medium">
+                    <Text variant="caption" className="font-medium">
                         暂无记录
                     </Text>
                 )}
