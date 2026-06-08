@@ -308,7 +308,7 @@ export function TodayWorkouts({
                         <Card style={{ backgroundColor: `${colors.orange}1A`, borderColor: `${colors.orange}33` }}
                             className="rounded-bento-sm p-3 gap-2">
                             <View className="flex-row justify-between items-center ml-1">
-                                <Text style={{ color: colors.orange }} className="text-xs font-extrabold tracking-widest uppercase opacity-90">
+                                <Text className="text-xs font-extrabold uppercase tracking-widest text-accent opacity-90">
                                     有氧训练
                                 </Text>
                                 <AnimatedPressable onPress={handleOpenCardio}
@@ -327,7 +327,7 @@ export function TodayWorkouts({
                                         <View className="flex-row justify-between items-center">
                                             <Text className="text-sm font-bold">{w.name}</Text>
                                             <View style={{ backgroundColor: `${colors.orange}1A` }} className="px-2 py-0.5 rounded-md">
-                                                <Text style={{ color: colors.orange }} className="text-xs font-semibold">{formatTime(w.createdAt)}</Text>
+                                                <Text className="text-xs font-semibold text-accent">{formatTime(w.createdAt)}</Text>
                                             </View>
                                         </View>
                                         {w.stats && <Text className="mt-0.5 text-xs font-semibold opacity-90">{w.stats}</Text>}
@@ -345,8 +345,8 @@ export function TodayWorkouts({
                                     力量训练
                                 </Text>
                                 <AnimatedPressable onPress={handleOpenStrength}
-                                    style={{ backgroundColor: colors.gray2, borderColor: colors.border, borderWidth: 1 }}
-                                    className="w-6 h-6 rounded-md items-center justify-center">
+                                    style={{ backgroundColor: colors.gray2, borderColor: colors.border }}
+                                    className="h-6 w-6 items-center justify-center rounded-md border">
                                     <Plus size={14} color={colors.white} strokeWidth={3} />
                                 </AnimatedPressable>
                             </View>
@@ -392,7 +392,7 @@ export function TodayWorkouts({
                             variant="outline"
                             className="flex-1 border py-3">
                             <Activity size={16} color={colors.orange} />
-                            <ButtonText variant="outline" className="text-sm" style={{ color: colors.orange }}>有氧运动</ButtonText>
+                            <ButtonText variant="outline" className="text-sm text-accent">有氧运动</ButtonText>
                         </Button>
                     )}
                     {strengthWorkouts.length === 0 && (
@@ -415,7 +415,7 @@ export function TodayWorkouts({
                         variant="outline"
                         className="flex-1 border py-3">
                         <Activity size={16} color={colors.orange} />
-                        <ButtonText variant="outline" className="text-sm" style={{ color: colors.orange }}>补录有氧</ButtonText>
+                        <ButtonText variant="outline" className="text-sm text-accent">补录有氧</ButtonText>
                     </Button>
                     <Button onPress={handleOpenStrength}
                         style={{ backgroundColor: colors.gray2, borderColor: colors.border }}
