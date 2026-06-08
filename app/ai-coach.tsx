@@ -227,12 +227,12 @@ export default function AiCoachScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            <View style={{ paddingTop: 60, paddingHorizontal: 16, paddingBottom: 12, backgroundColor: `${colors.bg}F2`, borderBottomWidth: 0.5, borderBottomColor: colors.border }}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                    <View style={{ width: 42, height: 42, borderRadius: 21, alignItems: "center", justifyContent: "center", backgroundColor: `${colors.green}22` }}>
+            <View className="border-b px-4 pb-3 pt-[60px]" style={{ backgroundColor: `${colors.bg}F2`, borderBottomColor: colors.border }}>
+                <View className="flex-row items-center gap-3">
+                    <View className="h-[42px] w-[42px] items-center justify-center rounded-full" style={{ backgroundColor: `${colors.green}22` }}>
                         <Sparkles size={20} color={colors.green} />
                     </View>
-                    <View style={{ flex: 1 }}>
+                    <View className="flex-1">
                         <Text variant="heading">AI 教练</Text>
                         <Text variant="caption" className="mt-0.5 font-bold">今天练什么</Text>
                     </View>
@@ -244,7 +244,7 @@ export default function AiCoachScreen() {
                     <Text variant="caption" className="text-[11px] font-extrabold tracking-[1.2px] text-accent">今日状态</Text>
                     <Text variant="subheading" className="mt-2">先选一下今天的状态</Text>
 
-                    <View style={{ gap: 12, marginTop: 16 }}>
+                    <View className="mt-4 gap-3">
                         <FilterRow
                             title="精力"
                             icon={<Flame size={14} color={colors.orange} />}
@@ -279,14 +279,14 @@ export default function AiCoachScreen() {
 
                 <Card>
                     <Text variant="caption" className="text-[11px] font-extrabold tracking-[1.2px] text-accent">AI 建议</Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, marginTop: 8 }}>
+                    <View className="mt-2 flex-row items-center justify-between gap-3">
                         <Text variant="subheading" className="flex-1">今天的建议</Text>
-                        <View style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: `${colors.orange}18` }}>
+                        <View className="rounded-full px-2.5 py-1.5" style={{ backgroundColor: `${colors.orange}18` }}>
                             <Text className="text-xs font-black text-primary">{reportData?.intensityScore ?? 0} / 100</Text>
                         </View>
                     </View>
 
-                    <View style={{ marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: `${colors.gray3}55` }}>
+                    <View className="mt-3.5 rounded-[14px] p-3.5" style={{ backgroundColor: `${colors.gray3}55` }}>
                         <Text className="text-base font-extrabold">{coachLine}</Text>
                         <Text variant="muted" className="mt-2 leading-[22px]">
                             {reportData?.overallEvaluation || "生成建议后，这里会显示 AI 对你今天训练的判断。"}
@@ -299,15 +299,15 @@ export default function AiCoachScreen() {
                     <Text variant="subheading" className="mt-2">今天的训练计划</Text>
 
                     {adjustedPlan.length === 0 ? (
-                        <View style={{ marginTop: 14, padding: 16, borderRadius: 14, backgroundColor: `${colors.gray3}44` }}>
+                        <View className="mt-3.5 rounded-[14px] p-4" style={{ backgroundColor: `${colors.gray3}44` }}>
                             <Text variant="muted" className="leading-[22px]">先生成建议，这里会给你 2 到 3 个今天该做的训练项。</Text>
                         </View>
                     ) : (
-                        <View style={{ gap: 10, marginTop: 14 }}>
+                        <View className="mt-3.5 gap-2.5">
                             {adjustedPlan.map((plan, index) => (
-                                <View key={`${plan.name}-${index}`} style={{ borderRadius: 14, padding: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: `${colors.bg}66` }}>
-                                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                                        <View style={{ flex: 1 }}>
+                                <View key={`${plan.name}-${index}`} className="rounded-[14px] border p-3.5" style={{ borderColor: colors.border, backgroundColor: `${colors.bg}66` }}>
+                                    <View className="flex-row items-center justify-between gap-2.5">
+                                        <View className="flex-1">
                                             <Text className="text-base font-extrabold">{plan.name}</Text>
                                             <Text variant="caption" className="mt-1 font-bold">{getPlanTypeLabel(plan.type)}</Text>
                                         </View>
@@ -318,7 +318,7 @@ export default function AiCoachScreen() {
                         </View>
                     )}
 
-                    <View style={{ flexDirection: "row", gap: 10, marginTop: 14 }}>
+                    <View className="mt-3.5 flex-row gap-2.5">
                         <Button onPress={() => setUseLiteMode((prev) => !prev)} disabled={!reportData} variant="outline" className="flex-1 py-3" style={{ borderColor: useLiteMode ? colors.green : colors.border, backgroundColor: useLiteMode ? `${colors.green}18` : `${colors.gray3}44` }}>
                             <ButtonText variant="outline" className="text-[13px]" style={{ color: useLiteMode ? colors.green : colors.white }}>{useLiteMode ? "已切到轻松版" : "换个更轻松的"}</ButtonText>
                         </Button>
@@ -343,11 +343,11 @@ export default function AiCoachScreen() {
 function FilterRow({ title, icon, options, value, onChange, colors }: { title: string; icon: ReactNode; options: { key: string; label: string }[]; value: string; onChange: (value: string) => void; colors: ReturnType<typeof useTheme>["colors"]; }) {
     return (
         <View>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8 }}>
+            <View className="mb-2 flex-row items-center gap-1.5">
                 {icon}
                 <Text className="text-[13px] font-extrabold">{title}</Text>
             </View>
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+            <View className="flex-row flex-wrap gap-2">
                 {options.map((option) => {
                     const active = option.key === value;
                     return (
