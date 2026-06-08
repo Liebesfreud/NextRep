@@ -116,10 +116,9 @@ export function CardioModal({
                                 key={i}
                                 onPress={() => { setSelectedExercise(ex); setModalStep("form"); }}
                                 variant="ghost"
-                                className="w-full justify-between rounded-[18px] p-[18px]"
+                                className="w-full justify-between rounded-[18px] border p-[18px]"
                                 style={{
                                     backgroundColor: visual.cardBg ?? colors.gray2,
-                                    borderWidth: 0.75,
                                     borderColor: `${visual.accent}26`,
                                 }}
                             >
@@ -129,7 +128,7 @@ export function CardioModal({
                                     </View>
                                     <View className="flex-1">
                                         <Text className="mb-1.5 text-lg font-bold">{ex}</Text>
-                                        <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>{visual.label}</Text>
+                                        <Text className="text-xs font-bold" style={{ color: visual.accent }}>{visual.label}</Text>
                                     </View>
                                 </View>
                                 <Plus size={20} color={visual.accent} />
