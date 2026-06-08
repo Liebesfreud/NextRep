@@ -20,6 +20,12 @@ type Props = {
     onSave: (metricType: "weight" | "bodyFat", valueStr: string, dateStr: string) => Promise<void>;
 };
 
+type MetricCalendarCell = {
+    key: string;
+    day: number | null;
+    value: number | null;
+};
+
 export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: Props) {
     const { colors } = useTheme();
 
@@ -94,6 +100,32 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
         : trendRange === 30
             ? metricSummary?.deltaFrom30Days
             : metricSummary?.deltaFrom90Days;
+
+    const metricCalendarCells = useMemo<MetricCalendarCell[]>(() => {
+        const year = metricCalendarDate.getFullYear();
+        const month = metricCalendarDate.getMonth();
+        const start = new Date(year, month, 1).getDay();
+        const days = new Date(year, month + 1, 0).getDate();
+        const total = Math.ceil((start + days) / 7) * 7;
+        const recordsMap = new Map<number, number>();
+
+        (metricSummary?.recentRecords || []).forEach((record: BodyMetricPoint) => {
+            const parts = record.dateStr.split("-");
+            if (parseInt(parts[0], 10) === year && parseInt(parts[1], 10) - 1 === month) {
+                recordsMap.set(parseInt(parts[2], 10), record.value);
+            }
+        });
+
+        return Array.from({ length: total }, (_, index) => {
+            const isPad = index < start || index >= start + days;
+            const day = isPad ? null : index - start + 1;
+            return {
+                key: isPad ? `pad-${year}-${month}-${index}` : `day-${year}-${month}-${day}`,
+                day,
+                value: day ? recordsMap.get(day) ?? null : null,
+            };
+        });
+    }, [metricCalendarDate, metricSummary]);
 
     // Reset state when opened
     useEffect(() => {
@@ -297,49 +329,30 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                                 </View>
                             ))}
                         </View>
-                        {(() => {
-                            const mYear = metricCalendarDate.getFullYear();
-                            const mMonth = metricCalendarDate.getMonth();
-                            const mStart = new Date(mYear, mMonth, 1).getDay();
-                            const mDays = new Date(mYear, mMonth + 1, 0).getDate();
-                            const mTotal = Math.ceil((mStart + mDays) / 7) * 7;
+                        <View className="flex-row flex-wrap">
+                            {metricCalendarCells.map((cell) => {
+                                if (!cell.day) return <View key={cell.key} style={{ width: `${100 / 7}%`, aspectRatio: 1 }} />;
 
-                            const recordsMap = new Map<number, number>();
-                            (data?.bodyMetrics?.[metricType]?.recentRecords || []).forEach((r: BodyMetricPoint) => {
-                                const parts = r.dateStr.split("-");
-                                if (parseInt(parts[0]) === mYear && parseInt(parts[1]) - 1 === mMonth) {
-                                    recordsMap.set(parseInt(parts[2]), r.value);
-                                }
-                            });
-
-                            return (
-                                <View className="flex-row flex-wrap">
-                                    {Array.from({ length: mTotal }).map((_, i) => {
-                                        const isPad = i < mStart || i >= mStart + mDays;
-                                        const dayN = i - mStart + 1;
-                                        const val = isPad ? null : recordsMap.get(dayN);
-                                        const hasValue = val != null;
-                                        if (isPad) return <View key={`pad-${i}`} style={{ width: `${100 / 7}%`, aspectRatio: 1 }} />;
-
-                                        return (
-                                            <View key={dayN} style={{ width: `${100 / 7}%`, aspectRatio: 1, padding: 2 }}>
-                                                <CalendarDayCell
-                                                    day={dayN}
-                                                    size={40}
-                                                    marked={hasValue}
-                                                    valueLabel={hasValue ? val : null}
-                                                    onPress={() => {
-                                                        const ds = `${mYear}-${String(mMonth + 1).padStart(2, "0")}-${String(dayN).padStart(2, "0")}`;
-                                                        setFormDate(ds);
-                                                        if (hasValue) setFormValue(String(val));
-                                                    }}
-                                                />
-                                            </View>
-                                        );
-                                    })}
-                                </View>
-                            );
-                        })()}
+                                const hasValue = cell.value != null;
+                                return (
+                                    <View key={cell.key} style={{ width: `${100 / 7}%`, aspectRatio: 1, padding: 2 }}>
+                                        <CalendarDayCell
+                                            day={cell.day}
+                                            size={40}
+                                            marked={hasValue}
+                                            valueLabel={cell.value}
+                                            onPress={() => {
+                                                const year = metricCalendarDate.getFullYear();
+                                                const month = metricCalendarDate.getMonth();
+                                                const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(cell.day).padStart(2, "0")}`;
+                                                setFormDate(dateStr);
+                                                if (hasValue) setFormValue(String(cell.value));
+                                            }}
+                                        />
+                                    </View>
+                                );
+                            })}
+                        </View>
                     </Card>
                 </View>
             </ScrollView>

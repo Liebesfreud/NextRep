@@ -16,6 +16,7 @@ export const Colors = {
         black: "#000000",       // --text-inverse
         card: "#1C1C1E",
         border: "rgba(255,255,255,0.06)",
+        overlay: "rgba(0,0,0,0.6)",
         primaryForeground: "#000000",
         accentForeground: "#000000",
         destructiveForeground: "#FFFFFF",
@@ -35,6 +36,7 @@ export const Colors = {
         black: "#FFFFFF",
         card: "#FFFFFF",
         border: "rgba(0,0,0,0.05)",
+        overlay: "rgba(0,0,0,0.35)",
         primaryForeground: "#000000",
         accentForeground: "#000000",
         destructiveForeground: "#FFFFFF",

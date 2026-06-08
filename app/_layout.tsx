@@ -78,7 +78,7 @@ function TabLayout() {
                 safeAreaInsets={{ bottom: 0 }}
                 screenOptions={{
                     headerShown: false,
-                    tabBarStyle: getTabBarStyle(colors.border),
+                    tabBarStyle: getTabBarStyle(colors.border, colors.black),
                     tabBarBackground: () => <TabBarBackground />,
                     tabBarShowLabel: false,
                     tabBarLabelPosition: 'beside-icon',

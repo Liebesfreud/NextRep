@@ -37,7 +37,7 @@ function ActionRow({ icon, iconClassName, label, desc, destructive, onPress, dis
                     {desc}
                 </Text>
             </View>
-            <ChevronRight size={16} color={destructive ? "#FFFFFF" : colors.gray4} className={destructive ? "opacity-80" : "opacity-50"} />
+            <ChevronRight size={16} color={destructive ? colors.destructiveForeground : colors.gray4} className={destructive ? "opacity-80" : "opacity-50"} />
         </>
     );
 
@@ -181,7 +181,7 @@ export function DataManagementSettings() {
                 disabled={isPending}
             />
             <ActionRow
-                icon={<Trash2 size={16} color="#FFFFFF" />}
+                icon={<Trash2 size={16} color={colors.destructiveForeground} />}
                 iconClassName="bg-destructive-foreground/15"
                 label="清空所有记录"
                 desc="危险操作，不可撤销"

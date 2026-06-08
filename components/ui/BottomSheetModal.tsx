@@ -12,6 +12,7 @@ import {
     Dimensions,
     Easing,
 } from "react-native";
+import { useTheme } from "@/hooks/useTheme";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -23,6 +24,8 @@ type Props = {
     children: React.ReactNode;
     /** Sheet 背景色 */
     backgroundColor: string;
+    /** 遮罩层背景色 */
+    backdropColor?: string;
     /** 是否包裹 KeyboardAvoidingView（需要输入框时传 true）*/
     avoidKeyboard?: boolean;
 };
@@ -33,8 +36,10 @@ export function BottomSheetModal({
     sheetHeight = "85%",
     children,
     backgroundColor,
+    backdropColor,
     avoidKeyboard = false,
 }: Props) {
+    const { colors } = useTheme();
     const [isMounted, setIsMounted] = useState(visible);
     // 遮罩层透明度动画
     const backdropOpacity = useRef(new Animated.Value(0)).current;
@@ -107,7 +112,7 @@ export function BottomSheetModal({
         <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
             {/* 深色遮罩 —— 固定整屏，不参与 slide 动画 */}
             <Animated.View
-                style={[StyleSheet.absoluteFill, styles.backdrop, { opacity: backdropOpacity }]}
+                style={[StyleSheet.absoluteFill, { backgroundColor: backdropColor ?? colors.overlay, opacity: backdropOpacity }]}
             >
                 {/* disabled 控制触摸穿透，不触发布局重算 */}
                 <Pressable
@@ -160,9 +165,6 @@ export function BottomSheetModal({
 }
 
 const styles = StyleSheet.create({
-    backdrop: {
-        backgroundColor: "rgba(0,0,0,0.6)",
-    },
     sheet: {
         position: "absolute",
         bottom: 0,

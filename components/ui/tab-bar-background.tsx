@@ -4,7 +4,7 @@ import { useTheme } from "@/hooks/useTheme";
 const TAB_BAR_HEIGHT = 70;
 const TAB_BAR_RADIUS = 16;
 
-function getTabBarStyle(borderColor: string): ViewStyle {
+function getTabBarStyle(borderColor: string, shadowColor: string): ViewStyle {
     return {
         position: "absolute",
         bottom: 32,
@@ -20,7 +20,7 @@ function getTabBarStyle(borderColor: string): ViewStyle {
         height: TAB_BAR_HEIGHT,
         paddingBottom: 0,
         paddingTop: 0,
-        shadowColor: "#000",
+        shadowColor,
         shadowOffset: { width: 0, height: 16 },
         shadowOpacity: 0.08,
         shadowRadius: 32,
@@ -51,7 +51,7 @@ export function TabBarBackground() {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    backgroundColor: "#FFFFFF",
+                    backgroundColor: colors.white,
                     opacity: 0.03,
                 }}
             />
@@ -62,8 +62,8 @@ export function TabBarBackground() {
                     left: "10%",
                     right: "10%",
                     height: 50,
-                    backgroundColor: "#FFFFFF",
-                    shadowColor: "#FFFFFF",
+                    backgroundColor: colors.white,
+                    shadowColor: colors.white,
                     shadowOffset: { width: 0, height: 25 },
                     shadowOpacity: 0.08,
                     shadowRadius: 40,
