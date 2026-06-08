@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { View, Text, Pressable, PanResponder, Modal, ScrollView, Animated } from "react-native";
+import { View, Pressable, PanResponder, Modal, ScrollView, Animated } from "react-native";
 import { X, CalendarCheck } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { getCheckinsByMonth, getWorkoutsByMonth } from "@/db/services/workout";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 
 type Props = {
     refreshKey?: string;
@@ -86,10 +88,10 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
             <View className="justify-center" style={{ paddingVertical: 2 }}>
                 <View>
                     <Pressable onPress={() => setIsPickerVisible(true)}>
-                        <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "700", letterSpacing: 1, marginBottom: 2 }}>
+                        <Text variant="caption" className="mb-0.5 font-bold tracking-wider">
                             {year}
                         </Text>
-                        <Text style={{ color: colors.white, fontSize: 22, fontWeight: "900" }}>
+                        <Text className="text-[22px] font-black">
                             {monthName}
                         </Text>
                     </Pressable>
@@ -98,13 +100,13 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                 <View className="mt-4">
                     <View className="flex-row items-center gap-1 mb-0.5">
                         <CalendarCheck size={12} color={colors.green} />
-                        <Text style={{ color: colors.gray4, fontSize: 11, fontWeight: "800", letterSpacing: 1 }}>打卡</Text>
+                        <Text variant="caption" className="font-extrabold tracking-wider">打卡</Text>
                     </View>
                     <View className="flex-row items-baseline gap-0.5">
-                        <Text style={{ color: colors.white, fontSize: 24, fontWeight: "900" }}>
+                        <Text className="text-2xl font-black">
                             {monthlyCheckinCount}
                         </Text>
-                        <Text style={{ color: colors.gray4, fontSize: 10, fontWeight: "800" }}>天</Text>
+                        <Text variant="caption" className="text-[10px] font-extrabold">天</Text>
                     </View>
                 </View>
             </View>
@@ -152,33 +154,33 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                     onPress={() => setIsPickerVisible(false)}>
                     <Pressable onPress={() => { }} style={{ backgroundColor: colors.bento, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: 48, maxHeight: "50%" }}>
                         <View className="flex-row justify-between items-center mb-6">
-                            <Text style={{ color: colors.white }} className="text-xl font-extrabold tracking-tight">选择时间</Text>
-                            <Pressable onPress={() => setIsPickerVisible(false)}
-                                style={{ backgroundColor: colors.border }}
-                                className="w-8 h-8 rounded-full items-center justify-center">
+                            <Text variant="subheading" className="tracking-tight">选择时间</Text>
+                            <Button onPress={() => setIsPickerVisible(false)}
+                                variant="secondary"
+                                size="icon"
+                                className="h-8 w-8 rounded-full">
                                 <X size={18} color={colors.gray4} />
-                            </Pressable>
+                            </Button>
                         </View>
 
                         <View className="flex-row gap-4">
                             {/* Year Scroll */}
                             <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
                                 {years.map(y => (
-                                    <Pressable
+                                    <Button
                                         key={y}
                                         onPress={() => setYear(y)}
+                                        variant="ghost"
                                         style={{
-                                            paddingVertical: 12,
-                                            paddingHorizontal: 16,
                                             backgroundColor: year === y ? colors.border : "transparent",
-                                            borderRadius: 12,
                                             marginBottom: 4,
                                         }}
+                                        className="rounded-bento-sm py-3"
                                     >
-                                        <Text style={{ color: year === y ? colors.white : colors.gray4, fontWeight: year === y ? "bold" : "normal", textAlign: "center" }}>
+                                        <ButtonText variant="ghost" style={{ color: year === y ? colors.white : colors.gray4, fontWeight: year === y ? "bold" : "normal", textAlign: "center" }}>
                                             {y}年
-                                        </Text>
-                                    </Pressable>
+                                        </ButtonText>
+                                    </Button>
                                 ))}
                             </ScrollView>
 
@@ -188,22 +190,21 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                                     const mName = new Intl.DateTimeFormat("zh-CN", { month: "long" }).format(new Date(year, m));
                                     const isFuture = year === now.getFullYear() && m > now.getMonth();
                                     return (
-                                        <Pressable
+                                        <Button
                                             key={m}
                                             onPress={() => !isFuture && setMonth(m)}
+                                            variant="ghost"
                                             style={{
-                                                paddingVertical: 12,
-                                                paddingHorizontal: 16,
                                                 backgroundColor: month === m ? colors.green : "transparent",
-                                                borderRadius: 12,
                                                 marginBottom: 4,
                                                 opacity: isFuture ? 0.3 : 1,
                                             }}
+                                            className="rounded-bento-sm py-3"
                                         >
-                                            <Text style={{ color: month === m ? "#000" : colors.gray4, fontWeight: month === m ? "bold" : "normal", textAlign: "center" }}>
+                                            <ButtonText variant="ghost" style={{ color: month === m ? "#000" : colors.gray4, fontWeight: month === m ? "bold" : "normal", textAlign: "center" }}>
                                                 {mName}
-                                            </Text>
-                                        </Pressable>
+                                            </ButtonText>
+                                        </Button>
                                     );
                                 })}
                             </ScrollView>
