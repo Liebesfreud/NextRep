@@ -163,14 +163,14 @@ export default function ExerciseManagementScreen() {
     );
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1, backgroundColor: colors.bg }}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 bg-background">
             <AnimatedEnter delay={0} distance={10}>
-                <View style={{ paddingTop: 60, paddingHorizontal: 20, paddingBottom: 16, backgroundColor: colors.bento, borderBottomWidth: 1, borderBottomColor: colors.border, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                    <Pressable onPress={() => router.back()} style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                <View className="flex-row items-center justify-between border-b border-border bg-card px-5 pb-4 pt-[60px]">
+                    <Button onPress={() => router.back()} variant="ghost" size="sm" className="h-auto gap-1 px-0 py-0">
                         <ChevronLeft size={24} color={colors.white} />
-                        <Text style={{ color: colors.white, fontSize: 16, fontWeight: "bold" }}>返回</Text>
-                    </Pressable>
-                    <Text style={{ color: colors.white, fontSize: 18, fontWeight: "900" }}>动作库</Text>
+                        <ButtonText variant="ghost" className="text-base text-foreground">返回</ButtonText>
+                    </Button>
+                    <Text className="text-lg font-black">动作库</Text>
                     <View style={{ width: 60 }} />
                 </View>
             </AnimatedEnter>
