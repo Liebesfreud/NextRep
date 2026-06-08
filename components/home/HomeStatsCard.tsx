@@ -1,7 +1,10 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { Flame, Layers } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { LightEffect } from "@/components/ui/LightEffect";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Text } from "@/components/ui/text";
 type Props = {
     displayCal: number;
     totalSets: number;
@@ -12,10 +15,7 @@ export function HomeStatsCard({ displayCal, totalSets, isAiPredicting }: Props) 
     const { colors } = useTheme();
 
     return (
-        <View
-            style={{ backgroundColor: colors.bento, borderColor: colors.border, flex: 1, overflow: 'hidden' }}
-            className="rounded-bento-lg border p-3 justify-around"
-        >
+        <Card className="flex-1 justify-around overflow-hidden p-3">
             <LightEffect 
                 color={colors.orange} 
                 opacity={0.07} 
@@ -26,30 +26,30 @@ export function HomeStatsCard({ displayCal, totalSets, isAiPredicting }: Props) 
             <View className="mb-3">
                 <View className="flex-row items-center gap-1 mb-1">
                     <Flame size={14} color={colors.orange} />
-                    <Text style={{ color: colors.gray4 }} className="text-xs font-bold tracking-widest">燃脂</Text>
+                    <Text variant="caption" className="font-bold tracking-widest">燃脂</Text>
                 </View>
                 <View className="flex-row items-baseline gap-1">
                     {isAiPredicting ? (
-                        <Text style={{ color: colors.white, opacity: 0.5 }} className="text-lg">预测中...</Text>
+                        <Text className="text-lg opacity-50">预测中...</Text>
                     ) : (
-                        <Text style={{ color: colors.white }} className="text-2xl font-extrabold">{displayCal}</Text>
+                        <Text className="text-2xl font-extrabold">{displayCal}</Text>
                     )}
-                    {!isAiPredicting && <Text style={{ color: colors.gray4 }} className="text-xs font-bold">千卡</Text>}
+                    {!isAiPredicting && <Text variant="caption" className="font-bold">千卡</Text>}
                 </View>
             </View>
 
-            <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 2 }} />
+            <Separator className="my-0.5" />
 
             <View className="mt-3">
                 <View className="flex-row items-center gap-1 mb-1">
                     <Layers size={14} color={colors.green} />
-                    <Text style={{ color: colors.gray4 }} className="text-xs font-bold tracking-widest">组数</Text>
+                    <Text variant="caption" className="font-bold tracking-widest">组数</Text>
                 </View>
                 <View className="flex-row items-baseline gap-1">
-                    <Text style={{ color: colors.white }} className="text-2xl font-extrabold">{totalSets}</Text>
-                    <Text style={{ color: colors.gray4 }} className="text-xs font-bold">组</Text>
+                    <Text className="text-2xl font-extrabold">{totalSets}</Text>
+                    <Text variant="caption" className="font-bold">组</Text>
                 </View>
             </View>
-        </View>
+        </Card>
     );
 }
