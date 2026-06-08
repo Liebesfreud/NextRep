@@ -106,7 +106,7 @@ export function CardioModal({
             </View>
 
             {modalStep === "select" ? (
-                <View style={{ gap: 12 }}>
+                <View className="gap-3">
                     {CARDIO_EXERCISES.map((ex, i) => {
                         const visual = getCardioExerciseVisual(ex, colors);
                         const Icon = visual.icon;
@@ -138,14 +138,14 @@ export function CardioModal({
                     })}
                 </View>
             ) : (
-                <View style={{ flex: 1 }}>
+                <View className="flex-1">
                     {(() => {
                         const visual = getCardioExerciseVisual(selectedExercise, colors);
                         const Icon = visual.icon;
 
                         return (
-                            <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 24 }}>
-                                <View style={{ backgroundColor: visual.iconBg, width: 48, height: 48, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
+                            <View className="mb-6 flex-row items-center gap-3">
+                                <View className="h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: visual.iconBg }}>
                                     <Icon size={24} color={visual.accent} />
                                 </View>
                                 <View className="flex-1">
@@ -155,9 +155,9 @@ export function CardioModal({
                             </View>
                         );
                     })()}
-                    <View style={{ gap: 16, flex: 1 }}>
+                    <View className="flex-1 gap-4">
                         <View>
-                            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                            <View className="mb-2 flex-row items-center gap-1.5">
                                 <Timer size={14} color={colors.gray4} />
                                 <Text variant="caption" className="font-bold tracking-[1px]">时长 (分钟)</Text>
                             </View>
@@ -170,7 +170,7 @@ export function CardioModal({
                             />
                         </View>
                         <View>
-                            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                            <View className="mb-2 flex-row items-center gap-1.5">
                                 <Flame size={14} color={colors.gray4} />
                                 <Text variant="caption" className="font-bold tracking-[1px]">消耗 (千卡)</Text>
                             </View>
@@ -183,7 +183,7 @@ export function CardioModal({
                             />
                         </View>
                     </View>
-                    <View style={{ flexDirection: "row", gap: 8, marginTop: 24 }}>
+                    <View className="mt-6 flex-row gap-2">
                         {initialWorkout && (
                             <Button onPress={() => onDelete(initialWorkout.id)} disabled={isPending} variant="destructive" className="w-16 bg-destructive/10 py-4">
                                 <Trash2 size={20} color={colors.red} />
