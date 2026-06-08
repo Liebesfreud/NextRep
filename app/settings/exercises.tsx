@@ -249,7 +249,12 @@ export default function ExerciseManagementScreen() {
                                             const isSelected = tag === newTag;
 
                                             return (
-                                                <Pressable key={tag} onPress={() => setNewTag(isSelected ? null : tag)}>
+                                                <Button
+                                                    key={tag}
+                                                    onPress={() => setNewTag(isSelected ? null : tag)}
+                                                    variant="ghost"
+                                                    className="h-auto bg-transparent p-0"
+                                                >
                                                     <Badge
                                                         variant={isSelected ? "default" : "secondary"}
                                                         style={{ backgroundColor: isSelected ? visual.iconBg : colors.gray2, borderColor: isSelected ? visual.accent : colors.border }}
@@ -257,7 +262,7 @@ export default function ExerciseManagementScreen() {
                                                     >
                                                         <BadgeText style={{ color: isSelected ? colors.white : colors.gray4 }}>{tag}</BadgeText>
                                                     </Badge>
-                                                </Pressable>
+                                                </Button>
                                             );
                                         })}
                                     </View>
