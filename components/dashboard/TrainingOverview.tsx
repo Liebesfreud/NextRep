@@ -98,13 +98,11 @@ function getMonthLabel(month: number) {
 }
 
 function SectionTitle({ icon, title, action }: { icon: ReactNode; title: string; action?: ReactNode }) {
-    const { colors } = useTheme();
-
     return (
         <View className="flex-row items-center justify-between gap-3">
             <View className="flex-row items-center gap-2">
                 {icon}
-                <Text style={{ color: colors.white }} className="text-sm font-black tracking-wide">
+                <Text variant="label" className="tracking-wide">
                     {title}
                 </Text>
             </View>
@@ -132,22 +130,20 @@ function ToggleAction({ label, active, onPress }: { label: string; active: boole
 }
 
 function MetricStat({ label, value, unit, icon }: { label: string; value: string; unit?: string; icon: ReactNode }) {
-    const { colors } = useTheme();
-
     return (
         <View className="flex-1 gap-2">
             <View className="flex-row items-center gap-1.5">
                 {icon}
-                <Text style={{ color: colors.gray4 }} className="text-[11px] font-bold">
+                <Text variant="caption" className="text-[11px] font-bold">
                     {label}
                 </Text>
             </View>
             <View className="flex-row items-end gap-1">
-                <Text style={{ color: colors.white }} className="text-xl font-black tracking-tight">
+                <Text className="text-xl font-black tracking-tight">
                     {value}
                 </Text>
                 {unit ? (
-                    <Text style={{ color: colors.gray4 }} className="text-xs font-bold pb-0.5">
+                    <Text variant="caption" className="pb-0.5 font-bold">
                         {unit}
                     </Text>
                 ) : null}
@@ -157,8 +153,6 @@ function MetricStat({ label, value, unit, icon }: { label: string; value: string
 }
 
 function ReviewCard({ title, summary }: { title: string; summary?: ReviewSummary }) {
-    const { colors } = useTheme();
-
     const metrics = [
         { label: "训练次数", value: String(summary?.workouts ?? 0) },
         { label: "活跃天数", value: String(summary?.activeDays ?? 0) },
@@ -168,17 +162,17 @@ function ReviewCard({ title, summary }: { title: string; summary?: ReviewSummary
 
     return (
         <Card className="gap-3 bg-muted p-3">
-            <Text style={{ color: colors.white }} className="text-sm font-black">
+            <Text variant="label">
                 {title}
             </Text>
 
             <View className="flex-row flex-wrap" style={{ marginHorizontal: -6 }}>
                 {metrics.map((item) => (
                     <View key={item.label} style={{ width: "50%", padding: 6 }}>
-                        <Text style={{ color: colors.gray4 }} className="text-[11px] font-bold">
+                        <Text variant="caption" className="text-[11px] font-bold">
                             {item.label}
                         </Text>
-                        <Text style={{ color: colors.white }} className="text-base font-black mt-1">
+                        <Text className="mt-1 text-base font-black">
                             {item.value}
                         </Text>
                     </View>
@@ -189,26 +183,26 @@ function ReviewCard({ title, summary }: { title: string; summary?: ReviewSummary
 
             <View className="gap-2">
                 <View className="flex-row items-center justify-between gap-3">
-                    <Text style={{ color: colors.gray4 }} className="text-[11px] font-bold">
+                    <Text variant="caption" className="text-[11px] font-bold">
                         训练结构
                     </Text>
-                    <Text style={{ color: colors.white }} className="text-xs font-bold">
+                    <Text className="text-xs font-bold">
                         力量 {summary?.strengthWorkouts ?? 0} · 有氧 {summary?.cardioWorkouts ?? 0}
                     </Text>
                 </View>
                 <View className="flex-row items-center justify-between gap-3">
-                    <Text style={{ color: colors.gray4 }} className="text-[11px] font-bold">
+                    <Text variant="caption" className="text-[11px] font-bold">
                         高频动作
                     </Text>
-                    <Text style={{ color: colors.white }} className="flex-1 text-right text-xs font-bold" numberOfLines={1}>
+                    <Text className="flex-1 text-right text-xs font-bold" numberOfLines={1}>
                         {summary?.topExercise ?? "暂无"}
                     </Text>
                 </View>
                 <View className="flex-row items-center justify-between gap-3">
-                    <Text style={{ color: colors.gray4 }} className="text-[11px] font-bold">
+                    <Text variant="caption" className="text-[11px] font-bold">
                         单次均量
                     </Text>
-                    <Text style={{ color: colors.white }} className="text-xs font-bold">
+                    <Text className="text-xs font-bold">
                         {formatVolumeKg(summary?.averageVolumePerWorkoutKg ?? 0)}
                     </Text>
                 </View>
