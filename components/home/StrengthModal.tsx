@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { View, Pressable, ScrollView, Alert, Keyboard, FlatList } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { View, Pressable, ScrollView, Alert, Keyboard, FlatList, Platform } from "react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, Dumbbell, Trash2, Plus, Check, Search, Library } from "lucide-react-native";
 import { useRouter } from "expo-router";
@@ -52,14 +52,23 @@ export function StrengthModal({
 
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("全部");
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const categories = ["全部", ...STRENGTH_CATEGORIES];
+    const categories = useMemo(() => ["全部", ...STRENGTH_CATEGORIES], []);
+    const normalizedSearchQuery = useMemo(() => searchQuery.trim().toLowerCase(), [searchQuery]);
 
-    const filteredPresets = presets.filter(p => {
-        const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchCat = selectedCategory === "全部" || p.tag === selectedCategory;
-        return matchSearch && matchCat;
-    });
+    const filteredPresets = useMemo(
+        () => presets.filter(p => {
+            const matchSearch = !normalizedSearchQuery || p.name.toLowerCase().includes(normalizedSearchQuery);
+            const matchCat = selectedCategory === "全部" || p.tag === selectedCategory;
+            return matchSearch && matchCat;
+        }),
+        [normalizedSearchQuery, presets, selectedCategory]
+    );
+
+    useEffect(() => () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    }, []);
 
     // Reset state when modal opens or initialWorkout changes
     useEffect(() => {
@@ -180,11 +189,16 @@ export function StrengthModal({
 
     const dismissKeyboardAndRun = (callback: () => void, delay = 80) => {
         Keyboard.dismiss();
-        setTimeout(callback, delay);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+            timeoutRef.current = null;
+            callback();
+        }, delay);
     };
 
     const handleClose = () => {
         Keyboard.dismiss();
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
         onClose();
     };
 
@@ -226,7 +240,7 @@ export function StrengthModal({
         ]);
     };
 
-    const renderExerciseItem = ({ item: ex }: { item: StrengthPresetItem }) => {
+    const renderExerciseItem = useCallback(({ item: ex }: { item: StrengthPresetItem }) => {
         const visual = getStrengthCategoryVisual(ex.tag, colors);
         const Icon = visual.icon;
 
@@ -255,7 +269,7 @@ export function StrengthModal({
                 <Plus size={20} color={visual.accent} className="ml-2 opacity-70" />
             </Button>
         );
-    };
+    }, [colors]);
 
     const renderExerciseEmpty = () => (
         <View className="items-center justify-center gap-2 py-12 opacity-60">
@@ -302,8 +316,8 @@ export function StrengthModal({
                             <AnimatedPressable
                                 onPress={() => dismissKeyboardAndRun(() => {
                                     onClose();
-                                    setTimeout(() => router.push("/settings/exercises"), 120);
-                                })}
+                                    dismissKeyboardAndRun(() => router.push("/settings/exercises"), 120);
+                                }, 0)}
                                 activeScale={0.92}
                                 activeOpacity={0.75}
                                 className="h-8 w-8 items-center justify-center rounded-lg bg-muted"
@@ -386,6 +400,10 @@ export function StrengthModal({
                             ListEmptyComponent={renderExerciseEmpty}
                             showsVerticalScrollIndicator={false}
                             keyboardShouldPersistTaps="handled"
+                            initialNumToRender={10}
+                            maxToRenderPerBatch={8}
+                            removeClippedSubviews={Platform.OS !== "web"}
+                            windowSize={7}
                             className="-mx-6 flex-1"
                             contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 100 }}
                         />

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { View, Keyboard } from "react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, Activity, Plus, Timer, Flame, Trash2 } from "lucide-react-native";
@@ -28,6 +28,11 @@ export function CardioModal({
     const [selectedExercise, setSelectedExercise] = useState("");
     const [formDuration, setFormDuration] = useState("");
     const [formCalories, setFormCalories] = useState("");
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    }, []);
 
     useEffect(() => {
         if (!visible) return;
@@ -47,11 +52,16 @@ export function CardioModal({
 
     const dismissKeyboardAndRun = (callback: () => void, delay = 80) => {
         Keyboard.dismiss();
-        setTimeout(callback, delay);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+            timeoutRef.current = null;
+            callback();
+        }, delay);
     };
 
     const handleClose = () => {
         Keyboard.dismiss();
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
         onClose();
     };
 
