@@ -1,5 +1,5 @@
-// Apple-inspired design color system
-// Matches the CSS variables in the Next.js version's globals.css
+// NextRep design color bridge
+// Mirrors the semantic CSS tokens in global.css while preserving runtime color access.
 
 export const Colors = {
     dark: {
@@ -8,10 +8,10 @@ export const Colors = {
         gray2: "#2C2C2E",      // --bg-2
         gray3: "#3A3A3C",      // --bg-3
         gray4: "#8E8D93",      // --text-muted
-        blue: "#0A84FF",       // --color-apple-blue
-        green: "#30D158",      // --color-apple-green
-        orange: "#FF9F0A",     // --color-apple-orange
-        red: "#FF453A",        // --color-apple-red
+        blue: "#0A84FF",       // info/accent-blue
+        green: "#30D158",      // success
+        orange: "#FF9F0A",     // primary
+        red: "#FF453A",        // destructive
         white: "#FFFFFF",       // --text-main
         black: "#000000",       // --text-inverse
         card: "#1C1C1E",
