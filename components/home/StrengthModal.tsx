@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, ScrollView, TextInput, Alert, Keyboard, FlatList } from "react-native";
+import { View, Pressable, ScrollView, TextInput, Alert, Keyboard, FlatList } from "react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, Dumbbell, Trash2, Plus, Check, Search, Library } from "lucide-react-native";
 import { useRouter } from "expo-router";
@@ -7,6 +7,9 @@ import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem, type StrengthPresetItem } from "@/db/services/workout";
 import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
 import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
 
 export interface WorkoutSet {
     id: string;
@@ -311,12 +314,11 @@ export function StrengthModal({
                         {/* Modern Search Bar */}
                         <View style={{ backgroundColor: colors.gray2, flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingVertical: 12, borderRadius: 16, marginBottom: 16 }}>
                             <Search size={18} color={colors.gray4} />
-                            <TextInput
+                            <Input
                                 value={searchQuery}
                                 onChangeText={setSearchQuery}
                                 placeholder="搜索动作..."
-                                placeholderTextColor={`${colors.gray4}80`}
-                                style={{ color: colors.white, fontSize: 16, fontWeight: "600", marginLeft: 10, flex: 1, padding: 0 }}
+                                className="ml-2.5 min-h-0 flex-1 border-0 bg-transparent p-0 text-base font-semibold"
                             />
                             {searchQuery.length > 0 && (
                                 <Pressable onPress={() => setSearchQuery("")}>
@@ -444,24 +446,24 @@ export function StrengthModal({
                             ))}
 
                             {/* Add Set Button */}
-                            <Pressable onPress={handleAddSet} style={{ backgroundColor: `${colors.gray2}80`, width: "100%", marginTop: 12, paddingVertical: 12, borderRadius: 8, alignItems: "center", justifyContent: "center" }}>
-                                <Text style={{ color: colors.green, fontWeight: "bold", fontSize: 14 }}>+ 添加下一组</Text>
-                            </Pressable>
-                            <Text style={{ color: colors.gray4, textAlign: 'center', marginTop: 12, fontSize: 11, opacity: 0.6 }}>长按某组即可删除</Text>
+                            <Button onPress={handleAddSet} variant="secondary" className="mt-3 w-full bg-secondary/80 py-3">
+                                <ButtonText variant="secondary" className="text-accent">+ 添加下一组</ButtonText>
+                            </Button>
+                            <Text variant="caption" className="mt-3 text-center opacity-60">长按某组即可删除</Text>
                             <View style={{ height: 24 }} />
                         </ScrollView>
 
                         <View style={{ flexDirection: "row", gap: 8, marginTop: 16, paddingTop: 8, borderTopWidth: 1, borderTopColor: `${colors.gray3}4D` }}>
                             {initialWorkout && (
-                                <Pressable onPress={() => onDelete(initialWorkout.id)} disabled={isPending} style={{ backgroundColor: `${colors.red}1A`, width: 64, opacity: isPending ? 0.5 : 1, paddingVertical: 16, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
+                                <Button onPress={() => onDelete(initialWorkout.id)} disabled={isPending} variant="destructive" className="w-16 bg-destructive/10 py-4">
                                     <Trash2 size={20} color={colors.red} />
-                                </Pressable>
+                                </Button>
                             )}
-                            <Pressable onPress={handleSave} disabled={isPending || !selectedExercise} style={{ backgroundColor: colors.green, flex: 1, opacity: (isPending || !selectedExercise) ? 0.5 : 1, paddingVertical: 16, borderRadius: 12, alignItems: "center" }}>
-                                <Text style={{ color: colors.white, fontWeight: "bold", fontSize: 18 }}>
+                            <Button onPress={handleSave} disabled={isPending || !selectedExercise} className="flex-1 bg-accent py-4">
+                                <ButtonText className="text-lg text-foreground">
                                     {isPending ? "保存中..." : "保存记录"}
-                                </Text>
-                            </Pressable>
+                                </ButtonText>
+                            </Button>
                         </View>
                     </View>
                 )}
