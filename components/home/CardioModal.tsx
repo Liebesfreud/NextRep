@@ -76,29 +76,33 @@ export function CardioModal({
             backgroundColor={colors.bento}
             avoidKeyboard
         >
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+            <View className="mb-6 flex-row items-center justify-between">
                 {modalStep === "form" && !initialWorkout ? (
-                    <Pressable
+                    <Button
                         onPress={() => dismissKeyboardAndRun(() => {
                             setModalStep("select");
                             setSelectedExercise("");
                         })}
-                        style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto px-0 py-1"
                     >
                         <ChevronLeft size={20} color={colors.orange} />
-                        <Text style={{ color: colors.orange, fontWeight: "bold", fontSize: 14 }}>返回</Text>
-                    </Pressable>
+                        <ButtonText variant="ghost" size="sm" className="text-primary">返回</ButtonText>
+                    </Button>
                 ) : (
-                    <Text style={{ color: colors.white, fontSize: 24, fontWeight: "800", letterSpacing: -0.5 }}>
+                    <Text variant="heading" className="tracking-[-0.5px]">
                         {initialWorkout ? "修改有氧运动" : "添加有氧运动"}
                     </Text>
                 )}
-                <Pressable
+                <Button
                     onPress={handleClose}
-                    style={{ backgroundColor: colors.gray3, width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" }}
+                    variant="secondary"
+                    size="icon"
+                    className="h-8 w-8 rounded-lg"
                 >
                     <X size={20} color={colors.gray4} />
-                </Pressable>
+                </Button>
             </View>
 
             {modalStep === "select" ? (
@@ -127,8 +131,8 @@ export function CardioModal({
                                     <View style={{ backgroundColor: visual.iconBg, width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" }}>
                                         <Icon size={20} color={visual.accent} />
                                     </View>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={{ color: colors.white, fontWeight: "bold", fontSize: 18, marginBottom: 6 }}>{ex}</Text>
+                                    <View className="flex-1">
+                                        <Text className="mb-1.5 text-lg font-bold">{ex}</Text>
                                         <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>{visual.label}</Text>
                                     </View>
                                 </View>
@@ -148,8 +152,8 @@ export function CardioModal({
                                 <View style={{ backgroundColor: visual.iconBg, width: 48, height: 48, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
                                     <Icon size={24} color={visual.accent} />
                                 </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={{ color: colors.white, fontSize: 20, fontWeight: "bold", marginBottom: 4 }}>{selectedExercise}</Text>
+                                <View className="flex-1">
+                                    <Text variant="subheading" className="mb-1">{selectedExercise}</Text>
                                     <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>{visual.label}</Text>
                                 </View>
                             </View>
@@ -159,7 +163,7 @@ export function CardioModal({
                         <View>
                             <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8 }}>
                                 <Timer size={14} color={colors.gray4} />
-                                <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "bold", letterSpacing: 1 }}>时长 (分钟)</Text>
+                                <Text variant="caption" className="font-bold tracking-[1px]">时长 (分钟)</Text>
                             </View>
                             <Input
                                 keyboardType="number-pad"
@@ -172,7 +176,7 @@ export function CardioModal({
                         <View>
                             <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8 }}>
                                 <Flame size={14} color={colors.gray4} />
-                                <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "bold", letterSpacing: 1 }}>消耗 (千卡)</Text>
+                                <Text variant="caption" className="font-bold tracking-[1px]">消耗 (千卡)</Text>
                             </View>
                             <Input
                                 keyboardType="number-pad"
