@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Pressable, ScrollView, TextInput, Alert, Keyboard, FlatList } from "react-native";
+import { View, Pressable, ScrollView, Alert, Keyboard, FlatList } from "react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, Dumbbell, Trash2, Plus, Check, Search, Library } from "lucide-react-native";
 import { useRouter } from "expo-router";
