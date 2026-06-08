@@ -11,6 +11,7 @@ import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
+import { cn } from "@/lib/utils";
 
 export interface WorkoutSet {
     id: string;
@@ -325,7 +326,7 @@ export function StrengthModal({
                 {modalStep === "select" ? (
                     <View className="flex-1">
                         {/* Modern Search Bar */}
-                        <View className="mb-4 flex-row items-center rounded-2xl px-4 py-3" style={{ backgroundColor: colors.gray2 }}>
+                        <View className="mb-4 flex-row items-center rounded-2xl bg-secondary px-4 py-3">
                             <Search size={18} color={colors.gray4} />
                             <Input
                                 value={searchQuery}
@@ -365,7 +366,10 @@ export function StrengthModal({
                                                     style={{ backgroundColor, borderColor: isSelected ? accent : `${accent}40`, borderWidth: 0.75 }}
                                                     className="px-4 py-2"
                                                 >
-                                                    <BadgeText style={{ color: colors.white, fontWeight: isSelected ? "800" : "700", fontSize: 14 }}>
+                                                    <BadgeText
+                                                        style={{ color: colors.white }}
+                                                        className={cn("text-sm", isSelected ? "font-extrabold" : "font-bold")}
+                                                    >
                                                     {cat}
                                                     </BadgeText>
                                                 </Badge>
