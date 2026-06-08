@@ -149,7 +149,7 @@ export function CardioModal({
                                 </View>
                                 <View className="flex-1">
                                     <Text variant="subheading" className="mb-1">{selectedExercise}</Text>
-                                    <Text style={{ color: visual.accent, fontSize: 12, fontWeight: "700" }}>{visual.label}</Text>
+                                    <Text className="text-xs font-bold" style={{ color: visual.accent }}>{visual.label}</Text>
                                 </View>
                             </View>
                         );
