@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
-import { View, Text, Pressable, TextInput, Keyboard } from "react-native";
+import { View, Pressable, Keyboard } from "react-native";
 import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, Activity, Plus, Timer, Flame, Trash2 } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem } from "@/db/services/workout";
 import { CARDIO_EXERCISES, getCardioExerciseVisual } from "@/constants/exerciseVisuals";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
 
 type Props = {
     visible: boolean;
@@ -158,13 +161,12 @@ export function CardioModal({
                                 <Timer size={14} color={colors.gray4} />
                                 <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "bold", letterSpacing: 1 }}>时长 (分钟)</Text>
                             </View>
-                            <TextInput
+                            <Input
                                 keyboardType="number-pad"
                                 value={formDuration}
                                 onChangeText={setFormDuration}
                                 placeholder="例如 30"
-                                placeholderTextColor={`${colors.gray4}66`}
-                                style={{ color: colors.white, backgroundColor: colors.gray2, padding: 16, borderRadius: 12, fontWeight: "bold", fontSize: 18, borderWidth: 1, borderColor: `${colors.gray3}4D` }}
+                                className="p-4 text-lg font-bold"
                             />
                         </View>
                         <View>
@@ -172,29 +174,26 @@ export function CardioModal({
                                 <Flame size={14} color={colors.gray4} />
                                 <Text style={{ color: colors.gray4, fontSize: 12, fontWeight: "bold", letterSpacing: 1 }}>消耗 (千卡)</Text>
                             </View>
-                            <TextInput
+                            <Input
                                 keyboardType="number-pad"
                                 value={formCalories}
                                 onChangeText={setFormCalories}
                                 placeholder="例如 300"
-                                placeholderTextColor={`${colors.gray4}66`}
-                                style={{ color: colors.white, backgroundColor: colors.gray2, padding: 16, borderRadius: 12, fontWeight: "bold", fontSize: 18, borderWidth: 1, borderColor: `${colors.gray3}4D` }}
+                                className="p-4 text-lg font-bold"
                             />
                         </View>
                     </View>
                     <View style={{ flexDirection: "row", gap: 8, marginTop: 24 }}>
                         {initialWorkout && (
-                            <Pressable onPress={() => onDelete(initialWorkout.id)} disabled={isPending}
-                                style={{ backgroundColor: `${colors.red}1A`, width: 64, opacity: isPending ? 0.5 : 1, paddingVertical: 16, borderRadius: 12, alignItems: "center", justifyContent: "center" }}>
+                            <Button onPress={() => onDelete(initialWorkout.id)} disabled={isPending} variant="destructive" className="w-16 bg-destructive/10 py-4">
                                 <Trash2 size={20} color={colors.red} />
-                            </Pressable>
+                            </Button>
                         )}
-                        <Pressable onPress={handleSave} disabled={isPending || !selectedExercise}
-                            style={{ backgroundColor: colors.orange, flex: 1, opacity: (isPending || !selectedExercise) ? 0.5 : 1, paddingVertical: 16, borderRadius: 12, alignItems: "center" }}>
-                            <Text style={{ fontWeight: "bold", fontSize: 18, color: "#000" }}>
+                        <Button onPress={handleSave} disabled={isPending || !selectedExercise} className="flex-1 py-4">
+                            <ButtonText className="text-lg">
                                 {isPending ? "保存中..." : "保存记录"}
-                            </Text>
-                        </Pressable>
+                            </ButtonText>
+                        </Button>
                     </View>
                 </View>
             )}
