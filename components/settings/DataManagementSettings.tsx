@@ -7,6 +7,7 @@ import * as Sharing from "expo-sharing";
 import { clearDatabase, exportAllData, importAllData } from "@/db/services/data";
 import { useTheme } from "@/hooks/useTheme";
 import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
@@ -25,6 +26,33 @@ type ActionRowProps = {
 
 function ActionRow({ icon, iconClassName, label, desc, destructive, onPress, disabled, isLast }: ActionRowProps) {
     const { colors } = useTheme();
+    const content = (
+        <>
+            <View className={cn("mr-3 h-[34px] w-[34px] items-center justify-center rounded-[10px]", iconClassName)}>{icon}</View>
+            <View className="flex-1">
+                <Text variant="label" className={destructive ? "text-destructive-foreground" : undefined}>
+                    {label}
+                </Text>
+                <Text variant="caption" className={cn("mt-0.5 font-semibold", destructive && "text-destructive-foreground/80")}>
+                    {desc}
+                </Text>
+            </View>
+            <ChevronRight size={16} color={destructive ? "#FFFFFF" : colors.gray4} style={{ opacity: destructive ? 0.8 : 0.5 }} />
+        </>
+    );
+
+    if (destructive) {
+        return (
+            <Button
+                onPress={onPress}
+                disabled={disabled}
+                variant="destructive"
+                className={cn("mx-3.5 my-2 justify-start rounded-bento-sm px-3.5 py-3.5", disabled && "opacity-50")}
+            >
+                {content}
+            </Button>
+        );
+    }
 
     return (
         <AnimatedPressable
@@ -32,16 +60,7 @@ function ActionRow({ icon, iconClassName, label, desc, destructive, onPress, dis
             disabled={disabled}
             className={cn("flex-row items-center px-3.5 py-3.5", !isLast && "border-b border-border", disabled && "opacity-50")}
         >
-            <View className={cn("mr-3 h-[34px] w-[34px] items-center justify-center rounded-[10px]", iconClassName)}>{icon}</View>
-            <View className="flex-1">
-                <Text variant="label" className={destructive ? "text-destructive" : undefined}>
-                    {label}
-                </Text>
-                <Text variant="caption" className={cn("mt-0.5 font-semibold", destructive && "text-destructive/70")}>
-                    {desc}
-                </Text>
-            </View>
-            <ChevronRight size={16} color={colors.gray4} style={{ opacity: 0.5 }} />
+            {content}
         </AnimatedPressable>
     );
 }
@@ -162,8 +181,8 @@ export function DataManagementSettings() {
                 disabled={isPending}
             />
             <ActionRow
-                icon={<Trash2 size={16} color={colors.red} />}
-                iconClassName="bg-destructive/10"
+                icon={<Trash2 size={16} color="#FFFFFF" />}
+                iconClassName="bg-destructive-foreground/15"
                 label="清空所有记录"
                 desc="危险操作，不可撤销"
                 onPress={handleClear}
