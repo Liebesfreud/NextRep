@@ -162,9 +162,14 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
                                         <BadgeText>激活</BadgeText>
                                     </Badge>
                                 )}
-                                <Pressable className="p-1 opacity-70" onPress={() => deleteConfig(config.id, config.name)}>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 opacity-70"
+                                    onPress={() => deleteConfig(config.id, config.name)}
+                                >
                                     <Trash2 size={14} color={colors.red} />
-                                </Pressable>
+                                </Button>
                             </View>
 
                             {([
