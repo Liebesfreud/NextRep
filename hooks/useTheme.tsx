@@ -6,7 +6,7 @@ import React, {
     type ReactNode,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useColorScheme as useRNColorScheme, LayoutAnimation } from "react-native";
+import { useColorScheme as useRNColorScheme, LayoutAnimation, View } from "react-native";
 import { Colors, type ColorScheme, type ColorTheme } from "@/constants/colors";
 
 // ─── Context ──────────────────────────────────────────────────────────────────
@@ -65,7 +65,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         <ThemeContext.Provider
             value={{ theme, preference, colors: Colors[theme] as ColorTheme, toggleTheme, setTheme }}
         >
-            {children}
+            <View className={theme} style={{ flex: 1 }}>
+                {children}
+            </View>
         </ThemeContext.Provider>
     );
 }
