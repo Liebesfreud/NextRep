@@ -1,24 +1,11 @@
 import { View } from "react-native";
 import { LayoutDashboard } from "lucide-react-native";
-import { useTheme } from "@/hooks/useTheme";
-import { Text } from "@/components/ui/text";
+import { BrandMark } from "@/components/ui/brand-mark";
 
 export function DashboardHeader() {
-    const { colors } = useTheme();
-
     return (
         <View className="flex-row items-center justify-between pt-2 px-1">
-            <View className="flex-row items-center gap-3">
-                <View className="h-10 w-10 items-center justify-center rounded-full bg-accent/10">
-                    <LayoutDashboard size={20} color={colors.green} />
-                </View>
-                <View>
-                    <Text variant="heading" className="leading-none">数据看板</Text>
-                    <Text variant="caption" className="mt-1 text-[10px] font-bold uppercase tracking-widest opacity-80">
-                        Dashboard
-                    </Text>
-                </View>
-            </View>
+            <BrandMark title="数据看板" subtitle="Dashboard · NextRep" icon={LayoutDashboard} />
         </View>
     );
 }

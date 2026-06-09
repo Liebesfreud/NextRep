@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ViewStyle, StyleProp } from 'react-native';
 import { MotiView } from 'moti';
 import { ELEGANT_SPRING } from '@/constants/animations';
@@ -24,7 +24,8 @@ export const AnimatedEnter: React.FC<AnimatedEnterProps> = ({
     // 监听当前页面是否处于活动态
     const isFocused = useIsFocused();
 
-    const getInitialTranslate = () => {
+    const initial = useMemo(() => {
+        const getInitialTranslate = () => {
         switch (direction) {
             case 'up': return { translateY: distance };
             case 'down': return { translateY: -distance };
@@ -32,29 +33,31 @@ export const AnimatedEnter: React.FC<AnimatedEnterProps> = ({
             case 'right': return { translateX: -distance };
             case 'none': return {};
         }
-    };
+        };
 
-    const initial = {
-        opacity: 0,
-        ...getInitialTranslate(),
-    };
+        return {
+            opacity: 0,
+            ...getInitialTranslate(),
+        };
+    }, [direction, distance]);
 
-    const animate = {
+    const animate = useMemo(() => ({
         opacity: 1,
         translateY: 0,
         translateX: 0,
-    };
+    }), []);
+
+    const transition = useMemo(() => ({
+        ...ELEGANT_SPRING,
+        delay: isFocused ? delay : 0,
+    }), [delay, isFocused]);
 
     return (
         <MotiView
             from={initial}
             // 当从别的标签页切回来时通过重新改变 animate 值触发进场入场，切走时恢复至 initial（退场）
             animate={isFocused ? animate : initial}
-            transition={{
-                ...ELEGANT_SPRING,
-                // 为了让入场有阶梯感同时退场迅速干脆：只在处于焦点获得时给延时，否则迅速退回 initial
-                delay: isFocused ? delay : 0,
-            }}
+            transition={transition}
             className={className}
             style={style}
         >

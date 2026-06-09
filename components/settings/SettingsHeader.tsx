@@ -1,8 +1,8 @@
 import { View } from "react-native";
 import { Check, Save, Settings } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
+import { BrandMark } from "@/components/ui/brand-mark";
 import { Button, ButtonText } from "@/components/ui/button";
-import { Text } from "@/components/ui/text";
 
 type Props = {
     onSave: () => void;
@@ -15,17 +15,7 @@ export function SettingsHeader({ onSave, isPending, isSaved }: Props) {
 
     return (
         <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center gap-3">
-                <View className="h-10 w-10 items-center justify-center rounded-full bg-accent/10">
-                    <Settings size={20} color={colors.green} />
-                </View>
-                <View>
-                    <Text variant="heading" className="leading-none">个人配置</Text>
-                    <Text variant="caption" className="mt-1 text-[10px] font-bold uppercase tracking-widest opacity-80">
-                        Settings
-                    </Text>
-                </View>
-            </View>
+            <BrandMark title="个人配置" subtitle="Settings · NextRep" icon={Settings} />
 
             <Button
                 onPress={onSave}

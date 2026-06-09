@@ -11,6 +11,7 @@ import { ExerciseDetailModal } from "@/components/dashboard/ExerciseDetailModal"
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CategoryBadge } from "@/components/ui/category-badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 
@@ -163,13 +164,11 @@ export default function ExerciseManagementScreen() {
     }, [colors, handleDelete, presetNames]);
 
     const renderEmptyList = useCallback(() => (
-        <View className="items-center justify-center gap-3 rounded-bento-lg border border-border bg-card/60 px-6 py-10 opacity-80">
-            <Dumbbell size={40} color={colors.gray4} />
-            <Text variant="label" className="text-center">没有找到动作</Text>
-            <Text variant="caption" className="text-center font-semibold">
-                {searchQuery || selectedCategory !== "全部" ? "试试清空搜索或切换分类" : "点击右上角 + 添加你的第一个力量动作"}
-            </Text>
-        </View>
+        <EmptyState
+            icon={<Dumbbell size={24} color={colors.green} />}
+            title="没有找到动作"
+            description={searchQuery || selectedCategory !== "全部" ? "试试清空搜索或切换分类" : "点击右上角 + 添加你的第一个力量动作"}
+        />
     ), [colors.gray4, searchQuery, selectedCategory]);
 
     return (

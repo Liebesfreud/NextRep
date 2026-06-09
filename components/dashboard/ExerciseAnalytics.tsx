@@ -8,6 +8,7 @@ import { ExerciseDetailModal } from "@/components/dashboard/ExerciseDetailModal"
 import { type StrengthExerciseAnalytics } from "@/db/services/dashboard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Text } from "@/components/ui/text";
 
 type DashboardData = {
@@ -56,9 +57,13 @@ export function ExerciseAnalytics({ data }: Props) {
 
                 <Card className="min-h-[112px] rounded-[14px] border border-border bg-muted p-2">
                     {analytics.length === 0 ? (
-                        <View className="items-center justify-center p-5">
-                            <Text variant="muted" className="italic">暂无力量动作分析数据</Text>
-                        </View>
+                        <EmptyState
+                            icon={<Target size={22} color={colors.orange} />}
+                            title="暂无力量动作分析数据"
+                            description="记录几次力量训练后，这里会展示你的高频动作与训练容量。"
+                            compact
+                            className="border-0 bg-transparent py-5"
+                        />
                     ) : analytics.map((exercise, idx) => {
                         const visual = getStrengthCategoryVisual(exercise.tag, colors);
                         const Icon = visual.icon;

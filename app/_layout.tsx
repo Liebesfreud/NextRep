@@ -9,6 +9,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from "@react-navigation/native";
 import { Button, ButtonText } from "@/components/ui/button";
 import { getTabBarStyle, TabBarBackground, TAB_BAR_ITEM_STYLE } from "@/components/ui/tab-bar-background";
+import { TabIcon } from "@/components/ui/tab-icon";
 import { Text } from "@/components/ui/text";
 import "../global.css";
 
@@ -91,52 +92,28 @@ function TabLayout() {
                     name="index"
                     options={{
                         title: "首页",
-                        tabBarIcon: ({ color, size, focused }) => (
-                            <Home
-                                color={color}
-                                size={size}
-                                strokeWidth={focused ? 2.5 : 2}
-                            />
-                        ),
+                        tabBarIcon: ({ color, size, focused }) => <TabIcon icon={Home} color={color} size={size} focused={focused} />,
                     }}
                 />
                 <Tabs.Screen
                     name="dashboard"
                     options={{
                         title: "看板",
-                        tabBarIcon: ({ color, size, focused }) => (
-                            <LayoutDashboard
-                                color={color}
-                                size={size}
-                                strokeWidth={focused ? 2.5 : 2}
-                            />
-                        ),
+                        tabBarIcon: ({ color, size, focused }) => <TabIcon icon={LayoutDashboard} color={color} size={size} focused={focused} />,
                     }}
                 />
                 <Tabs.Screen
                     name="ai-coach"
                     options={{
                         title: "AI 教练",
-                        tabBarIcon: ({ color, size, focused }) => (
-                            <Bot
-                                color={color}
-                                size={size}
-                                strokeWidth={focused ? 2.5 : 2}
-                            />
-                        ),
+                        tabBarIcon: ({ color, size, focused }) => <TabIcon icon={Bot} color={color} size={size} focused={focused} />,
                     }}
                 />
                 <Tabs.Screen
                     name="settings"
                     options={{
                         title: "设置",
-                        tabBarIcon: ({ color, size, focused }) => (
-                            <Settings
-                                color={color}
-                                size={size}
-                                strokeWidth={focused ? 2.5 : 2}
-                            />
-                        ),
+                        tabBarIcon: ({ color, size, focused }) => <TabIcon icon={Settings} color={color} size={size} focused={focused} />,
                     }}
                 />
                 <Tabs.Screen

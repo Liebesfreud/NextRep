@@ -10,6 +10,7 @@ import { bodyMetrics, workouts } from "@/db/schema";
 import { generateTrainingReportWithAI, type AiReportData } from "@/db/services/ai";
 import * as workoutService from "@/db/services/workout";
 import { useTheme } from "@/hooks/useTheme";
+import { BrandMark } from "@/components/ui/brand-mark";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
@@ -228,15 +229,7 @@ export default function AiCoachScreen() {
     return (
         <View className="flex-1 bg-background">
             <View className="border-b border-border bg-background/95 px-4 pb-3 pt-[60px]">
-                <View className="flex-row items-center gap-3">
-                    <View className="h-[42px] w-[42px] items-center justify-center rounded-full bg-accent/10">
-                        <Sparkles size={20} color={colors.green} />
-                    </View>
-                    <View className="flex-1">
-                        <Text variant="heading">AI 教练</Text>
-                        <Text variant="caption" className="mt-0.5 font-bold">今天练什么</Text>
-                    </View>
-                </View>
+                <BrandMark title="AI 教练" subtitle="Coach · 今天练什么" icon={Sparkles} />
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 14 }}>

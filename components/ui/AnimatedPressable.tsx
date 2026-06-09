@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Pressable, PressableProps, StyleProp, ViewStyle } from 'react-native';
 import Animated, {
     useAnimatedStyle,
@@ -24,6 +24,7 @@ const AnimatedPressableComponent = React.forwardRef<any, AnimatedPressableProps>
             style,
             activeScale = 0.96, // 缩放比例控制在 0.96 到 1.0 之间
             activeOpacity = 0.8,
+            disabled,
             onPressIn,
             onPressOut,
             ...props
@@ -33,17 +34,25 @@ const AnimatedPressableComponent = React.forwardRef<any, AnimatedPressableProps>
         const scale = useSharedValue(1);
         const opacity = useSharedValue(1);
 
-        const handlePressIn = (e: any) => {
+        const handlePressIn = useCallback((e: any) => {
+            if (disabled) {
+                onPressIn?.(e);
+                return;
+            }
             scale.value = withSpring(activeScale, MICRO_INTERACTION_SPRING);
             opacity.value = withSpring(activeOpacity, MICRO_INTERACTION_SPRING);
             onPressIn?.(e);
-        };
+        }, [activeOpacity, activeScale, disabled, onPressIn, opacity, scale]);
 
-        const handlePressOut = (e: any) => {
+        const handlePressOut = useCallback((e: any) => {
+            if (disabled) {
+                onPressOut?.(e);
+                return;
+            }
             scale.value = withSpring(1, MICRO_INTERACTION_SPRING);
             opacity.value = withSpring(1, MICRO_INTERACTION_SPRING);
             onPressOut?.(e);
-        };
+        }, [disabled, onPressOut, opacity, scale]);
 
         const animatedStyle = useAnimatedStyle(() => ({
             transform: [{ scale: scale.value }],
@@ -53,6 +62,7 @@ const AnimatedPressableComponent = React.forwardRef<any, AnimatedPressableProps>
         return (
             <AnimatedPressableBase
                 ref={ref}
+                disabled={disabled}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
                 style={[style, animatedStyle]}
