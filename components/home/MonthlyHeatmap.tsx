@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { View, PanResponder, ScrollView } from "react-native";
+import { View, ScrollView, type GestureResponderEvent } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import { X, CalendarCheck } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
@@ -27,6 +27,7 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
     const [isPickerVisible, setIsPickerVisible] = useState(false);
     const currentMonthRef = useRef({ year: currentYear, month: currentMonth });
     const loadSeqRef = useRef(0);
+    const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
     const heatmapOpacity = useSharedValue(1);
     const heatmapAnimatedStyle = useAnimatedStyle(() => ({ opacity: heatmapOpacity.value }));
@@ -72,23 +73,24 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
     const goToPrev = useCallback(() => navigateMonth(-1), [navigateMonth]);
     const goToNext = useCallback(() => navigateMonth(1), [navigateMonth]);
 
-    // PanResponder for swipe gestures
-    const panResponder = useMemo(
-        () => PanResponder.create({
-            onStartShouldSetPanResponder: () => false,
-            onMoveShouldSetPanResponder: (evt, gestureState) => {
-                return Math.abs(gestureState.dx) > 20 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy);
-            },
-            onPanResponderRelease: (evt, gestureState) => {
-                if (gestureState.dx > 50) {
-                    goToPrev(); // Swipe right -> prev month
-                } else if (gestureState.dx < -50) {
-                    goToNext(); // Swipe left -> next month
-                }
-            },
-        }),
-        [goToNext, goToPrev]
-    );
+    const handleTouchStart = useCallback((event: GestureResponderEvent) => {
+        touchStartRef.current = {
+            x: event.nativeEvent.pageX,
+            y: event.nativeEvent.pageY,
+        };
+    }, []);
+
+    const handleTouchEnd = useCallback((event: GestureResponderEvent) => {
+        const start = touchStartRef.current;
+        touchStartRef.current = null;
+        if (!start) return;
+
+        const dx = event.nativeEvent.pageX - start.x;
+        const dy = event.nativeEvent.pageY - start.y;
+        if (Math.abs(dx) <= 50 || Math.abs(dx) <= Math.abs(dy)) return;
+        if (dx > 0) goToPrev();
+        else goToNext();
+    }, [goToNext, goToPrev]);
 
     const totalCells = 42; // Strictly 6 weeks * 7 days to maintain fixed height
     const todayNum = (year === currentYear && month === currentMonth) ? currentDate : -1;
@@ -103,7 +105,12 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
     const monthLabels = useMemo(() => months.map((m) => MONTH_FORMATTER.format(new Date(year, m))), [months, year]);
 
     return (
-        <View className="flex-row justify-between items-center w-full" {...panResponder.panHandlers}>
+        <View
+            className="flex-row justify-between items-center w-full"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={() => { touchStartRef.current = null; }}
+        >
             {/* Left Panel: Summary */}
             <View className="justify-center" style={{ paddingVertical: 2 }}>
                 <View>
