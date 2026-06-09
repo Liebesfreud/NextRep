@@ -1,153 +1,132 @@
 <p align="center">
-  <img src="assets/icon.png" width="120" height="120" alt="NextRep Logo" style="border-radius: 24px;" />
+  <img src="assets/icon.png" width="112" height="112" alt="NextRep 应用图标" />
 </p>
 
 <h1 align="center">NextRep</h1>
 
 <p align="center">
-  <strong>AI 驱动的本地健身记录助手</strong><br/>
-  开源 · 离线优先 · 隐私至上
+  本地优先的健身记录与 AI 训练建议应用
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0.0-brightgreen" alt="version" />
-  <img src="https://img.shields.io/badge/platform-Android-blue" alt="platform" />
-  <img src="https://img.shields.io/badge/Expo_SDK-55-purple" alt="expo" />
-  <img src="https://img.shields.io/badge/license-MIT-orange" alt="license" />
+  <img src="https://img.shields.io/badge/app-1.3.0-34C759" alt="应用版本 1.3.0" />
+  <img src="https://img.shields.io/badge/Expo-55-000020?logo=expo" alt="Expo SDK 55" />
+  <img src="https://img.shields.io/badge/React_Native-0.83-61DAFB?logo=react" alt="React Native 0.83" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License" /></a>
 </p>
 
----
+NextRep 使用设备本地 SQLite 保存训练、打卡、身体指标和个人配置。核心记录功能不依赖账号或云端服务；AI 功能由用户自行配置 OpenAI Chat Completions 兼容接口。
 
-## ✨ 功能亮点
+## 当前功能
 
-### 🏠 首页 — 今日训练中心
+- 记录力量训练的动作、重量、组数、次数和完成状态。
+- 记录有氧训练的时长、距离、热量等数据。
+- 按日期查看和编辑训练，完成每日打卡并浏览月度热力图。
+- 查看训练频率、训练容量、动作历史、突破记录、体重和体脂趋势。
+- 管理自定义力量动作库，并按训练分类搜索和筛选。
+- 根据精力、可用时长和训练地点生成 AI 今日建议。
+- 将 AI 返回的训练计划直接加入当天训练列表。
+- 配置多个 OpenAI 兼容服务，测试连接并统计 token 用量。
+- 在深色、浅色和跟随系统三种主题之间切换。
+- 将全部本地数据导出为 JSON，或从备份文件全量恢复。
 
-- **力量训练** — 逐组记录重量与次数，支持完成状态标记与 RPE 记录
-- **有氧训练** — 记录时长、距离、卡路里等关键指标
-- **每日打卡** — 一键完成打卡，伴随 🎉 撒花互动动效
-- **训练日历** — Bento Box 风格的小格子日历，直观展示月度贡献度
-- **AI 动态估算** — 基于当日训练强度自动估算卡路里消耗
+## 技术栈
 
-### 📊 看板 — 数据可视化
+| 范围 | 技术 |
+| --- | --- |
+| 应用框架 | Expo SDK 55、React Native 0.83、React 19 |
+| 路由 | Expo Router |
+| UI | NativeWind 4、React Native Reusables 风格组件、Lucide |
+| 动画 | Reanimated 4、Moti |
+| 数据 | expo-sqlite、Drizzle ORM |
+| 语言 | TypeScript 5.9 |
 
-- **Bento Box 身体统计** — 非对称布局直观展示体重、体格记录
-- **动态趋势** — 自动对比最近数据，呈现代数与比例的变化趋势
-- **AI 身体评估** — 根据当前指标生成个性化状态分析与运动建议
-- **多维分析** — 统计分析最常训练的动作，洞察训练偏好
+## 快速开始
 
-### 🤖 AI 教练 — 智能对话
+### 环境要求
 
-- 接入任意 **OpenAI 兼容 API**（如 DeepSeek、Claude、本地模型等）
-- 自动上下文注入 — 包含最近训练数据与体测数据
-- **今日训练报告** — 评价动作质量、打分激励并提供恢复建议
-- 支持多轮对话与 Markdown 格式渲染展示
+- Node.js `>= 20.19.4`
+- npm
+- Android Studio 与 Android SDK，用于本地 Android 构建
+- macOS、Xcode 与 CocoaPods，用于本地 iOS 构建
 
-### ⚙️ 设置 — 精致且灵活
-
-- **全新的沉浸式 UI** — 优化的视觉层次，操作更直观顺畅
-- **自定义动作库** — 独立的管理页面，支持快速创建、搜索与筛选
-- **多模型配置** — 灵活管理 API 端点，支持一键切换与自动容灾
-- **数据管家** — JSON 导入/导出与一键清理，数据完全本地化
-
----
-
-## 🛠️ 技术栈
-
-| 层级 | 技术 |
-|------|------|
-| 框架 | [Expo SDK 55](https://expo.dev) + [React Native 0.83](https://reactnative.dev) |
-| 路由 | [Expo Router](https://docs.expo.dev/router/introduction/) (文件系统路由) |
-| 样式 | [NativeWind v4](https://www.nativewind.dev) (Tailwind CSS for React Native) |
-| 动画 | [Moti](https://moti.fyi) + [Reanimated 4](https://docs.swmansion.com/react-native-reanimated/) |
-| 数据库 | [Drizzle ORM](https://orm.drizzle.team) + [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/) |
-| 图标 | [Lucide React Native](https://lucide.dev) |
-| 语言 | TypeScript |
-
----
-
-## 🚀 快速开始
-
-### 前置要求
-
-- [Node.js](https://nodejs.org/) >= 18
-- [Expo CLI](https://docs.expo.dev/get-started/installation/)
-- iOS (Simulator) 或 Android (Emulator / 真机 Expo Go)
-
-### 安装与运行
+### 安装
 
 ```bash
-# 克隆仓库
-git clone https://github.com/YourUsername/NextRep.git
+git clone https://github.com/Liebesfreud/NextRep.git
 cd NextRep
-
-# 安装依赖
-npm install
-
-# 启动开发服务器
-npx expo start
+npm ci
 ```
 
-### 构建与编译
+### 运行
 
 ```bash
-# 运行本地构建 (Android)
+# 启动 Expo 开发服务器
+npm start
+
+# 生成并运行 Android 原生项目
 npm run android
 
-# 构建 Preview APK (需 EAS 环境)
-eas build -p android --profile preview
+# 生成并运行 iOS 原生项目，仅限 macOS
+npm run ios
+
+# 启动 Web 开发版本
+npm run web
 ```
 
----
+`android/` 和 `ios/` 是 Expo 生成目录，不提交到仓库。首次执行原生运行命令时，Expo 会按当前配置生成对应项目。
 
-## 📁 项目结构
+### 基础校验
 
+```bash
+npx tsc --noEmit
 ```
+
+仓库目前尚未配置自动化测试和 lint 脚本。提交功能改动前，至少应完成 TypeScript 检查和目标平台手动验证。
+
+## AI 配置
+
+1. 打开“设置”。
+2. 在“服务端配置”中添加名称、Base URL、API Key 和模型 ID。
+3. 选择激活配置并执行连接测试。
+4. 打开“AI 教练”，选择当天状态并生成训练建议。
+
+Base URL 可以填写 API 根地址，例如 `https://api.openai.com/v1`，也可以直接填写以 `/chat/completions` 结尾的完整地址。
+
+AI 请求会把相关个人资料、近期训练、近期身体指标和动作库发送给当前激活的第三方服务。API Key 保存在本地 SQLite 中，也会包含在完整 JSON 备份里。导出的备份文件应按敏感文件管理。详情见[数据与隐私说明](docs/DATA_AND_PRIVACY.md)。
+
+## 项目结构
+
+```text
 NextRep/
-├── app/                    # 路由目录 (Expo Router)
-│   ├── _layout.tsx         #   顶层布局与状态提供者
-│   ├── index.tsx           #   训练记录首页
-│   ├── dashboard.tsx       #   数据指标看板
-│   ├── ai-coach.tsx        #   AI 教练对话
-│   ├── settings.tsx        #   设置菜单主页
-│   └── settings/           #   二级设置页面
-│       └── exercises.tsx   #     自定义动作库管理
-├── components/             # 组件层
-│   ├── home/               #   首页特有组件
-│   ├── dashboard/          #   看板特有组件
-│   ├── settings/           #   设置模块组件
-│   └── ui/                 #   全局通用原子组件
-├── db/                     # 数据访问层
-│   ├── schema.ts           #   数据库模型
-│   └── services/           #   业务逻辑服务 (CRUD)
-├── hooks/                  # 数据获取与交互 Hooks
-├── constants/              # 设计 Token 与全局常量
-└── assets/                 # 核心静态资源
+├── app/                    Expo Router 页面与根布局
+├── components/
+│   ├── home/               首页和训练录入
+│   ├── dashboard/          数据看板与动作分析
+│   ├── settings/           设置与数据管理
+│   └── ui/                 通用 UI 组件
+├── constants/              主题、动画和动作视觉配置
+├── db/
+│   ├── client.ts           SQLite 初始化和兼容迁移
+│   ├── schema.ts           Drizzle 数据模型
+│   └── services/           训练、看板、AI、配置和备份服务
+├── hooks/                  应用级 Hooks
+├── assets/                 图标和启动资源
+└── docs/                   维护文档
 ```
 
----
+## 文档
 
-## 🔑 AI 配置说明
+- [开发指南](docs/DEVELOPMENT.md)
+- [架构说明](docs/ARCHITECTURE.md)
+- [数据与隐私说明](docs/DATA_AND_PRIVACY.md)
+- [贡献指南](CONTRIBUTING.md)
+- [后续计划](plan.md)
 
-NextRep 支持任意 **OpenAI Chat Completions 兼容的 API**：
+## 平台状态
 
-1. 进入 **设置** → **AI 配置**
-2. 添加配置：
-   - **名称**：标识当前 API 环境（如 "DeepSeek"）
-   - **Base URL**：API 服务器地址（如 `https://api.deepseek.com`）
-   - **API Key**：您的个人密钥
-   - **模型名称**：指定调用的模型 ID（如 `deepseek-chat` 、`gpt-4o-mini`）
-3. 将该配置设为 **活跃**。
+Android 是当前主要运行目标。Web 用于开发和兼容性验证；iOS 已包含 Expo 配置和运行脚本，但发布前仍需要在真实 iOS 环境完成验证。
 
-> 💡 **隐私提示**：所有健身数据、API 密钥与对话记录均存储在设备本地 SQLite 数据库中，绝不上传第三方服务器（AI 服务端除外）。
+## 许可证
 
----
-
-## 📄 开源协议
-
-[MIT License](LICENSE) — 自由使用、修改及再分发。
-
----
-
-<p align="center">
-  Crafted with ❤️ for Fitness Enthusiasts
-</p>
+本项目使用 [MIT License](LICENSE)。
