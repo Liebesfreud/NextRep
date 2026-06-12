@@ -122,6 +122,9 @@ const StrengthSetRow = React.memo(function StrengthSetRow({ item, onDelete, onTo
             <View className="w-10 items-center">
                 <Button
                     onPress={() => onToggleComplete(item.id)}
+                    accessibilityLabel={`第 ${item.setNumber} 组${item.isCompleted ? "，已完成" : "，未完成"}`}
+                    accessibilityRole="checkbox"
+                    accessibilityState={{ checked: item.isCompleted }}
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 rounded-lg bg-transparent p-0"
@@ -356,7 +359,7 @@ export function StrengthModal({
                 没有找到相关动作
             </Text>
             <Text variant="caption" className="text-center">
-                请前往“设置 {'->'} 数据与备份”新增你的自定义动作库
+                点击右上角动作库按钮新增自定义动作
             </Text>
         </View>
     );
@@ -396,6 +399,8 @@ export function StrengthModal({
                                     onClose();
                                     dismissKeyboardAndRun(() => router.push("/settings/exercises"), 120);
                                 }, 0)}
+                                accessibilityLabel="打开动作库"
+                                accessibilityRole="button"
                                 activeScale={0.92}
                                 activeOpacity={0.75}
                                 className="h-8 w-8 items-center justify-center rounded-lg bg-muted"
@@ -405,6 +410,7 @@ export function StrengthModal({
                         )}
                         <Button
                             onPress={handleClose}
+                            accessibilityLabel="关闭力量训练弹窗"
                             variant="secondary"
                             size="icon"
                             className="h-8 w-8 rounded-lg"
@@ -428,6 +434,7 @@ export function StrengthModal({
                             {searchQuery.length > 0 && (
                                 <Button
                                     onPress={() => setSearchQuery("")}
+                                    accessibilityLabel="清空动作搜索"
                                     variant="ghost"
                                     size="icon"
                                     className="h-7 w-7"
@@ -522,7 +529,13 @@ export function StrengthModal({
 
                         <View className="mt-4 flex-row gap-2 border-t pt-2" style={{ borderTopColor: `${colors.gray3}4D` }}>
                             {initialWorkout && (
-                                <Button onPress={handleDeleteWorkout} disabled={isPending} variant="destructive" className="w-16 bg-destructive/10 py-4">
+                                <Button
+                                    onPress={handleDeleteWorkout}
+                                    accessibilityLabel="删除力量训练记录"
+                                    disabled={isPending}
+                                    variant="destructive"
+                                    className="w-16 bg-destructive/10 py-4"
+                                >
                                     <Trash2 size={20} color={colors.red} />
                                 </Button>
                             )}

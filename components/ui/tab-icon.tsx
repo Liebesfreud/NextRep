@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View } from "react-native";
+import { Platform, View, type ViewStyle } from "react-native";
 import { MotiView } from "moti";
 import { type LucideIcon } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
@@ -23,7 +23,16 @@ const TabIcon = React.memo(function TabIcon({ icon: Icon, color, size, focused }
                 }}
                 transition={{ type: "timing", duration: 180 }}
                 className="absolute h-9 w-12 rounded-full border border-accent/20 bg-accent/10"
-                style={{ shadowColor: colors.green, shadowOpacity: focused ? 0.16 : 0, shadowRadius: 16 }}
+                style={Platform.select<ViewStyle>({
+                    web: {
+                        boxShadow: focused ? `0 0 16px ${colors.green}29` : "none",
+                    },
+                    default: {
+                        shadowColor: colors.green,
+                        shadowOpacity: focused ? 0.16 : 0,
+                        shadowRadius: 16,
+                    },
+                })}
             />
             <MotiView
                 animate={{

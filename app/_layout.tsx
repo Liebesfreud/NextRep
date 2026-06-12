@@ -79,7 +79,7 @@ function TabLayout() {
                 safeAreaInsets={{ bottom: 0 }}
                 screenOptions={{
                     headerShown: false,
-                    tabBarStyle: getTabBarStyle(colors.border, colors.black),
+                    tabBarStyle: getTabBarStyle(colors.border),
                     tabBarBackground: () => <TabBarBackground />,
                     tabBarShowLabel: false,
                     tabBarLabelPosition: 'beside-icon',
@@ -92,6 +92,7 @@ function TabLayout() {
                     name="index"
                     options={{
                         title: "首页",
+                        tabBarAccessibilityLabel: "首页",
                         tabBarIcon: ({ color, size, focused }) => <TabIcon icon={Home} color={color} size={size} focused={focused} />,
                     }}
                 />
@@ -99,6 +100,7 @@ function TabLayout() {
                     name="dashboard"
                     options={{
                         title: "看板",
+                        tabBarAccessibilityLabel: "数据看板",
                         tabBarIcon: ({ color, size, focused }) => <TabIcon icon={LayoutDashboard} color={color} size={size} focused={focused} />,
                     }}
                 />
@@ -106,6 +108,7 @@ function TabLayout() {
                     name="ai-coach"
                     options={{
                         title: "AI 教练",
+                        tabBarAccessibilityLabel: "AI 教练",
                         tabBarIcon: ({ color, size, focused }) => <TabIcon icon={Bot} color={color} size={size} focused={focused} />,
                     }}
                 />
@@ -113,6 +116,7 @@ function TabLayout() {
                     name="settings"
                     options={{
                         title: "设置",
+                        tabBarAccessibilityLabel: "设置",
                         tabBarIcon: ({ color, size, focused }) => <TabIcon icon={Settings} color={color} size={size} focused={focused} />,
                     }}
                 />

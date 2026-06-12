@@ -9,12 +9,11 @@ import {
     Keyboard,
     Platform,
     StatusBar,
-    Dimensions,
     Easing,
+    useWindowDimensions,
+    type ViewStyle,
 } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
-
-const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 type Props = {
     visible: boolean;
@@ -40,11 +39,12 @@ export function BottomSheetModal({
     avoidKeyboard = false,
 }: Props) {
     const { colors } = useTheme();
+    const { height: screenHeight } = useWindowDimensions();
     const [isMounted, setIsMounted] = useState(visible);
     // 遮罩层透明度动画
     const backdropOpacity = useRef(new Animated.Value(0)).current;
     // 卡片滑动位移动画
-    const sheetTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+    const sheetTranslateY = useRef(new Animated.Value(screenHeight)).current;
 
     useEffect(() => {
         let cancelled = false;
@@ -53,20 +53,20 @@ export function BottomSheetModal({
         if (visible) {
             setIsMounted(true);
             backdropOpacity.setValue(0);
-            sheetTranslateY.setValue(SCREEN_HEIGHT);
+            sheetTranslateY.setValue(screenHeight);
             // 打开：遮罩淡入 + 卡片上滑（cubic ease-out，顺滑无超调）
             animation = Animated.parallel([
                 Animated.timing(backdropOpacity, {
                     toValue: 1,
                     duration: 220,
                     easing: Easing.out(Easing.quad),
-                    useNativeDriver: true,
+                    useNativeDriver: Platform.OS !== "web",
                 }),
                 Animated.timing(sheetTranslateY, {
                     toValue: 0,
                     duration: 300,
                     easing: Easing.out(Easing.cubic),
-                    useNativeDriver: true,
+                    useNativeDriver: Platform.OS !== "web",
                 }),
             ]);
             animation.start();
@@ -78,13 +78,13 @@ export function BottomSheetModal({
                     toValue: 0,
                     duration: 180,
                     easing: Easing.in(Easing.quad),
-                    useNativeDriver: true,
+                    useNativeDriver: Platform.OS !== "web",
                 }),
                 Animated.timing(sheetTranslateY, {
-                    toValue: SCREEN_HEIGHT,
+                    toValue: screenHeight,
                     duration: 220,
                     easing: Easing.in(Easing.cubic),
-                    useNativeDriver: true,
+                    useNativeDriver: Platform.OS !== "web",
                 }),
             ]);
             animation.start(({ finished }) => {
@@ -98,10 +98,7 @@ export function BottomSheetModal({
         };
     }, [visible]);
 
-    const sheetHeightStyle =
-        typeof sheetHeight === "string"
-            ? { height: sheetHeight as any }
-            : { height: sheetHeight };
+    const sheetHeightStyle: ViewStyle = { height: sheetHeight };
 
     const handleRequestClose = () => {
         Keyboard.dismiss();
@@ -109,7 +106,7 @@ export function BottomSheetModal({
     };
 
     const modalBody = (
-        <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
+        <View style={[StyleSheet.absoluteFill, styles.modalRoot]}>
             {/* 深色遮罩 —— 固定整屏，不参与 slide 动画 */}
             <Animated.View
                 style={[StyleSheet.absoluteFill, { backgroundColor: backdropColor ?? colors.overlay, opacity: backdropOpacity }]}
@@ -124,11 +121,14 @@ export function BottomSheetModal({
 
             {/* 底部卡片 —— 从底部弹入 */}
             <Animated.View
-                pointerEvents={visible ? "auto" : "none"}
                 style={[
                     styles.sheet,
                     sheetHeightStyle,
-                    { backgroundColor, transform: [{ translateY: sheetTranslateY }] },
+                    {
+                        backgroundColor,
+                        pointerEvents: visible ? "auto" : "none",
+                        transform: [{ translateY: sheetTranslateY }],
+                    },
                 ]}
             >
                 {avoidKeyboard ? (
@@ -165,6 +165,9 @@ export function BottomSheetModal({
 }
 
 const styles = StyleSheet.create({
+    modalRoot: {
+        pointerEvents: "box-none",
+    },
     sheet: {
         position: "absolute",
         bottom: 0,

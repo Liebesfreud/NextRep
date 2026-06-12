@@ -139,6 +139,9 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
                                     size="icon"
                                     className="h-7 w-7"
                                     onPress={() => setProfile((current) => ({ ...current, activeAiConfigId: config.id }))}
+                                    accessibilityLabel={`激活配置 ${config.name || index + 1}`}
+                                    accessibilityRole="radio"
+                                    accessibilityState={{ selected: isActive }}
                                 >
                                     <View
                                         className={cn(
@@ -172,6 +175,7 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
                                     size="icon"
                                     className="h-7 w-7 opacity-70"
                                     onPress={() => deleteConfig(config.id, config.name)}
+                                    accessibilityLabel={`删除配置 ${config.name || index + 1}`}
                                 >
                                     <Trash2 size={14} color={colors.red} />
                                 </Button>

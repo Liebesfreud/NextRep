@@ -186,6 +186,7 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                         <View className="mb-6 flex-row items-center justify-between">
                             <Text variant="subheading" className="tracking-tight">选择时间</Text>
                             <Button onPress={() => setIsPickerVisible(false)}
+                                accessibilityLabel="关闭日期选择器"
                                 variant="secondary"
                                 size="icon"
                                 className="h-8 w-8 rounded-full">

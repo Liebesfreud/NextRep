@@ -121,13 +121,13 @@ function DatePickerModal({
             <View className="flex-1 px-5 pb-8 pt-5">
                     {/* 月份导航 */}
                     <View className="mb-4 flex-row items-center justify-between">
-                        <Button onPress={prevMonth} variant="ghost" size="icon" className="h-8 w-8">
+                        <Button onPress={prevMonth} accessibilityLabel="上一个月" variant="ghost" size="icon" className="h-8 w-8">
                             <ChevronLeft size={20} color={colors.white} />
                         </Button>
                         <Text className="text-base font-extrabold">
                             {viewYear}年 {MONTH_NAMES[viewMonth]}
                         </Text>
-                        <Button onPress={nextMonth} variant="ghost" size="icon" disabled={isNextDisabled} className="h-8 w-8">
+                        <Button onPress={nextMonth} accessibilityLabel="下一个月" variant="ghost" size="icon" disabled={isNextDisabled} className="h-8 w-8">
                             <ChevronRight size={20} color={colors.white} />
                         </Button>
                     </View>

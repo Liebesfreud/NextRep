@@ -22,6 +22,7 @@ const PaginationDots = React.forwardRef<React.ElementRef<typeof View>, Paginatio
                         <Pressable
                             key={index}
                             accessibilityRole="button"
+                            accessibilityLabel={`切换到第 ${index + 1} 页`}
                             accessibilityState={{ selected: active }}
                             onPress={() => onSelect?.(index)}
                             className="h-5 w-6 items-center justify-center active:opacity-80"

@@ -32,19 +32,35 @@ const badgeTextVariants = cva("text-xs font-black", {
     },
 });
 
+type BadgeContextValue = {
+    variant: VariantProps<typeof badgeVariants>["variant"];
+};
+
+const BadgeContext = React.createContext<BadgeContextValue>({ variant: "default" });
+
 type BadgeProps = ViewProps & VariantProps<typeof badgeVariants>;
 
 const Badge = React.forwardRef<React.ElementRef<typeof View>, BadgeProps>(({ className, variant, ...props }, ref) => (
-    <View ref={ref} className={cn(badgeVariants({ variant }), className)} {...props} />
+    <BadgeContext.Provider value={{ variant }}>
+        <View ref={ref} className={cn(badgeVariants({ variant }), className)} {...props} />
+    </BadgeContext.Provider>
 ));
 Badge.displayName = "Badge";
 
 type BadgeTextProps = Omit<React.ComponentPropsWithoutRef<typeof Text>, "variant"> & VariantProps<typeof badgeTextVariants>;
 
 const BadgeText = React.forwardRef<React.ElementRef<typeof Text>, BadgeTextProps>(
-    ({ className, variant, ...props }, ref) => (
-        <Text ref={ref} className={cn(badgeTextVariants({ variant }), className)} {...props} />
-    )
+    ({ className, variant, ...props }, ref) => {
+        const context = React.useContext(BadgeContext);
+
+        return (
+            <Text
+                ref={ref}
+                className={cn(badgeTextVariants({ variant: variant ?? context.variant }), className)}
+                {...props}
+            />
+        );
+    }
 );
 BadgeText.displayName = "BadgeText";
 

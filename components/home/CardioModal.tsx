@@ -107,6 +107,7 @@ export function CardioModal({
                 )}
                 <Button
                     onPress={handleClose}
+                    accessibilityLabel="关闭有氧运动弹窗"
                     variant="secondary"
                     size="icon"
                     className="h-8 w-8 rounded-lg"
@@ -194,7 +195,13 @@ export function CardioModal({
                     </View>
                     <View className="mt-6 flex-row gap-2">
                         {initialWorkout && (
-                            <Button onPress={() => onDelete(initialWorkout.id)} disabled={isPending} variant="destructive" className="w-16 bg-destructive/10 py-4">
+                            <Button
+                                onPress={() => onDelete(initialWorkout.id)}
+                                accessibilityLabel="删除有氧运动记录"
+                                disabled={isPending}
+                                variant="destructive"
+                                className="w-16 bg-destructive/10 py-4"
+                            >
                                 <Trash2 size={20} color={colors.red} />
                             </Button>
                         )}

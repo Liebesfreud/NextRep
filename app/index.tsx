@@ -255,7 +255,7 @@ export default function HomeScreen() {
                 </AnimatedEnter>
             </ScrollView>
 
-            <View pointerEvents="none" className="absolute inset-0 z-[999]">
+            <View className="pointer-events-none absolute inset-0 z-[999]">
                 <ConfettiCannon
                     ref={confettiRef}
                     count={120}

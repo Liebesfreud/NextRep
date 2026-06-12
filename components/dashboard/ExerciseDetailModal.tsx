@@ -91,6 +91,7 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
                 </View>
                 <Button
                     onPress={onClose}
+                    accessibilityLabel="关闭动作详情"
                     variant="secondary"
                     size="icon"
                     className="h-8 w-8 rounded-lg"

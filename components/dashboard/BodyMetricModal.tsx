@@ -176,6 +176,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                     {metricType === "weight" ? "记录体重" : "记录体脂率"}
                 </Text>
                 <Button onPress={onClose}
+                    accessibilityLabel="关闭身体指标弹窗"
                     variant="secondary"
                     size="icon"
                     className="h-8 w-8 rounded-lg">
@@ -307,12 +308,14 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                         </Text>
                         <View className="flex-row gap-1">
                             <Button onPress={() => setMetricCalendarDate(new Date(metricCalendarDate.getFullYear(), metricCalendarDate.getMonth() - 1, 1))}
+                                accessibilityLabel="上一个月"
                                 variant="secondary"
                                 size="icon"
                                 className="h-6 w-6 rounded-md bg-border">
                                 <ChevronLeft size={12} color={colors.gray4} />
                             </Button>
                             <Button onPress={() => setMetricCalendarDate(new Date(metricCalendarDate.getFullYear(), metricCalendarDate.getMonth() + 1, 1))}
+                                accessibilityLabel="下一个月"
                                 variant="secondary"
                                 size="icon"
                                 className="h-6 w-6 rounded-md bg-border">

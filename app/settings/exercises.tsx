@@ -151,6 +151,7 @@ export default function ExerciseManagementScreen() {
                 {isPreset ? (
                     <Button
                         onPress={() => handleDelete(item.name)}
+                        accessibilityLabel={`删除动作 ${item.name}`}
                         variant="ghost"
                         size="icon"
                         hitSlop={8}
@@ -198,6 +199,7 @@ export default function ExerciseManagementScreen() {
                             {searchQuery.length > 0 ? (
                                 <Button
                                     onPress={() => setSearchQuery("")}
+                                    accessibilityLabel="清空动作搜索"
                                     variant="ghost"
                                     size="icon"
                                     className="h-7 w-7"
@@ -208,6 +210,7 @@ export default function ExerciseManagementScreen() {
                         </View>
                         <Button
                             onPress={() => setIsCreating(!isCreating)}
+                            accessibilityLabel={isCreating ? "取消新增动作" : "新增动作"}
                             variant={isCreating ? "outline" : "secondary"}
                             size="icon"
                             className={isCreating ? "border-accent bg-accent/10" : undefined}

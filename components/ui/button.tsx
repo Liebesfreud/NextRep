@@ -54,6 +54,16 @@ const buttonTextVariants = cva("text-sm font-black", {
     },
 });
 
+type ButtonContextValue = {
+    variant: ButtonProps["variant"];
+    size: ButtonProps["size"];
+};
+
+const ButtonContext = React.createContext<ButtonContextValue>({
+    variant: "default",
+    size: "default",
+});
+
 type ButtonProps = PressableProps &
     VariantProps<typeof buttonVariants> & {
         asChild?: boolean;
@@ -74,16 +84,18 @@ const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>
         const { colors } = useTheme();
 
         return (
-            <Component
-                ref={ref}
-                className={cn(buttonVariants({ variant, size }), className)}
-                disabled={isDisabled}
-                accessibilityRole="button"
-                accessibilityState={{ disabled: isDisabled }}
-                {...props}
-            >
-                {loading ? <ActivityIndicator size="small" color={indicatorColor ?? getIndicatorColor(variant, colors)} /> : children}
-            </Component>
+            <ButtonContext.Provider value={{ variant, size }}>
+                <Component
+                    ref={ref}
+                    className={cn(buttonVariants({ variant, size }), className)}
+                    disabled={isDisabled}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: isDisabled }}
+                    {...props}
+                >
+                    {loading ? <ActivityIndicator size="small" color={indicatorColor ?? getIndicatorColor(variant, colors)} /> : children}
+                </Component>
+            </ButtonContext.Provider>
         );
     }
 );
@@ -92,9 +104,23 @@ Button.displayName = "Button";
 type ButtonTextProps = React.ComponentPropsWithoutRef<typeof RNText> & VariantProps<typeof buttonTextVariants>;
 
 const ButtonText = React.forwardRef<React.ElementRef<typeof RNText>, ButtonTextProps>(
-    ({ className, variant, size, ...props }, ref) => (
-        <RNText ref={ref} className={cn(buttonTextVariants({ variant, size }), className)} {...props} />
-    )
+    ({ className, variant, size, ...props }, ref) => {
+        const context = React.useContext(ButtonContext);
+
+        return (
+            <RNText
+                ref={ref}
+                className={cn(
+                    buttonTextVariants({
+                        variant: variant ?? context.variant,
+                        size: size ?? context.size,
+                    }),
+                    className
+                )}
+                {...props}
+            />
+        );
+    }
 );
 ButtonText.displayName = "ButtonText";
 

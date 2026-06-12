@@ -47,6 +47,7 @@ export function ExerciseAnalytics({ data }: Props) {
                     </View>
                     <Button
                         onPress={() => router.push("/settings/exercises")}
+                        accessibilityLabel="打开动作库"
                         variant="secondary"
                         size="icon"
                         className="h-8 w-8 rounded-lg border border-border"
