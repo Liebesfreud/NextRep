@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { View, ScrollView, type GestureResponderEvent } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import { X, CalendarCheck } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
@@ -16,6 +17,7 @@ const MONTH_FORMATTER = new Intl.DateTimeFormat("zh-CN", { month: "long" });
 
 export function MonthlyHeatmap({ refreshKey }: Props) {
     const { colors } = useTheme();
+    const insets = useSafeAreaInsets();
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
@@ -182,7 +184,7 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
             </Animated.View>
 
             <Sheet visible={isPickerVisible} onClose={() => setIsPickerVisible(false)} sheetHeight="50%" backgroundColor={colors.bg}>
-                <View className="flex-1 p-6 pb-12">
+                <View className="flex-1 p-6" style={{ paddingBottom: Math.max(insets.bottom, 48) }}>
                         <View className="mb-6 flex-row items-center justify-between">
                             <Text variant="subheading">选择时间</Text>
                             <Button onPress={() => setIsPickerVisible(false)}

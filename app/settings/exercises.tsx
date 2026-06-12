@@ -2,6 +2,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { View, ScrollView, Alert, KeyboardAvoidingView, Platform, FlatList } from "react-native";
 import { ChevronLeft, ChevronRight, Dumbbell, Plus, Search, Trash2, X } from "lucide-react-native";
 import { useFocusEffect, useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/hooks/useTheme";
 import { getStrengthPresets, addStrengthPreset, removeStrengthPreset, type StrengthPresetItem } from "@/db/services/workout";
 import { getStrengthExerciseAnalytics, type StrengthExerciseAnalytics } from "@/db/services/dashboard";
@@ -31,6 +32,7 @@ function formatDate(dateStr: string | null | undefined) {
 export default function ExerciseManagementScreen() {
     const { colors } = useTheme();
     const router = useRouter();
+    const insets = useSafeAreaInsets();
 
     const [presets, setPresets] = useState<StrengthPresetItem[]>([]);
     const [analytics, setAnalytics] = useState<StrengthExerciseAnalytics[]>([]);
@@ -171,8 +173,8 @@ export default function ExerciseManagementScreen() {
     ), [colors.gray4]);
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 bg-background">
-            <View className="flex-row items-center justify-between border-b border-border bg-card px-5 pb-4 pt-[60px]">
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1 bg-background">
+            <View className="flex-row items-center justify-between border-b border-border bg-card px-5 pb-4" style={{ paddingTop: insets.top + 16 }}>
                 <Button onPress={() => router.back()} variant="ghost" size="sm" className="h-auto gap-1 px-0 py-0">
                     <ChevronLeft size={24} color={colors.foreground} />
                     <ButtonText variant="ghost" className="text-base text-foreground">返回</ButtonText>
@@ -302,7 +304,7 @@ export default function ExerciseManagementScreen() {
                     maxToRenderPerBatch={8}
                     removeClippedSubviews={Platform.OS !== "web"}
                     windowSize={7}
-                    contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: 110 }}
+                    contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: 110 + Math.max(insets.bottom, 0) + 20 }}
                 />
             </View>
 

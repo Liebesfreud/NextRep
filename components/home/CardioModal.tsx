@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { View, Keyboard } from "react-native";
+import { View, ScrollView, Keyboard } from "react-native";
 import { X, ChevronLeft, Activity, Plus, Timer, Flame, Trash2 } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem } from "@/db/services/workout";
@@ -116,32 +116,34 @@ export function CardioModal({
             </View>
 
             {modalStep === "select" ? (
-                <View className="gap-3">
-                    {CARDIO_EXERCISES.map((ex, i) => {
-                        const visual = getCardioExerciseVisual(ex, colors);
-                        const Icon = visual.icon;
+                <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+                    <View className="gap-3">
+                        {CARDIO_EXERCISES.map((ex, i) => {
+                            const visual = getCardioExerciseVisual(ex, colors);
+                            const Icon = visual.icon;
 
-                        return (
-                            <Button
-                                key={i}
-                                onPress={() => { setSelectedExercise(ex); setModalStep("form"); }}
-                                variant="outline"
-                                className="w-full justify-between rounded-2xl p-[18px]"
-                            >
-                                <View className="flex-1 flex-row items-center gap-3">
-                                    <View className="h-11 w-11 items-center justify-center rounded-[14px] bg-secondary">
-                                        <Icon size={20} color={colors.foreground} />
+                            return (
+                                <Button
+                                    key={i}
+                                    onPress={() => { setSelectedExercise(ex); setModalStep("form"); }}
+                                    variant="outline"
+                                    className="w-full justify-between rounded-2xl p-[18px]"
+                                >
+                                    <View className="flex-1 flex-row items-center gap-3">
+                                        <View className="h-11 w-11 items-center justify-center rounded-[14px] bg-secondary">
+                                            <Icon size={20} color={colors.foreground} />
+                                        </View>
+                                        <View className="flex-1">
+                                            <Text className="mb-1.5 text-lg font-bold">{ex}</Text>
+                                            <Text variant="muted" className="text-xs">{visual.label}</Text>
+                                        </View>
                                     </View>
-                                    <View className="flex-1">
-                                        <Text className="mb-1.5 text-lg font-bold">{ex}</Text>
-                                        <Text variant="muted" className="text-xs">{visual.label}</Text>
-                                    </View>
-                                </View>
-                                <Plus size={20} color={colors.mutedForeground} />
-                            </Button>
-                        );
-                    })}
-                </View>
+                                    <Plus size={20} color={colors.mutedForeground} />
+                                </Button>
+                            );
+                        })}
+                    </View>
+                </ScrollView>
             ) : (
                 <View className="flex-1">
                     {(() => {
@@ -160,35 +162,38 @@ export function CardioModal({
                             </View>
                         );
                     })()}
-                    <View className="flex-1 gap-4">
-                        <View>
-                            <View className="mb-2 flex-row items-center gap-1.5">
-                                <Timer size={14} color={colors.gray4} />
-                                <Text variant="caption" className="font-bold tracking-[1px]">时长 (分钟)</Text>
+                    <ScrollView className="flex-1" showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+                        <View className="gap-4">
+                            <View>
+                                <View className="mb-2 flex-row items-center gap-1.5">
+                                    <Timer size={14} color={colors.gray4} />
+                                    <Text variant="caption" className="font-bold tracking-[1px]">时长 (分钟)</Text>
+                                </View>
+                                <Input
+                                    keyboardType="number-pad"
+                                    value={formDuration}
+                                    onChangeText={setFormDuration}
+                                    placeholder="例如 30"
+                                    className="p-4 text-lg font-bold"
+                                />
                             </View>
-                            <Input
-                                keyboardType="number-pad"
-                                value={formDuration}
-                                onChangeText={setFormDuration}
-                                placeholder="例如 30"
-                                className="p-4 text-lg font-bold"
-                            />
-                        </View>
-                        <View>
-                            <View className="mb-2 flex-row items-center gap-1.5">
-                                <Flame size={14} color={colors.gray4} />
-                                <Text variant="caption" className="font-bold tracking-[1px]">消耗 (千卡)</Text>
+                            <View>
+                                <View className="mb-2 flex-row items-center gap-1.5">
+                                    <Flame size={14} color={colors.gray4} />
+                                    <Text variant="caption" className="font-bold tracking-[1px]">消耗 (千卡)</Text>
+                                </View>
+                                <Input
+                                    keyboardType="number-pad"
+                                    value={formCalories}
+                                    onChangeText={setFormCalories}
+                                    placeholder="例如 300"
+                                    className="p-4 text-lg font-bold"
+                                />
                             </View>
-                            <Input
-                                keyboardType="number-pad"
-                                value={formCalories}
-                                onChangeText={setFormCalories}
-                                placeholder="例如 300"
-                                className="p-4 text-lg font-bold"
-                            />
                         </View>
-                    </View>
-                    <View className="mt-6 flex-row gap-2">
+                    </ScrollView>
+
+                    <View className="mt-4 flex-row gap-2 border-t pt-3" style={{ borderTopColor: `${colors.gray3}4D` }}>
                         {initialWorkout && (
                             <Button
                                 onPress={() => onDelete(initialWorkout.id)}

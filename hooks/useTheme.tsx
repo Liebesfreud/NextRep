@@ -17,7 +17,6 @@ type ThemeContextType = {
     theme: ColorScheme;
     preference: ThemePreference;
     colors: ColorTheme;
-    toggleTheme: () => void;
     setTheme: (theme: ThemePreference) => void;
 };
 
@@ -25,7 +24,6 @@ const ThemeContext = createContext<ThemeContextType>({
     theme: "dark",
     preference: "system",
     colors: Colors.dark,
-    toggleTheme: () => { },
     setTheme: () => { },
 });
 
@@ -62,14 +60,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         AsyncStorage.setItem(STORAGE_KEY, t);
     }, []);
 
-    const toggleTheme = React.useCallback(() => {
-        const nextPreference = preference === "dark" ? "light" : "dark";
-        setTheme(nextPreference);
-    }, [preference, setTheme]);
-
     const value = React.useMemo(
-        () => ({ theme, preference, colors: Colors[theme] as ColorTheme, toggleTheme, setTheme }),
-        [theme, preference, toggleTheme, setTheme]
+        () => ({ theme, preference, colors: Colors[theme] as ColorTheme, setTheme }),
+        [theme, preference, setTheme]
     );
 
     return (

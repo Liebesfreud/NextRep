@@ -16,9 +16,7 @@
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   --accent: #27272a;
-  --accent-foreground: #fafafa;
   --success: #fafafa;
-  --success-foreground: #18181b;
   --border: rgba(255, 255, 255, 0.09);
   --input: rgba(255, 255, 255, 0.06);
   --ring: #fafafa;
@@ -38,9 +36,7 @@
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   --accent: #f4f4f5;
-  --accent-foreground: #18181b;
   --success: #18181b;
-  --success-foreground: #fafafa;
   --border: rgba(24, 24, 27, 0.08);
   --input: rgba(24, 24, 27, 0.05);
   --ring: #18181b;
@@ -60,9 +56,7 @@
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   --accent: #27272a;
-  --accent-foreground: #fafafa;
   --success: #fafafa;
-  --success-foreground: #18181b;
   --border: rgba(255, 255, 255, 0.09);
   --input: rgba(255, 255, 255, 0.06);
   --ring: #fafafa;

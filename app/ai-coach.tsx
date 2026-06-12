@@ -1,6 +1,7 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Clock3, Flame, MapPin, Plus, Sparkles } from "lucide-react-native";
 import { desc } from "drizzle-orm";
 import * as SplashScreen from "expo-splash-screen";
@@ -108,6 +109,7 @@ function getAdjustedPlan(reportData: AiReportData | null, checkIn: CheckInState,
 
 export default function AiCoachScreen() {
     const { colors } = useTheme();
+    const insets = useSafeAreaInsets();
     const mountedRef = useRef(true);
     const contextSeqRef = useRef(0);
     const reportSeqRef = useRef(0);
@@ -227,11 +229,11 @@ export default function AiCoachScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            <View className="border-b border-border bg-background px-4 pb-3 pt-[60px]">
+            <View className="border-b border-border bg-background px-4 pb-3" style={{ paddingTop: insets.top + 16 }}>
                 <Text variant="title">AI 教练</Text>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 14 }}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40 + Math.max(insets.bottom, 0) + 52, gap: 14 }}>
                 <Card>
                     <Text variant="subheading">今日状态</Text>
 

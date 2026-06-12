@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getUserProfile, updateUserProfile, type UserProfileData } from "@/db/services/profile";
 import * as SplashScreen from "expo-splash-screen";
 
@@ -13,6 +14,7 @@ import { DataManagementSettings } from "@/components/settings/DataManagementSett
 export default function SettingsScreen() {
     const mountedRef = useRef(true);
     const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const insets = useSafeAreaInsets();
     const [isSaved, setIsSaved] = useState(false);
     const [isPending, setIsPending] = useState(false);
 
@@ -68,9 +70,9 @@ export default function SettingsScreen() {
     };
 
     return (
-        <View className="flex-1 bg-background">
+        <KeyboardAvoidingView className="flex-1 bg-background" behavior={Platform.OS === "ios" ? "padding" : undefined}>
             <ScrollView
-                contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 60, paddingBottom: 120, gap: 20 }}
+                contentContainerStyle={{ paddingHorizontal: 20, paddingTop: insets.top + 16, paddingBottom: 120, gap: 20 }}
                 showsVerticalScrollIndicator={false}
             >
                 <SettingsHeader
@@ -93,6 +95,6 @@ export default function SettingsScreen() {
 
                 <DataManagementSettings />
             </ScrollView>
-        </View>
+        </KeyboardAvoidingView>
     );
 }

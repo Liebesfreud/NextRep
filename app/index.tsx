@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { View, ScrollView } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "expo-router";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { useTheme } from "@/hooks/useTheme";
@@ -49,6 +50,7 @@ function parseKcal(stats: string | null): number {
 
 export default function HomeScreen() {
     const { colors } = useTheme();
+    const insets = useSafeAreaInsets();
     const confettiRef = useRef<any>(null);
     const mountedRef = useRef(true);
     const loadSeqRef = useRef(0);
@@ -220,7 +222,7 @@ export default function HomeScreen() {
         <View className="flex-1 bg-background">
             <ScrollView
                 className="flex-1"
-                contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 60, paddingBottom: 100, gap: 16 }}
+                contentContainerStyle={{ paddingHorizontal: 20, paddingTop: insets.top + 16, paddingBottom: 100 + Math.max(insets.bottom - 20, 0), gap: 16 }}
                 showsVerticalScrollIndicator={false}
             >
                 <HomeHeader greeting={greeting} userName={userName} isCheckedIn={isCheckedIn} />

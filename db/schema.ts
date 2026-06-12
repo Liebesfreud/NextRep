@@ -64,9 +64,9 @@ export const userProfile = sqliteTable("UserProfile", {
     goal: text("goal"),
     targetWeight: real("targetWeight"),
     targetBodyFat: real("targetBodyFat"),
-    aiBaseUrl: text("aiBaseUrl"), // Legacy
-    aiApiKey: text("aiApiKey"),     // Legacy
-    aiModel: text("aiModel"),       // Legacy
+    aiBaseUrl: text("aiBaseUrl"), // Legacy — kept for DB migration compat; aiConfigs is the current field
+    aiApiKey: text("aiApiKey"),   // Legacy — kept for DB migration compat; aiConfigs is the current field
+    aiModel: text("aiModel"),     // Legacy — kept for DB migration compat; aiConfigs is the current field
 
     // Multi-AI Config fields
     aiConfigs: text("aiConfigs"), // Stored as JSON string

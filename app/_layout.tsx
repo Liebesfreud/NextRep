@@ -7,7 +7,7 @@ import { ThemeProvider, useTheme } from "@/hooks/useTheme";
 import { initDatabase } from "@/db/client";
 import * as SplashScreen from "expo-splash-screen";
 import { Button, ButtonText } from "@/components/ui/button";
-import { getTabBarStyle, TabBarBackground, TAB_BAR_ITEM_STYLE } from "@/components/ui/tab-bar-background";
+import { getTabBarStyle, TabBarBackground, TAB_BAR_ITEM_STYLE, useTabBarStyle } from "@/components/ui/tab-bar-background";
 import { TabIcon } from "@/components/ui/tab-icon";
 import { Text } from "@/components/ui/text";
 import "../global.css";
@@ -19,6 +19,7 @@ SplashScreen.preventAutoHideAsync().catch(() => { });
 
 function TabLayout() {
     const { colors, theme } = useTheme();
+    const tabBarStyle = useTabBarStyle(colors.border);
     const [dbInitialized, setDbInitialized] = useState(false);
     const [dbError, setDbError] = useState<string | null>(null);
     const [retryKey, setRetryKey] = useState(0);
@@ -78,7 +79,7 @@ function TabLayout() {
                 safeAreaInsets={{ bottom: 0 }}
                 screenOptions={{
                     headerShown: false,
-                    tabBarStyle: getTabBarStyle(colors.border),
+                    tabBarStyle: tabBarStyle,
                     tabBarBackground: () => <TabBarBackground />,
                     tabBarShowLabel: false,
                     tabBarLabelPosition: 'beside-icon',

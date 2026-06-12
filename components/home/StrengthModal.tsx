@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { View, ScrollView, Alert, Keyboard, FlatList, Platform, Pressable } from "react-native";
+import { View, ScrollView, Alert, Keyboard, FlatList, Platform } from "react-native";
 import { X, ChevronLeft, Dumbbell, Trash2, Plus, Check, Search, Library } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
+import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import { type WorkoutItem, type StrengthPresetItem } from "@/db/services/workout";
 import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
 import { Button, ButtonText } from "@/components/ui/button";
@@ -67,7 +68,7 @@ const StrengthSetRow = React.memo(function StrengthSetRow({ item, onDelete, onTo
     const { colors } = useTheme();
 
     return (
-        <Pressable
+        <AnimatedPressable
             onLongPress={() => onDelete(item.id)}
             delayLongPress={500}
             className={cn(
@@ -134,7 +135,7 @@ const StrengthSetRow = React.memo(function StrengthSetRow({ item, onDelete, onTo
                     </View>
                 </Button>
             </View>
-        </Pressable>
+        </AnimatedPressable>
     );
 });
 
@@ -471,8 +472,8 @@ export function StrengthModal({
                             maxToRenderPerBatch={8}
                             removeClippedSubviews={Platform.OS !== "web"}
                             windowSize={7}
-                            className="-mx-6 flex-1"
-                            contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 100 }}
+                            className="flex-1"
+                            contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
                         />
                     </View>
                 ) : (

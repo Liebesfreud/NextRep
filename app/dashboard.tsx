@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { View, ScrollView } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "expo-router";
 import { getDashboardData, addBodyMetric } from "@/db/services/dashboard";
 import * as SplashScreen from "expo-splash-screen";
@@ -16,6 +17,7 @@ type DashboardData = Awaited<ReturnType<typeof getDashboardData>>;
 export default function DashboardScreen() {
     const mountedRef = useRef(true);
     const loadSeqRef = useRef(0);
+    const insets = useSafeAreaInsets();
     const todayNum = new Date().getDate();
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
@@ -70,7 +72,7 @@ export default function DashboardScreen() {
         <View className="flex-1 bg-background">
             <ScrollView
                 className="flex-1"
-                contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 60, paddingBottom: 100, gap: 16 }}
+                contentContainerStyle={{ paddingHorizontal: 20, paddingTop: insets.top + 16, paddingBottom: 100 + Math.max(insets.bottom - 20, 0), gap: 16 }}
                 showsVerticalScrollIndicator={false}
             >
                 <DashboardHeader />

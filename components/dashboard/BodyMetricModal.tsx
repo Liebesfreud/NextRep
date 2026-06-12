@@ -183,9 +183,10 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                 </Button>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {/* Current Value */}
-                <Card className="mb-3 rounded-xl bg-secondary p-3">
+            <View className="flex-1">
+                <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+                    {/* Current Value */}
+                    <Card className="mb-3 rounded-xl bg-secondary p-3">
                     <Text variant="caption" className="mb-1 font-bold uppercase tracking-wider">
                         当前{metricType === "weight" ? "体重" : "体脂率"}
                     </Text>
@@ -288,17 +289,6 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                     <Text className="mb-2 px-1 text-xs font-bold text-destructive">{error}</Text>
                 )}
 
-                <Button
-                    onPress={handleSave}
-                    disabled={isSaving}
-                    className="mb-2 py-3"
-                >
-                    <Save size={16} color={colors.white} />
-                    <ButtonText className="text-base">
-                        {isSaving ? "保存中..." : "保存记录"}
-                    </ButtonText>
-                </Button>
-
                 {/* Metric Calendar */}
                 <View className="mt-1">
                     <View className="flex-row justify-between items-center mb-2">
@@ -358,6 +348,20 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                     </Card>
                 </View>
             </ScrollView>
+
+            <View className="mt-4 flex-row gap-2 border-t pt-3" style={{ borderTopColor: `${colors.gray3}4D` }}>
+                <Button
+                    onPress={handleSave}
+                    disabled={isSaving}
+                    className="flex-1 py-3.5"
+                >
+                    <Save size={16} color={colors.white} />
+                    <ButtonText className="text-base">
+                        {isSaving ? "保存中..." : "保存记录"}
+                    </ButtonText>
+                </Button>
+            </View>
+            </View>
         </Sheet>
     );
 }

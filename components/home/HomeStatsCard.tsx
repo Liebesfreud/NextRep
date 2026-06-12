@@ -14,7 +14,7 @@ export function HomeStatsCard({ displayCal, totalSets, isAiPredicting }: Props) 
     const { colors } = useTheme();
 
     return (
-        <Card className="flex-1 justify-around p-4">
+        <Card className="min-w-0 flex-1 justify-around p-4">
             <View className="mb-4 gap-1">
                 <View className="mb-1 flex-row items-center gap-2">
                     <Flame size={14} color={colors.orange} />

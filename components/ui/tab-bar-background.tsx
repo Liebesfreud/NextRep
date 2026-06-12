@@ -1,13 +1,14 @@
 import { Platform, View, type ViewStyle } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/hooks/useTheme";
 
 const TAB_BAR_HEIGHT = 70;
 const TAB_BAR_RADIUS = 12;
 
-function getTabBarStyle(borderColor: string): ViewStyle {
+function getTabBarStyle(borderColor: string, bottomOffset = 20): ViewStyle {
     return {
         position: "absolute",
-        bottom: 20,
+        bottom: bottomOffset,
         marginHorizontal: 20,
         left: 0,
         right: 0,
@@ -54,7 +55,7 @@ export function TabBarBackground() {
                 borderColor: colors.border,
                 borderWidth: 1,
                 borderRadius: TAB_BAR_RADIUS,
-                overflow: "hidden",
+                overflow: "visible",
             }}
         >
             <View
@@ -70,6 +71,17 @@ export function TabBarBackground() {
             />
         </View>
     );
+}
+
+/**
+ * Hook that returns a safe-area-aware tab bar style.
+ * Uses `useSafeAreaInsets` to avoid the home indicator on iPhone X+.
+ */
+export function useTabBarStyle(borderColor: string): ViewStyle {
+    const insets = useSafeAreaInsets();
+    // Ensure at least 20px from bottom, plus the safe area inset for home indicator
+    const bottomOffset = Math.max(20, insets.bottom > 0 ? insets.bottom + 8 : 20);
+    return getTabBarStyle(borderColor, bottomOffset);
 }
 
 export { getTabBarStyle, TAB_BAR_ITEM_STYLE };

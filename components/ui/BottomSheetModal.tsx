@@ -10,6 +10,7 @@ import {
     View,
     type ViewStyle,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/hooks/useTheme";
 
 type Props = {
@@ -31,7 +32,8 @@ export function BottomSheetModal({
     backdropColor,
     avoidKeyboard = false,
 }: Props) {
-    const { colors } = useTheme();
+    const { theme, colors } = useTheme();
+    const insets = useSafeAreaInsets();
     const resolvedBackgroundColor = backgroundColor ?? colors.card;
     const resolvedBackdropColor = backdropColor ?? colors.overlay;
     const sheetHeightStyle: ViewStyle = { height: sheetHeight };
@@ -43,7 +45,7 @@ export function BottomSheetModal({
 
     const content = avoidKeyboard ? (
         <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
             keyboardVerticalOffset={Platform.OS === "ios" ? 12 : 0}
             style={styles.sheetContent}
         >
@@ -62,7 +64,7 @@ export function BottomSheetModal({
             statusBarTranslucent
             onRequestClose={handleRequestClose}
         >
-            <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+            <StatusBar translucent backgroundColor="transparent" barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
             <View style={styles.modalRoot}>
                 <Pressable
                     accessibilityRole="button"
@@ -77,6 +79,7 @@ export function BottomSheetModal({
                         {
                             backgroundColor: resolvedBackgroundColor,
                             borderTopColor: colors.border,
+                            paddingBottom: Math.max(insets.bottom, 20),
                         },
                     ]}
                 >
@@ -99,8 +102,6 @@ const styles = StyleSheet.create({
         borderTopWidth: StyleSheet.hairlineWidth,
         paddingHorizontal: 20,
         paddingTop: 12,
-        paddingBottom: 28,
-        overflow: "hidden",
     },
     handle: {
         alignSelf: "center",

@@ -402,7 +402,7 @@ export function TrainingOverview({
                         snapToInterval={reviewSnapInterval}
                         snapToAlignment="start"
                         disableIntervalMomentum
-                        contentContainerStyle={{ gap: reviewPageGap, paddingRight: 4 }}
+                        contentContainerStyle={{ gap: reviewPageGap, paddingHorizontal: 2, paddingRight: reviewPageGap + 4 }}
                         onMomentumScrollEnd={(event) => {
                             const offsetX = event.nativeEvent.contentOffset.x;
                             const page = Math.round(offsetX / reviewSnapInterval);
