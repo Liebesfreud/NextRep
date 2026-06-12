@@ -9,31 +9,32 @@ import { Button, ButtonText } from "@/components/ui/button";
 export function AppearanceSettings() {
     const { colors, theme, preference, setTheme } = useTheme();
     const isDark = theme === "dark";
+    const themeLabel = preference === "system"
+        ? `系统 · ${isDark ? "深色" : "浅色"}`
+        : isDark ? "深色" : "浅色";
 
     return (
         <Card className="overflow-hidden p-0">
-            {/* Section Header */}
             <View className="flex-row items-center gap-2 px-3.5 py-3">
                 {isDark
                     ? <Moon size={14} color={colors.gray4} />
                     : <Sun size={14} color={colors.gray4} />}
-                <Text variant="caption" className="font-extrabold uppercase tracking-[1.5px]">
-                    外观与显示
+                <Text variant="caption" className="font-semibold">
+                    外观
                 </Text>
             </View>
             <Separator />
 
-            {/* Dark Mode Row */}
             <View className="flex-row items-center px-3.5 py-3.5">
-                <View className="mr-3 h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-accent/10">
+                <View className="mr-3 h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-muted">
                     {isDark
-                        ? <Moon size={16} color={colors.green} />
-                        : <Sun size={16} color={colors.orange} />}
+                        ? <Moon size={16} color={colors.foreground} />
+                        : <Sun size={16} color={colors.foreground} />}
                 </View>
                 <View className="flex-1">
                     <Text variant="label">深色模式</Text>
-                    <Text variant="caption" className="mt-0.5 font-semibold">
-                        {preference === "system" ? `跟随系统 (${isDark ? "暗夜" : "日间"})` : (isDark ? "当前: 暗夜模式" : "当前: 日间模式")}
+                    <Text variant="caption" className="mt-0.5">
+                        {themeLabel}
                     </Text>
                 </View>
                 <View className="flex-row rounded-lg bg-muted/80 p-0.5">
@@ -45,8 +46,12 @@ export function AppearanceSettings() {
                             size="sm"
                             className="h-auto rounded-md px-2.5 py-1.5"
                         >
-                            <ButtonText variant={preference === p ? "secondary" : "ghost"} size="sm" className={preference === p ? "font-bold" : "font-medium text-muted-foreground"}>
-                                {p === "light" ? "日间" : p === "dark" ? "暗夜" : "系统"}
+                            <ButtonText
+                                variant={preference === p ? "secondary" : "ghost"}
+                                size="sm"
+                                className={preference === p ? "font-medium" : "text-muted-foreground"}
+                            >
+                                {p === "light" ? "浅色" : p === "dark" ? "深色" : "系统"}
                             </ButtonText>
                         </Button>
                     ))}

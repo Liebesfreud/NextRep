@@ -8,7 +8,6 @@ import { ExerciseDetailModal } from "@/components/dashboard/ExerciseDetailModal"
 import { type StrengthExerciseAnalytics } from "@/db/services/dashboard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { EmptyState } from "@/components/ui/empty-state";
 import { Text } from "@/components/ui/text";
 
 type DashboardData = {
@@ -39,11 +38,11 @@ export function ExerciseAnalytics({ data }: Props) {
 
     return (
         <>
-            <Card className="gap-3 p-3.5">
+            <Card className="gap-3 p-4">
                 <View className="flex-row items-center justify-between px-0.5">
                     <View className="flex-row items-center gap-1.5">
                         <Target size={16} color={colors.orange} />
-                        <Text variant="caption" className="font-bold tracking-wide opacity-90">高频动作 TOP5</Text>
+                        <Text variant="caption">高频动作</Text>
                     </View>
                     <Button
                         onPress={() => router.push("/settings/exercises")}
@@ -56,15 +55,14 @@ export function ExerciseAnalytics({ data }: Props) {
                     </Button>
                 </View>
 
-                <Card className="min-h-[112px] rounded-[14px] border border-border bg-muted p-2">
+                <Card className="min-h-[112px] border border-border p-2">
                     {analytics.length === 0 ? (
-                        <EmptyState
-                            icon={<Target size={22} color={colors.orange} />}
-                            title="暂无力量动作分析数据"
-                            description="记录几次力量训练后，这里会展示你的高频动作与训练容量。"
-                            compact
-                            className="border-0 bg-transparent py-5"
-                        />
+                        <View className="items-center justify-center py-8">
+                            <Target size={20} color={colors.gray4} />
+                            <Text variant="muted" className="mt-3">
+                                暂无数据
+                            </Text>
+                        </View>
                     ) : analytics.map((exercise, idx) => {
                         const visual = getStrengthCategoryVisual(exercise.tag, colors);
                         const Icon = visual.icon;
@@ -78,24 +76,24 @@ export function ExerciseAnalytics({ data }: Props) {
                             >
                                 <View className="flex-row items-center gap-3 flex-1">
                                     <View className="w-7 items-center">
-                                        <Text style={{ color: visual.accent }} className="text-base font-black">
+                                        <Text className="text-base font-semibold">
                                             {idx + 1}
                                         </Text>
                                     </View>
-                                    <View style={{ backgroundColor: visual.iconBg }} className="h-9 w-9 items-center justify-center rounded-[10px]">
-                                        <Icon size={18} color={visual.accent} />
+                                    <View className="h-9 w-9 items-center justify-center rounded-[10px] border border-border bg-muted">
+                                        <Icon size={18} color={colors.white} />
                                     </View>
                                     <View className="flex-1">
-                                        <Text className="text-sm font-bold" numberOfLines={1}>
+                                        <Text className="text-sm font-medium" numberOfLines={1}>
                                             {exercise.name}
                                         </Text>
-                                        <Text variant="caption" className="mt-0.5 font-semibold" numberOfLines={1}>
+                                        <Text variant="caption" className="mt-0.5 text-muted-foreground" numberOfLines={1}>
                                             {exercise.trainingDays} 天 · {exercise.records} 条记录 · 最高 {formatWeight(exercise.maxWeightKg)}
                                         </Text>
                                     </View>
                                 </View>
                                 <View className="items-end flex-row gap-1.5">
-                                    <Text variant="caption" className="font-black text-foreground">
+                                    <Text variant="caption" className="text-foreground">
                                         {formatVolume(exercise.totalVolumeKg)}
                                     </Text>
                                     <ChevronRight size={15} color={colors.gray4} />

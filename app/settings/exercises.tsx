@@ -6,12 +6,9 @@ import { useTheme } from "@/hooks/useTheme";
 import { getStrengthPresets, addStrengthPreset, removeStrengthPreset, type StrengthPresetItem } from "@/db/services/workout";
 import { getStrengthExerciseAnalytics, type StrengthExerciseAnalytics } from "@/db/services/dashboard";
 import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
-import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
 import { ExerciseDetailModal } from "@/components/dashboard/ExerciseDetailModal";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CategoryBadge } from "@/components/ui/category-badge";
-import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 
@@ -165,28 +162,26 @@ export default function ExerciseManagementScreen() {
     }, [colors, handleDelete, presetNames]);
 
     const renderEmptyList = useCallback(() => (
-        <EmptyState
-            icon={<Dumbbell size={24} color={colors.green} />}
-            title="没有找到动作"
-            description={searchQuery || selectedCategory !== "全部" ? "试试清空搜索或切换分类" : "点击右上角 + 添加你的第一个力量动作"}
-        />
-    ), [colors.gray4, searchQuery, selectedCategory]);
+        <View className="items-center justify-center py-12">
+            <Dumbbell size={24} color={colors.gray4} />
+            <Text variant="muted" className="mt-3">
+                暂无结果
+            </Text>
+        </View>
+    ), [colors.gray4]);
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 bg-background">
-            <AnimatedEnter delay={0} distance={10}>
-                <View className="flex-row items-center justify-between border-b border-border bg-card px-5 pb-4 pt-[60px]">
-                    <Button onPress={() => router.back()} variant="ghost" size="sm" className="h-auto gap-1 px-0 py-0">
-                        <ChevronLeft size={24} color={colors.white} />
-                        <ButtonText variant="ghost" className="text-base text-foreground">返回</ButtonText>
-                    </Button>
-                    <Text className="text-lg font-black">动作库</Text>
-                    <View className="w-[60px]" />
-                </View>
-            </AnimatedEnter>
+            <View className="flex-row items-center justify-between border-b border-border bg-card px-5 pb-4 pt-[60px]">
+                <Button onPress={() => router.back()} variant="ghost" size="sm" className="h-auto gap-1 px-0 py-0">
+                    <ChevronLeft size={24} color={colors.foreground} />
+                    <ButtonText variant="ghost" className="text-base text-foreground">返回</ButtonText>
+                </Button>
+                <Text className="text-lg font-semibold">动作库</Text>
+                <View className="w-[60px]" />
+            </View>
 
-            <AnimatedEnter delay={50} distance={12}>
-                <View className="px-5 pb-2.5 pt-4">
+            <View className="px-5 pb-2.5 pt-4">
                     <View className="mb-3 flex-row gap-2.5">
                         <View className="h-11 flex-1 flex-row items-center rounded-bento-sm bg-secondary px-3.5">
                             <Search size={18} color={colors.gray4} />
@@ -213,9 +208,9 @@ export default function ExerciseManagementScreen() {
                             accessibilityLabel={isCreating ? "取消新增动作" : "新增动作"}
                             variant={isCreating ? "outline" : "secondary"}
                             size="icon"
-                            className={isCreating ? "border-accent bg-accent/10" : undefined}
+                            className={isCreating ? "border-border bg-background" : undefined}
                         >
-                            {isCreating ? <X size={20} color={colors.green} /> : <Plus size={20} color={colors.white} />}
+                            {isCreating ? <X size={20} color={colors.foreground} /> : <Plus size={20} color={colors.foreground} />}
                         </Button>
                     </View>
 
@@ -244,10 +239,12 @@ export default function ExerciseManagementScreen() {
                                     <Button
                                         key={cat}
                                         onPress={() => setSelectedCategory(cat)}
-                                        variant="ghost"
-                                        className="h-auto bg-transparent p-0"
+                                        variant={isSelected ? "secondary" : "outline"}
+                                        className="h-auto rounded-full px-3 py-2"
                                     >
-                                        <CategoryBadge label={cat} selected={isSelected} accentColor={accent} />
+                                        <Text className="text-sm" style={{ color: isSelected ? accent : colors.foreground }}>
+                                            {cat}
+                                        </Text>
                                     </Button>
                                 );
                             })}
@@ -255,52 +252,45 @@ export default function ExerciseManagementScreen() {
                     </ScrollView>
 
                     {isCreating && (
-                        <AnimatedEnter delay={0} distance={8}>
-                            <Card className="mt-1.5 p-3.5">
-                                <Input
-                                    value={newName}
-                                    onChangeText={setNewName}
-                                    placeholder="例如：杠铃卧推"
-                                    className="mb-2.5 h-[42px] font-extrabold"
-                                />
-                                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3">
-                                    <View className="flex-row gap-2">
-                                        {STRENGTH_CATEGORIES.map((tag) => {
-                                            const visual = getStrengthCategoryVisual(tag, colors);
-                                            const isSelected = tag === newTag;
+                        <Card className="mt-1.5 p-3.5">
+                            <Input
+                                value={newName}
+                                onChangeText={setNewName}
+                                placeholder="例如：杠铃卧推"
+                                className="mb-2.5 h-[42px] font-semibold"
+                            />
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3">
+                                <View className="flex-row gap-2">
+                                    {STRENGTH_CATEGORIES.map((tag) => {
+                                        const visual = getStrengthCategoryVisual(tag, colors);
+                                        const isSelected = tag === newTag;
 
-                                            return (
-                                                <Button
-                                                    key={tag}
-                                                    onPress={() => setNewTag(isSelected ? null : tag)}
-                                                    variant="ghost"
-                                                    className="h-auto bg-transparent p-0"
-                                                >
-                                                    <CategoryBadge
-                                                        label={tag}
-                                                        selected={isSelected}
-                                                        accentColor={visual.accent}
-                                                        selectedBackgroundColor={visual.iconBg}
-                                                    />
-                                                </Button>
-                                            );
-                                        })}
-                                    </View>
-                                </ScrollView>
-                                <Button
-                                    onPress={handleAdd}
-                                    disabled={!newName.trim()}
-                                    className="bg-accent"
-                                >
-                                    <ButtonText className="text-accent-foreground">保存动作</ButtonText>
-                                </Button>
-                            </Card>
-                        </AnimatedEnter>
+                                        return (
+                                            <Button
+                                                key={tag}
+                                                onPress={() => setNewTag(isSelected ? null : tag)}
+                                                variant={isSelected ? "secondary" : "outline"}
+                                                className="h-auto rounded-full px-3 py-2"
+                                            >
+                                                <Text className="text-sm" style={{ color: isSelected ? visual.accent : colors.foreground }}>
+                                                    {tag}
+                                                </Text>
+                                            </Button>
+                                        );
+                                    })}
+                                </View>
+                            </ScrollView>
+                            <Button
+                                onPress={handleAdd}
+                                disabled={!newName.trim()}
+                            >
+                                <ButtonText>保存动作</ButtonText>
+                            </Button>
+                        </Card>
                     )}
                 </View>
-            </AnimatedEnter>
 
-            <AnimatedEnter delay={100} distance={14} className="flex-1">
+            <View className="flex-1">
                 <FlatList
                     data={filteredExercises}
                     keyExtractor={(item) => item.name}
@@ -314,7 +304,7 @@ export default function ExerciseManagementScreen() {
                     windowSize={7}
                     contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: 110 }}
                 />
-            </AnimatedEnter>
+            </View>
 
             <ExerciseDetailModal
                 visible={!!selectedExercise}

@@ -1,12 +1,10 @@
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import { View, ScrollView, useWindowDimensions } from "react-native";
-import { Activity, BarChart2, Calendar, Dumbbell, Flame, TrendingUp } from "lucide-react-native";
+import { Activity, BarChart2, Calendar, ChevronLeft, ChevronRight, Dumbbell, Flame, TrendingUp } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { Button, ButtonText } from "@/components/ui/button";
 import { CalendarDayCell } from "@/components/ui/calendar-day-cell";
 import { Card } from "@/components/ui/card";
-import { PaginationDots } from "@/components/ui/pagination-dots";
-import { SectionHeader } from "@/components/ui/section-header";
 import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
 
@@ -109,7 +107,7 @@ function ToggleAction({ label, active, onPress }: { label: string; active: boole
             hitSlop={8}
             className="min-h-8 rounded-full border border-border px-3"
         >
-            <ButtonText variant="secondary" size="sm" className={active ? "text-accent" : "text-muted-foreground"}>
+            <ButtonText variant="secondary" size="sm" className={active ? "text-foreground" : "text-muted-foreground"}>
                 {label}
             </ButtonText>
         </Button>
@@ -126,15 +124,35 @@ function MetricStat({ label, value, unit, icon }: { label: string; value: string
                 </Text>
             </View>
             <View className="flex-row items-end gap-1">
-                <Text className="text-xl font-black tracking-tight">
+                <Text className="text-xl font-semibold">
                     {value}
                 </Text>
                 {unit ? (
-                    <Text variant="caption" className="pb-0.5 font-bold">
+                    <Text variant="caption" className="pb-0.5">
                         {unit}
                     </Text>
                 ) : null}
             </View>
+        </View>
+    );
+}
+
+function SectionTitle({
+    icon,
+    title,
+    action,
+}: {
+    icon: ReactNode;
+    title: string;
+    action?: ReactNode;
+}) {
+    return (
+        <View className="flex-row items-center justify-between gap-3">
+            <View className="flex-row items-center gap-2">
+                {icon}
+                <Text variant="label">{title}</Text>
+            </View>
+            {action}
         </View>
     );
 }
@@ -148,7 +166,7 @@ function ReviewCard({ title, summary }: { title: string; summary?: ReviewSummary
     ];
 
     return (
-        <Card className="gap-3 bg-muted p-3">
+        <Card className="gap-3 p-3">
             <Text variant="label">
                 {title}
             </Text>
@@ -156,10 +174,10 @@ function ReviewCard({ title, summary }: { title: string; summary?: ReviewSummary
             <View className="-mx-1.5 flex-row flex-wrap">
                 {metrics.map((item) => (
                     <View key={item.label} className="w-1/2 p-1.5">
-                        <Text variant="caption" className="text-[11px] font-bold">
+                        <Text variant="caption" className="text-[11px] text-muted-foreground">
                             {item.label}
                         </Text>
-                        <Text className="mt-1 text-base font-black">
+                        <Text className="mt-1 text-base font-semibold">
                             {item.value}
                         </Text>
                     </View>
@@ -173,7 +191,7 @@ function ReviewCard({ title, summary }: { title: string; summary?: ReviewSummary
                     <Text variant="caption" className="text-[11px] font-bold">
                         训练结构
                     </Text>
-                    <Text className="text-xs font-bold">
+                    <Text className="text-xs">
                         力量 {summary?.strengthWorkouts ?? 0} · 有氧 {summary?.cardioWorkouts ?? 0}
                     </Text>
                 </View>
@@ -181,7 +199,7 @@ function ReviewCard({ title, summary }: { title: string; summary?: ReviewSummary
                     <Text variant="caption" className="text-[11px] font-bold">
                         高频动作
                     </Text>
-                    <Text className="flex-1 text-right text-xs font-bold" numberOfLines={1}>
+                    <Text className="flex-1 text-right text-xs" numberOfLines={1}>
                         {summary?.topExercise ?? "暂无"}
                     </Text>
                 </View>
@@ -189,7 +207,7 @@ function ReviewCard({ title, summary }: { title: string; summary?: ReviewSummary
                     <Text variant="caption" className="text-[11px] font-bold">
                         单次均量
                     </Text>
-                    <Text className="text-xs font-bold">
+                    <Text className="text-xs">
                         {formatVolumeKg(summary?.averageVolumePerWorkoutKg ?? 0)}
                     </Text>
                 </View>
@@ -238,10 +256,10 @@ export function TrainingOverview({
     const reviewSnapInterval = reviewPageWidth + reviewPageGap;
 
     return (
-        <Card className="gap-5">
-            <SectionHeader icon={<BarChart2 size={17} color={colors.green} />} title="训练表现" />
+        <Card className="gap-5 p-4">
+            <SectionTitle icon={<BarChart2 size={17} color={colors.green} />} title="训练表现" />
 
-            <Card className="gap-3 bg-muted p-3">
+            <Card className="gap-3 p-3">
                 <View className="flex-row gap-4">
                     <MetricStat label="本周训练" value={loading ? "-" : String(data?.workoutsThisWeek ?? 0)} unit="次" icon={<Activity size={14} color={colors.green} />} />
                     <MetricStat label="本月训练量" value={loading ? "-" : String(data?.monthlyVolumeTon ?? "0.0")} unit="t" icon={<Dumbbell size={14} color={colors.orange} />} />
@@ -251,7 +269,7 @@ export function TrainingOverview({
 
             <Separator />
 
-            <SectionHeader
+            <SectionTitle
                 icon={<Calendar size={17} color={colors.green} />}
                 title="训练日历"
                 action={
@@ -316,12 +334,12 @@ export function TrainingOverview({
                 </View>
             )}
 
-            <Card className="gap-3 bg-muted p-3">
+            <Card className="gap-3 p-3">
                 <View className="flex-row items-center justify-between">
                     <Text variant="label">
                         {currentMonth + 1} 月 {selectedDay} 日
                     </Text>
-                    <Text variant="caption" className="text-[11px] font-bold">
+                    <Text variant="caption" className="text-[11px] text-muted-foreground">
                         {selectedDay === todayNum ? "今天" : hasWorkout ? "训练日" : "休息日"}
                     </Text>
                 </View>
@@ -331,7 +349,7 @@ export function TrainingOverview({
                         {selectedDayData.workouts.slice(0, 3).map((workout) => (
                             <View key={workout.id} className="flex-row items-center justify-between gap-3 py-1">
                                 <View className="flex-1 gap-1">
-                                    <Text className="text-sm font-bold" numberOfLines={1}>
+                                    <Text className="text-sm font-medium" numberOfLines={1}>
                                         {workout.name}
                                     </Text>
                                     <Text variant="caption" className="text-[11px] font-medium">
@@ -353,7 +371,7 @@ export function TrainingOverview({
 
             <Separator />
 
-            <SectionHeader
+            <SectionTitle
                 icon={<TrendingUp size={17} color={colors.blue} />}
                 title="阶段复盘"
                 action={
@@ -398,15 +416,37 @@ export function TrainingOverview({
                         ))}
                     </ScrollView>
 
-                    <PaginationDots
-                        className="pt-1"
-                        count={reviewPages.length}
-                        activeIndex={activeReviewPage}
-                        onSelect={(index) => {
-                            setActiveReviewPage(index);
-                            reviewScrollRef.current?.scrollTo({ x: index * reviewSnapInterval, animated: true });
-                        }}
-                    />
+                    <View className="flex-row items-center justify-center gap-2 pt-1">
+                        <Button
+                            onPress={() => {
+                                const nextIndex = Math.max(0, activeReviewPage - 1);
+                                setActiveReviewPage(nextIndex);
+                                reviewScrollRef.current?.scrollTo({ x: nextIndex * reviewSnapInterval, animated: true });
+                            }}
+                            variant="ghost"
+                            size="icon"
+                            disabled={activeReviewPage === 0}
+                            className="h-8 w-8 rounded-full"
+                        >
+                            <ChevronLeft size={16} color={activeReviewPage === 0 ? colors.gray4 : colors.foreground} />
+                        </Button>
+                        <Text variant="caption" className="min-w-12 text-center text-[11px] text-muted-foreground">
+                            {activeReviewPage + 1} / {reviewPages.length}
+                        </Text>
+                        <Button
+                            onPress={() => {
+                                const nextIndex = Math.min(reviewPages.length - 1, activeReviewPage + 1);
+                                setActiveReviewPage(nextIndex);
+                                reviewScrollRef.current?.scrollTo({ x: nextIndex * reviewSnapInterval, animated: true });
+                            }}
+                            variant="ghost"
+                            size="icon"
+                            disabled={activeReviewPage === reviewPages.length - 1}
+                            className="h-8 w-8 rounded-full"
+                        >
+                            <ChevronRight size={16} color={activeReviewPage === reviewPages.length - 1 ? colors.gray4 : colors.foreground} />
+                        </Button>
+                    </View>
                 </>
             ) : null}
         </Card>

@@ -72,32 +72,32 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
         <View className="gap-3">
             <Card className="overflow-hidden p-0">
                 <View className="flex-row items-center gap-2 px-3.5 py-3">
-                    <Zap size={14} color={colors.orange} />
-                    <Text variant="caption" className="font-extrabold uppercase tracking-[1.5px] text-primary">
-                        AI 运算引擎
+                    <Zap size={14} color={colors.gray4} />
+                    <Text variant="caption" className="font-semibold">
+                        AI
                     </Text>
                 </View>
                 <Separator />
 
                 <View className="flex-row border-b border-border">
                     <View className="flex-1 border-r border-border px-3.5 py-3.5">
-                        <Text variant="caption" className="mb-1 font-semibold">
-                            今日消耗
+                        <Text variant="caption" className="mb-1">
+                            今日
                         </Text>
                         <View className="flex-row items-baseline gap-1">
-                            <Text className="text-xl font-extrabold">{profile.aiTokensToday.toLocaleString()}</Text>
-                            <Text variant="caption" className="font-semibold">
+                            <Text className="text-xl font-semibold">{profile.aiTokensToday.toLocaleString()}</Text>
+                            <Text variant="caption">
                                 tokens
                             </Text>
                         </View>
                     </View>
                     <View className="flex-1 px-3.5 py-3.5">
-                        <Text variant="caption" className="mb-1 font-semibold">
-                            历史总计
+                        <Text variant="caption" className="mb-1">
+                            总计
                         </Text>
                         <View className="flex-row items-baseline gap-1">
-                            <Text className="text-xl font-extrabold">{profile.aiTokensTotal.toLocaleString()}</Text>
-                            <Text variant="caption" className="font-semibold">
+                            <Text className="text-xl font-semibold">{profile.aiTokensTotal.toLocaleString()}</Text>
+                            <Text variant="caption">
                                 tokens
                             </Text>
                         </View>
@@ -110,9 +110,9 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
                     variant="ghost"
                     className="rounded-none py-3.5"
                 >
-                    {isTestingAI ? <Activity size={15} color={colors.orange} /> : <ShieldCheck size={15} color={colors.orange} />}
-                    <ButtonText variant="ghost" className="text-primary">
-                        {isTestingAI ? "连接测试中..." : "测试当前激活的 API 连接"}
+                    {isTestingAI ? <Activity size={15} color={colors.foreground} /> : <ShieldCheck size={15} color={colors.foreground} />}
+                    <ButtonText variant="ghost">
+                        {isTestingAI ? "测试中" : "测试连接"}
                     </ButtonText>
                 </Button>
             </Card>
@@ -120,11 +120,8 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
             <Card className="overflow-hidden p-0">
                 <View className="flex-row items-center gap-2 px-3.5 py-3">
                     <Radio size={14} color={colors.gray4} />
-                    <Text variant="caption" className="flex-1 font-extrabold uppercase tracking-[1.5px]">
-                        服务端配置
-                    </Text>
-                    <Text variant="caption" className="text-[10px] font-semibold opacity-60">
-                        点击圆点切换激活
+                    <Text variant="caption" className="flex-1 font-semibold">
+                        配置
                     </Text>
                 </View>
                 <Separator />
@@ -132,7 +129,7 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
                 {profile.aiConfigs.map((config, index) => {
                     const isActive = profile.activeAiConfigId === config.id;
                     return (
-                        <View key={config.id} className={cn("border-b border-border", isActive && "bg-primary/5")}>
+                        <View key={config.id} className={cn("border-b border-border", isActive && "bg-muted/40")}>
                             <View className="flex-row items-center gap-2.5 px-3.5 pb-2 pt-3">
                                 <Button
                                     variant="ghost"
@@ -146,10 +143,10 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
                                     <View
                                         className={cn(
                                             "h-5 w-5 items-center justify-center rounded-full border-2",
-                                            isActive ? "border-primary" : "border-muted-foreground"
+                                            isActive ? "border-foreground" : "border-muted-foreground"
                                         )}
                                     >
-                                        {isActive && <View className="h-2.5 w-2.5 rounded-full bg-primary" />}
+                                        {isActive && <View className="h-2.5 w-2.5 rounded-full bg-foreground" />}
                                     </View>
                                 </Button>
                                 <Input
@@ -160,14 +157,11 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
                                         setProfile((current) => ({ ...current, aiConfigs: nextConfigs }));
                                     }}
                                     placeholder="配置名称"
-                                    className={cn(
-                                        "min-h-0 flex-1 border-0 bg-transparent p-0 text-sm font-bold",
-                                        isActive && "text-primary"
-                                    )}
+                                    className="min-h-0 flex-1 border-0 bg-transparent p-0 text-sm font-medium"
                                 />
                                 {isActive && (
-                                    <Badge className="bg-primary/10 px-2 py-0.5">
-                                        <BadgeText>激活</BadgeText>
+                                    <Badge variant="outline" className="px-2 py-0.5">
+                                        <BadgeText variant="outline">当前</BadgeText>
                                     </Badge>
                                 )}
                                 <Button
@@ -187,7 +181,7 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
                                 { label: "Model", key: "model" as const, placeholder: "gpt-4o", secure: false },
                             ]).map(({ label, key, placeholder, secure }) => (
                                 <View key={key} className="flex-row items-center gap-2.5 border-t border-border/60 px-3.5 py-2">
-                                    <Text variant="caption" className="w-14 font-bold tracking-wide">
+                                    <Text variant="caption" className="w-14">
                                         {label}
                                     </Text>
                                     <Input
@@ -200,7 +194,7 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
                                         placeholder={placeholder}
                                         secureTextEntry={secure}
                                         autoCapitalize="none"
-                                        className="min-h-0 flex-1 border-0 bg-transparent p-0 text-xs font-medium text-muted-foreground"
+                                        className="min-h-0 flex-1 border-0 bg-transparent p-0 text-xs text-muted-foreground"
                                     />
                                 </View>
                             ))}
@@ -210,9 +204,9 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
                 })}
 
                 <Button onPress={addConfig} variant="ghost" className="rounded-none py-3.5">
-                    <Plus size={14} color={colors.green} strokeWidth={3} />
-                    <ButtonText variant="ghost" className="text-accent">
-                        添加新的服务端配置
+                    <Plus size={14} color={colors.foreground} strokeWidth={2.5} />
+                    <ButtonText variant="ghost">
+                        新增配置
                     </ButtonText>
                 </Button>
             </Card>

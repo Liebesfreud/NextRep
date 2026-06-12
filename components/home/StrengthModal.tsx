@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { View, ScrollView, Alert, Keyboard, FlatList, Platform } from "react-native";
-import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
+import { View, ScrollView, Alert, Keyboard, FlatList, Platform, Pressable } from "react-native";
 import { X, ChevronLeft, Dumbbell, Trash2, Plus, Check, Search, Library } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem, type StrengthPresetItem } from "@/db/services/workout";
 import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
-import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import { Button, ButtonText } from "@/components/ui/button";
-import { CategoryBadge } from "@/components/ui/category-badge";
 import { Input } from "@/components/ui/input";
+import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
 
@@ -69,11 +67,9 @@ const StrengthSetRow = React.memo(function StrengthSetRow({ item, onDelete, onTo
     const { colors } = useTheme();
 
     return (
-        <AnimatedPressable
+        <Pressable
             onLongPress={() => onDelete(item.id)}
             delayLongPress={500}
-            activeScale={0.99}
-            activeOpacity={0.9}
             className={cn(
                 "mb-1 flex-row items-center rounded-[10px] px-1 py-1.5",
                 item.isCompleted && "bg-foreground/[0.03]"
@@ -138,7 +134,7 @@ const StrengthSetRow = React.memo(function StrengthSetRow({ item, onDelete, onTo
                     </View>
                 </Button>
             </View>
-        </AnimatedPressable>
+        </Pressable>
     );
 });
 
@@ -331,23 +327,20 @@ export function StrengthModal({
                     setSelectedExercise(ex.name);
                     setModalStep("form");
                 }}
-                style={{
-                    borderColor: `${visual.accent}26`,
-                    backgroundColor: visual.cardBg ?? colors.gray2,
-                }}
-                variant="ghost"
-                className="mb-2.5 h-auto justify-start rounded-[18px] border px-3 py-3"
+                style={{ borderColor: colors.border }}
+                variant="outline"
+                className="mb-2.5 h-auto justify-start rounded-[18px] px-3 py-3"
             >
-                <View style={{ backgroundColor: visual.iconBg }} className="mr-4 h-12 w-12 items-center justify-center rounded-2xl">
-                    <Icon size={20} color={visual.accent} />
+                <View className="mr-4 h-12 w-12 items-center justify-center rounded-2xl bg-secondary">
+                    <Icon size={20} color={colors.foreground} />
                 </View>
                 <View className="flex-1 justify-center">
                     <Text className="mb-1.5 text-base font-bold">{ex.name}</Text>
-                    <Text className="text-xs font-bold" style={{ color: visual.accent }}>
+                    <Text variant="muted" className="text-xs">
                         {ex.tag || "力量训练"}
                     </Text>
                 </View>
-                <Plus size={20} color={visual.accent} className="ml-2 opacity-70" />
+                <Plus size={20} color={colors.mutedForeground} className="ml-2 opacity-70" />
             </Button>
         );
     }, [colors]);
@@ -358,18 +351,14 @@ export function StrengthModal({
             <Text variant="muted" className="text-center font-bold">
                 没有找到相关动作
             </Text>
-            <Text variant="caption" className="text-center">
-                点击右上角动作库按钮新增自定义动作
-            </Text>
         </View>
     );
 
     return (
-        <BottomSheetModal
+        <Sheet
             visible={visible}
             onClose={onClose}
             sheetHeight="85%"
-            backgroundColor={colors.bento}
             avoidKeyboard
         >
             <View className="flex-1">
@@ -384,8 +373,8 @@ export function StrengthModal({
                             size="sm"
                             className="h-auto gap-1 px-0 py-0"
                         >
-                            <ChevronLeft size={20} color={colors.green} />
-                            <ButtonText variant="ghost" size="sm" className="text-accent">返回</ButtonText>
+                            <ChevronLeft size={20} color={colors.foreground} />
+                            <ButtonText variant="ghost" size="sm">返回</ButtonText>
                         </Button>
                     ) : (
                         <Text variant="heading">
@@ -394,19 +383,18 @@ export function StrengthModal({
                     )}
                     <View className="flex-row gap-2">
                         {modalStep === "select" && (
-                            <AnimatedPressable
+                            <Button
                                 onPress={() => dismissKeyboardAndRun(() => {
                                     onClose();
                                     dismissKeyboardAndRun(() => router.push("/settings/exercises"), 120);
                                 }, 0)}
                                 accessibilityLabel="打开动作库"
-                                accessibilityRole="button"
-                                activeScale={0.92}
-                                activeOpacity={0.75}
-                                className="h-8 w-8 items-center justify-center rounded-lg bg-muted"
+                                variant="secondary"
+                                size="icon"
+                                className="h-8 w-8 rounded-lg"
                             >
                                 <Library size={18} color={colors.gray4} />
-                            </AnimatedPressable>
+                            </Button>
                         )}
                         <Button
                             onPress={handleClose}
@@ -456,18 +444,15 @@ export function StrengthModal({
                                             <Button
                                                 key={cat}
                                                 onPress={() => setSelectedCategory(cat)}
-                                                variant="ghost"
-                                                className="h-auto bg-transparent p-0"
+                                                variant={isSelected ? "secondary" : "outline"}
+                                                className="h-auto rounded-full px-4 py-2"
                                             >
-                                                <CategoryBadge
-                                                    label={cat}
-                                                    selected={isSelected}
-                                                    accentColor={accent}
-                                                    selectedBackgroundColor={visual?.iconBg}
-                                                    backgroundColor={visual?.chipBg}
-                                                    className="px-4 py-2"
-                                                    textClassName="text-sm"
-                                                />
+                                                <Text
+                                                    className="text-sm"
+                                                    style={{ color: isSelected ? accent : colors.foreground }}
+                                                >
+                                                    {cat}
+                                                </Text>
                                             </Button>
                                         );
                                     })}
@@ -493,8 +478,8 @@ export function StrengthModal({
                 ) : (
                     <View className="flex-1">
                         <View className="mb-6 flex-row items-center gap-3">
-                            <View className="h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: `${colors.green}33` }}>
-                                <Dumbbell size={24} color={colors.green} />
+                            <View className="h-12 w-12 items-center justify-center rounded-xl bg-secondary">
+                                <Dumbbell size={24} color={colors.foreground} />
                             </View>
                             <Text variant="subheading">{selectedExercise}</Text>
                         </View>
@@ -520,10 +505,9 @@ export function StrengthModal({
                             ))}
 
                             {/* Add Set Button */}
-                            <Button onPress={handleAddSet} variant="secondary" className="mt-3 w-full bg-secondary/80 py-3">
-                                <ButtonText variant="secondary" className="text-accent">+ 添加下一组</ButtonText>
+                            <Button onPress={handleAddSet} variant="secondary" className="mt-3 w-full py-3">
+                                <ButtonText variant="secondary">+ 添加下一组</ButtonText>
                             </Button>
-                            <Text variant="caption" className="mt-3 text-center opacity-60">长按某组即可删除</Text>
                             <View className="h-6" />
                         </ScrollView>
 
@@ -534,13 +518,13 @@ export function StrengthModal({
                                     accessibilityLabel="删除力量训练记录"
                                     disabled={isPending}
                                     variant="destructive"
-                                    className="w-16 bg-destructive/10 py-4"
+                                    className="w-16 py-4"
                                 >
                                     <Trash2 size={20} color={colors.red} />
                                 </Button>
                             )}
-                            <Button onPress={handleSave} disabled={isPending || !selectedExercise} className="flex-1 bg-accent py-4">
-                                <ButtonText className="text-lg text-foreground">
+                            <Button onPress={handleSave} disabled={isPending || !selectedExercise} className="flex-1 py-4">
+                                <ButtonText className="text-lg">
                                     {isPending ? "保存中..." : "保存记录"}
                                 </ButtonText>
                             </Button>
@@ -548,6 +532,6 @@ export function StrengthModal({
                     </View>
                 )}
             </View>
-        </BottomSheetModal>
+        </Sheet>
     );
 }

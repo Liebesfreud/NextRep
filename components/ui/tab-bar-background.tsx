@@ -2,12 +2,12 @@ import { Platform, View, type ViewStyle } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
 
 const TAB_BAR_HEIGHT = 70;
-const TAB_BAR_RADIUS = 16;
+const TAB_BAR_RADIUS = 12;
 
 function getTabBarStyle(borderColor: string): ViewStyle {
     return {
         position: "absolute",
-        bottom: 32,
+        bottom: 20,
         marginHorizontal: 20,
         left: 0,
         right: 0,
@@ -22,14 +22,14 @@ function getTabBarStyle(borderColor: string): ViewStyle {
         paddingTop: 0,
         ...Platform.select<ViewStyle>({
             web: {
-                boxShadow: "0 10px 24px rgba(0, 0, 0, 0.06)",
+                boxShadow: "0 6px 16px rgba(0, 0, 0, 0.04)",
             },
             default: {
                 shadowColor: "#000000",
-                shadowOffset: { width: 0, height: 10 },
-                shadowOpacity: 0.06,
-                shadowRadius: 24,
-                elevation: 5,
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 0.04,
+                shadowRadius: 16,
+                elevation: 3,
             },
         }),
     };

@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { Plus, Dumbbell, Activity, CheckCircle, Calendar, ChevronLeft, ChevronRight, X } from "lucide-react-native";
-import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
-import { LightEffect } from "@/components/ui/LightEffect";
 import { useTheme } from "@/hooks/useTheme";
 import { getCheckinsByMonth, type WorkoutItem } from "@/db/services/workout";
 import { Badge, BadgeText } from "@/components/ui/badge";
@@ -117,18 +115,18 @@ function DatePickerModal({
     });
 
     return (
-        <Sheet visible={visible} onClose={onClose} sheetHeight={430} backgroundColor={colors.bento}>
+        <Sheet visible={visible} onClose={onClose} sheetHeight={430} backgroundColor={colors.bg}>
             <View className="flex-1 px-5 pb-8 pt-5">
                     {/* 月份导航 */}
                     <View className="mb-4 flex-row items-center justify-between">
                         <Button onPress={prevMonth} accessibilityLabel="上一个月" variant="ghost" size="icon" className="h-8 w-8">
-                            <ChevronLeft size={20} color={colors.white} />
+                            <ChevronLeft size={20} color={colors.foreground} />
                         </Button>
-                        <Text className="text-base font-extrabold">
+                        <Text className="text-base font-semibold">
                             {viewYear}年 {MONTH_NAMES[viewMonth]}
                         </Text>
                         <Button onPress={nextMonth} accessibilityLabel="下一个月" variant="ghost" size="icon" disabled={isNextDisabled} className="h-8 w-8">
-                            <ChevronRight size={20} color={colors.white} />
+                            <ChevronRight size={20} color={colors.foreground} />
                         </Button>
                     </View>
 
@@ -178,9 +176,9 @@ function DatePickerModal({
                         <Button
                             onPress={() => { onSelect(today); onClose(); }}
                             variant="secondary"
-                            className="flex-1 rounded-[10px] py-2.5"
+                            className="flex-1 py-2.5"
                         >
-                            <ButtonText variant="secondary" className="text-[13px] text-accent">回到今天</ButtonText>
+                            <ButtonText variant="secondary" className="text-[13px]">回到今天</ButtonText>
                         </Button>
                     </View>
             </View>
@@ -220,32 +218,26 @@ export function TodayWorkouts({
         })();
 
     return (
-        <Card className="gap-bento overflow-hidden p-4">
-            <LightEffect 
-                color={colors.green} 
-                opacity={0.05} 
-                size={300} 
-                position={{ top: -120, right: -100 }} 
-            />
-
+        <Card className="gap-4 p-4">
             <View className="flex-row justify-between items-center px-1">
                 <View className="flex-row items-center gap-2">
                     {/* 标题 / 已选日期 */}
-                    <AnimatedPressable
+                    <Button
                         onPress={() => setShowDatePicker(true)}
-                        className="flex-row items-center gap-1.5"
+                        variant="ghost"
+                        className="h-auto flex-row items-center gap-1.5 px-0 py-0"
                     >
-                        <Text className="text-lg font-bold tracking-tight">
+                        <Text className="text-lg font-semibold">
                             {titleText}
                         </Text>
-                        <View className="rounded-md p-1" style={{ backgroundColor: isToday ? colors.border : `${colors.green}33` }}>
-                            <Calendar size={13} color={isToday ? colors.gray4 : colors.green} />
+                        <View className="rounded-md border border-border p-1">
+                            <Calendar size={13} color={colors.gray4} />
                         </View>
-                    </AnimatedPressable>
+                    </Button>
 
                     {workouts.length > 0 && (
-                        <Badge variant="secondary" className="rounded-md px-2 py-0.5">
-                            <BadgeText variant="secondary" className="uppercase tracking-wider text-foreground">
+                        <Badge variant="secondary" className="px-2 py-0.5">
+                            <BadgeText variant="secondary">
                                 {workouts.length} 次
                             </BadgeText>
                         </Badge>
@@ -258,109 +250,109 @@ export function TodayWorkouts({
                         onPress={() => onDateChange(toDateStr(new Date()))}
                         variant="ghost"
                         size="sm"
-                        className="h-auto bg-accent/10 px-2.5 py-1.5"
+                        className="h-auto px-2.5 py-1.5"
                     >
-                        <ButtonText variant="ghost" size="sm" className="text-[11px] text-accent">返回今天</ButtonText>
+                        <ButtonText variant="ghost" size="sm" className="text-[11px]">返回今天</ButtonText>
                     </Button>
                 )}
             </View>
 
             {workouts.length > 0 ? (
-                <View className="gap-bento">
+                <View className="gap-4">
                     {/* Cardio */}
                     {cardioWorkouts.length > 0 && (
-                        <Card className="gap-2 rounded-bento-sm border-primary/20 bg-primary/10 p-3">
+                        <Card className="gap-2 p-3">
                             <View className="flex-row justify-between items-center ml-1">
-                                <Text className="text-xs font-extrabold uppercase tracking-widest text-accent opacity-90">
+                                <Text variant="caption">
                                     有氧训练
                                 </Text>
-                                <AnimatedPressable onPress={handleOpenCardio}
-                                    className="h-6 w-6 items-center justify-center rounded-md bg-primary/20">
-                                    <Plus size={14} color={colors.orange} strokeWidth={3} />
-                                </AnimatedPressable>
+                                <Button onPress={handleOpenCardio} variant="ghost" size="icon"
+                                    className="h-6 w-6 rounded-md border border-border">
+                                    <Plus size={14} color={colors.foreground} strokeWidth={2.5} />
+                                </Button>
                             </View>
                             {cardioWorkouts.map((w) => (
-                                <AnimatedPressable key={w.id} onPress={() => openEditModal(w)}
-                                    className="flex-row items-center gap-2.5 p-1.5 -mx-1.5 rounded-lg">
-                                    <View className="h-9 w-9 items-center justify-center rounded-lg bg-primary/20">
-                                        <Activity size={16} color={colors.orange} />
+                                <Button key={w.id} onPress={() => openEditModal(w)} variant="ghost"
+                                    className="-mx-1.5 h-auto flex-row items-center gap-2.5 rounded-lg p-1.5">
+                                    <View className="h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted">
+                                        <Activity size={16} color={colors.foreground} />
                                     </View>
                                     <View className="flex-1">
                                         <View className="flex-row justify-between items-center">
-                                            <Text className="text-sm font-bold">{w.name}</Text>
-                                            <View className="rounded-md bg-primary/10 px-2 py-0.5">
-                                                <Text className="text-xs font-semibold text-accent">{formatTime(w.createdAt)}</Text>
+                                            <Text className="text-sm font-medium">{w.name}</Text>
+                                            <View className="rounded-md border border-border px-2 py-0.5">
+                                                <Text className="text-xs text-muted-foreground">{formatTime(w.createdAt)}</Text>
                                             </View>
                                         </View>
-                                        {w.stats && <Text className="mt-0.5 text-xs font-semibold opacity-90">{w.stats}</Text>}
+                                        {w.stats && <Text className="mt-0.5 text-xs text-muted-foreground">{w.stats}</Text>}
                                     </View>
-                                </AnimatedPressable>
+                                </Button>
                             ))}
                         </Card>
                     )}
 
                     {/* Strength */}
                     {strengthWorkouts.length > 0 && (
-                        <Card className="rounded-bento-sm bg-secondary p-3 gap-2">
+                        <Card className="gap-2 p-3">
                             <View className="flex-row justify-between items-center ml-1 mb-0.5">
-                                <Text variant="caption" className="text-xs font-extrabold uppercase tracking-widest opacity-70">
+                                <Text variant="caption">
                                     力量训练
                                 </Text>
-                                <AnimatedPressable onPress={handleOpenStrength}
-                                    className="h-6 w-6 items-center justify-center rounded-md border border-border bg-secondary">
-                                    <Plus size={14} color={colors.white} strokeWidth={3} />
-                                </AnimatedPressable>
+                                <Button onPress={handleOpenStrength} variant="ghost" size="icon"
+                                    className="h-6 w-6 rounded-md border border-border">
+                                    <Plus size={14} color={colors.foreground} strokeWidth={2.5} />
+                                </Button>
                             </View>
                             {strengthWorkouts.map((w) => (
-                                <AnimatedPressable key={w.id} onPress={() => openEditModal(w)}
-                                    className="flex-row items-center gap-2.5 p-1.5 -mx-1.5 rounded-lg">
-                                    <View className="h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                                <Button key={w.id} onPress={() => openEditModal(w)} variant="ghost"
+                                    className="-mx-1.5 h-auto flex-row items-center gap-2.5 rounded-lg p-1.5">
+                                    <View className="h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted">
                                         <Dumbbell size={16} color={colors.gray4} />
                                     </View>
                                     <View className="flex-1">
                                         <View className="flex-row justify-between items-center">
-                                            <Text className="text-sm font-bold">{w.name}</Text>
-                                            <View className="rounded-md bg-border px-2 py-0.5">
-                                                <Text variant="caption" className="text-xs font-semibold">{formatTime(w.createdAt)}</Text>
+                                            <Text className="text-sm font-medium">{w.name}</Text>
+                                            <View className="rounded-md border border-border px-2 py-0.5">
+                                                <Text variant="caption" className="text-xs text-muted-foreground">{formatTime(w.createdAt)}</Text>
                                             </View>
                                         </View>
-                                        <Text className="text-xs font-semibold mt-0.5">
+                                        <Text className="mt-0.5 text-xs text-muted-foreground">
                                             {w.weight && <Text className="opacity-90">{w.weight}</Text>}
                                             {w.weight && w.sets && <Text className="text-muted-foreground"> • </Text>}
                                             {w.sets && <Text className="text-muted-foreground">{formatSets(w.sets)}</Text>}
                                         </Text>
                                     </View>
-                                </AnimatedPressable>
+                                </Button>
                             ))}
                         </Card>
                     )}
                 </View>
             ) : (
-                <View className="items-center justify-center py-8 opacity-60">
-                    <Dumbbell size={40} color={colors.gray4} />
-                    <Text variant="muted" className="mt-3 font-bold">
-                        {isToday ? "今天还没有记录运动" : "这一天暂无运动记录"}
+                <View className="items-center justify-center py-8">
+                    <Dumbbell size={28} color={colors.gray4} />
+                    <Text variant="muted" className="mt-3">
+                        暂无记录
                     </Text>
                 </View>
             )}
 
             {/* Quick-add buttons —— 仅今天显示 */}
             {isToday && (
-                <View className="flex-row gap-bento">
+                <View className="flex-row gap-3">
                     {cardioWorkouts.length === 0 && (
                         <Button onPress={handleOpenCardio}
                             variant="outline"
-                            className="flex-1 border border-primary/20 bg-primary/15 py-3">
-                            <Activity size={16} color={colors.orange} />
-                            <ButtonText variant="outline" className="text-sm text-accent">有氧运动</ButtonText>
+                            className="flex-1 py-3">
+                            <Activity size={16} color={colors.foreground} />
+                            <ButtonText variant="outline" className="text-sm">有氧运动</ButtonText>
                         </Button>
                     )}
                     {strengthWorkouts.length === 0 && (
                         <Button onPress={handleOpenStrength}
                             variant="outline"
-                            className="flex-1 border border-border bg-secondary py-3">
-                            <Dumbbell size={16} color={colors.white} />
-                            <ButtonText variant="outline" className="text-sm text-foreground">力量训练</ButtonText>
+                            className="flex-1 py-3">
+                            <Dumbbell size={16} color={colors.foreground} />
+                            <ButtonText variant="outline" className="text-sm">力量训练</ButtonText>
                         </Button>
                     )}
                 </View>
@@ -368,18 +360,18 @@ export function TodayWorkouts({
 
             {/* 历史日期也可以补录记录 */}
             {!isToday && (
-                <View className="flex-row gap-bento">
+                <View className="flex-row gap-3">
                     <Button onPress={handleOpenCardio}
                         variant="outline"
-                        className="flex-1 border border-primary/20 bg-primary/15 py-3">
-                        <Activity size={16} color={colors.orange} />
-                        <ButtonText variant="outline" className="text-sm text-accent">补录有氧</ButtonText>
+                        className="flex-1 py-3">
+                        <Activity size={16} color={colors.foreground} />
+                        <ButtonText variant="outline" className="text-sm">补录有氧</ButtonText>
                     </Button>
                     <Button onPress={handleOpenStrength}
                         variant="outline"
-                        className="flex-1 border border-border bg-secondary py-3">
-                        <Dumbbell size={16} color={colors.white} />
-                        <ButtonText variant="outline" className="text-sm text-foreground">补录力量</ButtonText>
+                        className="flex-1 py-3">
+                        <Dumbbell size={16} color={colors.foreground} />
+                        <ButtonText variant="outline" className="text-sm">补录力量</ButtonText>
                     </Button>
                 </View>
             )}
@@ -389,20 +381,20 @@ export function TodayWorkouts({
                 <Button
                     onPress={handleCheckin}
                     disabled={isPending}
-                    className="w-full bg-accent py-4"
+                    className="w-full py-4"
                 >
-                    <CheckCircle size={18} color={colors.accentForeground} strokeWidth={2.5} />
-                    <ButtonText className="text-base tracking-widest text-accent-foreground">
+                    <CheckCircle size={18} color={colors.primaryForeground} strokeWidth={2.25} />
+                    <ButtonText className="text-base">
                         {isPending ? "打卡中..." : isToday ? "完成今日打卡" : "补打卡"}
                     </ButtonText>
                 </Button>
             )}
             {isCheckedIn && (
                 <View
-                    className="w-full flex-row items-center justify-center gap-2 rounded-bento-sm border border-success/20 bg-success/10 py-4"
+                    className="w-full flex-row items-center justify-center gap-2 rounded-lg border border-border py-4"
                 >
                     <CheckCircle size={18} color={colors.green} strokeWidth={2.5} />
-                    <Text className="text-base font-extrabold tracking-widest text-success">{isToday ? "今日打卡已完成" : "已补打卡"}</Text>
+                    <Text className="text-base">{isToday ? "今日已打卡" : "已补打卡"}</Text>
                 </View>
             )}
 

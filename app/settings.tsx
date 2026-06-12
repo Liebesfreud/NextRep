@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { useTheme } from "@/hooks/useTheme";
 import { getUserProfile, updateUserProfile, type UserProfileData } from "@/db/services/profile";
 import * as SplashScreen from "expo-splash-screen";
 
@@ -10,11 +9,8 @@ import { AppearanceSettings } from "@/components/settings/AppearanceSettings";
 import { ProfileSettings } from "@/components/settings/ProfileSettings";
 import { AiConfigSettings } from "@/components/settings/AiConfigSettings";
 import { DataManagementSettings } from "@/components/settings/DataManagementSettings";
-import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
-import { Text } from "@/components/ui/text";
 
 export default function SettingsScreen() {
-    const { colors } = useTheme();
     const mountedRef = useRef(true);
     const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [isSaved, setIsSaved] = useState(false);
@@ -77,41 +73,25 @@ export default function SettingsScreen() {
                 contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 60, paddingBottom: 120, gap: 20 }}
                 showsVerticalScrollIndicator={false}
             >
-                <AnimatedEnter delay={0} distance={10}>
-                    <SettingsHeader
-                        onSave={handleSave}
-                        isPending={isPending}
-                        isSaved={isSaved}
-                    />
-                </AnimatedEnter>
+                <SettingsHeader
+                    onSave={handleSave}
+                    isPending={isPending}
+                    isSaved={isSaved}
+                />
 
-                <AnimatedEnter delay={50} distance={15}>
-                    <AppearanceSettings />
-                </AnimatedEnter>
+                <AppearanceSettings />
 
-                <AnimatedEnter delay={100} distance={15}>
-                    <ProfileSettings
-                        profile={profile}
-                        setProfile={setProfile}
-                    />
-                </AnimatedEnter>
+                <ProfileSettings
+                    profile={profile}
+                    setProfile={setProfile}
+                />
 
-                <AnimatedEnter delay={150} distance={15}>
-                    <AiConfigSettings
-                        profile={profile}
-                        setProfile={setProfile}
-                    />
-                </AnimatedEnter>
+                <AiConfigSettings
+                    profile={profile}
+                    setProfile={setProfile}
+                />
 
-                <AnimatedEnter delay={200} distance={15}>
-                    <DataManagementSettings />
-                </AnimatedEnter>
-
-                {/* ── Version ── */}
-                <View className="items-center py-8 opacity-60">
-                    <Text variant="caption" className="mb-1.5 font-extrabold tracking-widest">NEXTREP V1.0</Text>
-                    <Text variant="caption" className="font-semibold">本地优先の健身数据管家</Text>
-                </View>
+                <DataManagementSettings />
             </ScrollView>
         </View>
     );

@@ -61,9 +61,9 @@ function TabLayout() {
                         setDbInitialized(false);
                         setRetryKey((prev) => prev + 1);
                     }}
-                    className="self-start bg-accent"
+                    className="self-start"
                 >
-                    <ButtonText className="text-accent-foreground">重试</ButtonText>
+                    <ButtonText>重试</ButtonText>
                 </Button>
             </View>
         );

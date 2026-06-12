@@ -11,7 +11,6 @@ import { MonthlyHeatmap } from "@/components/home/MonthlyHeatmap";
 import { TodayWorkouts } from "@/components/home/TodayWorkouts";
 import { StrengthModal } from "@/components/home/StrengthModal";
 import { CardioModal } from "@/components/home/CardioModal";
-import { AnimatedEnter } from "@/components/ui/AnimatedEnter";
 import { Card } from "@/components/ui/card";
 
 import {
@@ -224,35 +223,29 @@ export default function HomeScreen() {
                 contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 60, paddingBottom: 100, gap: 16 }}
                 showsVerticalScrollIndicator={false}
             >
-                <AnimatedEnter delay={0} distance={10}>
-                    <HomeHeader greeting={greeting} userName={userName} isCheckedIn={isCheckedIn} />
-                </AnimatedEnter>
+                <HomeHeader greeting={greeting} userName={userName} isCheckedIn={isCheckedIn} />
 
-                <AnimatedEnter delay={50} distance={15}>
-                    <View className="flex-row gap-bento">
-                        <HomeStatsCard displayCal={displayCal} totalSets={totalSets} isAiPredicting={isAiPredicting} />
-                        <Card className="flex-[2] p-3.5">
-                            <MonthlyHeatmap refreshKey={`${workouts.length}-${isCheckedIn}`} />
-                        </Card>
-                    </View>
-                </AnimatedEnter>
+                <View className="flex-row gap-4">
+                    <HomeStatsCard displayCal={displayCal} totalSets={totalSets} isAiPredicting={isAiPredicting} />
+                    <Card className="flex-[2] p-4">
+                        <MonthlyHeatmap refreshKey={`${workouts.length}-${isCheckedIn}`} />
+                    </Card>
+                </View>
 
-                <AnimatedEnter delay={100} distance={15}>
-                    <TodayWorkouts
-                        workouts={workouts}
-                        cardioWorkouts={cardioWorkouts}
-                        strengthWorkouts={strengthWorkouts}
-                        handleOpenCardio={() => { setEditingWorkout(null); setActiveModal("cardio"); }}
-                        handleOpenStrength={() => { setEditingWorkout(null); setActiveModal("strength"); }}
-                        openEditModal={(w) => { setEditingWorkout(w); setActiveModal(w.type as "strength" | "cardio"); }}
-                        handleCheckin={handleCheckin}
-                        isCheckedIn={isCheckedIn}
-                        isPending={isPending}
-                        selectedDate={selectedDate}
-                        onDateChange={handleDateChange}
-                        isToday={isToday}
-                    />
-                </AnimatedEnter>
+                <TodayWorkouts
+                    workouts={workouts}
+                    cardioWorkouts={cardioWorkouts}
+                    strengthWorkouts={strengthWorkouts}
+                    handleOpenCardio={() => { setEditingWorkout(null); setActiveModal("cardio"); }}
+                    handleOpenStrength={() => { setEditingWorkout(null); setActiveModal("strength"); }}
+                    openEditModal={(w) => { setEditingWorkout(w); setActiveModal(w.type as "strength" | "cardio"); }}
+                    handleCheckin={handleCheckin}
+                    isCheckedIn={isCheckedIn}
+                    isPending={isPending}
+                    selectedDate={selectedDate}
+                    onDateChange={handleDateChange}
+                    isToday={isToday}
+                />
             </ScrollView>
 
             <View className="pointer-events-none absolute inset-0 z-[999]">

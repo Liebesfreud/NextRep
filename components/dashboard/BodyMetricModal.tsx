@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { View, ScrollView } from "react-native";
-import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, ChevronRight, Save } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { type BodyMetricPoint } from "@/db/services/dashboard";
@@ -9,6 +8,7 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { CalendarDayCell } from "@/components/ui/calendar-day-cell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
 
@@ -164,11 +164,10 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
     if (!metricType) return null;
 
     return (
-        <BottomSheetModal
+        <Sheet
             visible={visible}
             onClose={onClose}
             sheetHeight="85%"
-            backgroundColor={colors.bento}
             avoidKeyboard
         >
             <View className="flex-row justify-between items-center mb-6">
@@ -292,10 +291,10 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                 <Button
                     onPress={handleSave}
                     disabled={isSaving}
-                    className="mb-2 bg-accent py-3"
+                    className="mb-2 py-3"
                 >
                     <Save size={16} color={colors.white} />
-                    <ButtonText className="text-base text-foreground">
+                    <ButtonText className="text-base">
                         {isSaving ? "保存中..." : "保存记录"}
                     </ButtonText>
                 </Button>
@@ -359,6 +358,6 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                     </Card>
                 </View>
             </ScrollView>
-        </BottomSheetModal>
+        </Sheet>
     );
 }

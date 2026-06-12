@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { View, Keyboard } from "react-native";
-import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { X, ChevronLeft, Activity, Plus, Timer, Flame, Trash2 } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem } from "@/db/services/workout";
 import { CARDIO_EXERCISES, getCardioExerciseVisual } from "@/constants/exerciseVisuals";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
 
 type Props = {
@@ -79,11 +79,10 @@ export function CardioModal({
     };
 
     return (
-        <BottomSheetModal
+        <Sheet
             visible={visible}
             onClose={onClose}
             sheetHeight="75%"
-            backgroundColor={colors.bento}
             avoidKeyboard
         >
             <View className="mb-6 flex-row items-center justify-between">
@@ -97,8 +96,8 @@ export function CardioModal({
                         size="sm"
                         className="h-auto px-0 py-1"
                     >
-                        <ChevronLeft size={20} color={colors.orange} />
-                        <ButtonText variant="ghost" size="sm" className="text-primary">返回</ButtonText>
+                        <ChevronLeft size={20} color={colors.foreground} />
+                        <ButtonText variant="ghost" size="sm">返回</ButtonText>
                     </Button>
                 ) : (
                     <Text variant="heading" className="tracking-[-0.5px]">
@@ -126,23 +125,19 @@ export function CardioModal({
                             <Button
                                 key={i}
                                 onPress={() => { setSelectedExercise(ex); setModalStep("form"); }}
-                                variant="ghost"
-                                className="w-full justify-between rounded-[18px] border p-[18px]"
-                                style={{
-                                    backgroundColor: visual.cardBg ?? colors.gray2,
-                                    borderColor: `${visual.accent}26`,
-                                }}
+                                variant="outline"
+                                className="w-full justify-between rounded-2xl p-[18px]"
                             >
                                 <View className="flex-1 flex-row items-center gap-3">
-                                    <View style={{ backgroundColor: visual.iconBg }} className="h-11 w-11 items-center justify-center rounded-[14px]">
-                                        <Icon size={20} color={visual.accent} />
+                                    <View className="h-11 w-11 items-center justify-center rounded-[14px] bg-secondary">
+                                        <Icon size={20} color={colors.foreground} />
                                     </View>
                                     <View className="flex-1">
                                         <Text className="mb-1.5 text-lg font-bold">{ex}</Text>
-                                        <Text className="text-xs font-bold" style={{ color: visual.accent }}>{visual.label}</Text>
+                                        <Text variant="muted" className="text-xs">{visual.label}</Text>
                                     </View>
                                 </View>
-                                <Plus size={20} color={visual.accent} />
+                                <Plus size={20} color={colors.mutedForeground} />
                             </Button>
                         );
                     })}
@@ -155,12 +150,12 @@ export function CardioModal({
 
                         return (
                             <View className="mb-6 flex-row items-center gap-3">
-                                <View className="h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: visual.iconBg }}>
-                                    <Icon size={24} color={visual.accent} />
+                                <View className="h-12 w-12 items-center justify-center rounded-xl bg-secondary">
+                                    <Icon size={24} color={colors.foreground} />
                                 </View>
                                 <View className="flex-1">
                                     <Text variant="subheading" className="mb-1">{selectedExercise}</Text>
-                                    <Text className="text-xs font-bold" style={{ color: visual.accent }}>{visual.label}</Text>
+                                    <Text variant="muted" className="text-xs">{visual.label}</Text>
                                 </View>
                             </View>
                         );
@@ -200,7 +195,7 @@ export function CardioModal({
                                 accessibilityLabel="删除有氧运动记录"
                                 disabled={isPending}
                                 variant="destructive"
-                                className="w-16 bg-destructive/10 py-4"
+                                className="w-16 py-4"
                             >
                                 <Trash2 size={20} color={colors.red} />
                             </Button>
@@ -213,6 +208,6 @@ export function CardioModal({
                     </View>
                 </View>
             )}
-        </BottomSheetModal>
+        </Sheet>
     );
 }

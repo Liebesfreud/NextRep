@@ -6,7 +6,6 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { clearDatabase, exportAllData, importAllData } from "@/db/services/data";
 import { useTheme } from "@/hooks/useTheme";
-import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -17,7 +16,7 @@ type ActionRowProps = {
     icon: React.ReactNode;
     iconClassName: string;
     label: string;
-    desc: string;
+    desc?: string;
     destructive?: boolean;
     onPress: () => void;
     disabled?: boolean;
@@ -33,9 +32,11 @@ function ActionRow({ icon, iconClassName, label, desc, destructive, onPress, dis
                 <Text variant="label" className={destructive ? "text-destructive-foreground" : undefined}>
                     {label}
                 </Text>
-                <Text variant="caption" className={cn("mt-0.5 font-semibold", destructive && "text-destructive-foreground/80")}>
-                    {desc}
-                </Text>
+                {desc ? (
+                    <Text variant="caption" className={cn("mt-0.5", destructive && "text-destructive-foreground/80")}>
+                        {desc}
+                    </Text>
+                ) : null}
             </View>
             <ChevronRight size={16} color={destructive ? colors.destructiveForeground : colors.gray4} className={destructive ? "opacity-80" : "opacity-50"} />
         </>
@@ -55,13 +56,14 @@ function ActionRow({ icon, iconClassName, label, desc, destructive, onPress, dis
     }
 
     return (
-        <AnimatedPressable
+        <Button
             onPress={onPress}
             disabled={disabled}
-            className={cn("flex-row items-center px-3.5 py-3.5", !isLast && "border-b border-border", disabled && "opacity-50")}
+            variant="ghost"
+            className={cn("h-auto flex-row items-center px-3.5 py-3.5", !isLast && "border-b border-border", disabled && "opacity-50")}
         >
             {content}
-        </AnimatedPressable>
+        </Button>
     );
 }
 
@@ -158,25 +160,23 @@ export function DataManagementSettings() {
         <Card className="overflow-hidden p-0">
             <View className="flex-row items-center gap-2 px-3.5 py-3">
                 <Database size={14} color={colors.gray4} />
-                <Text variant="caption" className="font-extrabold uppercase tracking-[1.5px]">
-                    数据与备份
+                <Text variant="caption" className="font-semibold">
+                    数据
                 </Text>
             </View>
             <Separator />
 
             <ActionRow
-                icon={<Download size={16} color={colors.green} />}
-                iconClassName="bg-accent/10"
+                icon={<Download size={16} color={colors.foreground} />}
+                iconClassName="bg-muted"
                 label="导出备份"
-                desc="将所有数据导出为 JSON 文件"
                 onPress={handleExport}
                 disabled={isPending}
             />
             <ActionRow
-                icon={<Upload size={16} color={colors.orange} />}
-                iconClassName="bg-primary/10"
+                icon={<Upload size={16} color={colors.foreground} />}
+                iconClassName="bg-muted"
                 label="导入数据"
-                desc="从备份文件全量恢复数据"
                 onPress={handleImport}
                 disabled={isPending}
             />
@@ -184,7 +184,7 @@ export function DataManagementSettings() {
                 icon={<Trash2 size={16} color={colors.destructiveForeground} />}
                 iconClassName="bg-destructive-foreground/15"
                 label="清空所有记录"
-                desc="危险操作，不可撤销"
+                desc="不可撤销"
                 onPress={handleClear}
                 disabled={isPending}
                 destructive

@@ -120,10 +120,10 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                         className="h-auto items-start justify-start bg-transparent p-0"
                     >
                         <View>
-                            <Text variant="caption" className="mb-0.5 font-bold tracking-wider">
+                            <Text variant="caption" className="text-muted-foreground">
                                 {year}
                             </Text>
-                            <Text className="text-[22px] font-black">
+                            <Text className="text-xl font-semibold">
                                 {monthName}
                             </Text>
                         </View>
@@ -131,15 +131,15 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                 </View>
 
                 <View className="mt-4">
-                    <View className="flex-row items-center gap-1 mb-0.5">
+                    <View className="mb-1 flex-row items-center gap-2">
                         <CalendarCheck size={12} color={colors.green} />
-                        <Text variant="caption" className="font-extrabold tracking-wider">打卡</Text>
+                        <Text variant="caption">打卡</Text>
                     </View>
                     <View className="flex-row items-baseline gap-0.5">
-                        <Text className="text-2xl font-black">
+                        <Text className="text-2xl font-semibold">
                             {monthlyCheckinCount}
                         </Text>
-                        <Text variant="caption" className="text-[10px] font-extrabold">天</Text>
+                        <Text variant="caption">天</Text>
                     </View>
                 </View>
             </View>
@@ -181,10 +181,10 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                 ))}
             </Animated.View>
 
-            <Sheet visible={isPickerVisible} onClose={() => setIsPickerVisible(false)} sheetHeight="50%" backgroundColor={colors.bento}>
+            <Sheet visible={isPickerVisible} onClose={() => setIsPickerVisible(false)} sheetHeight="50%" backgroundColor={colors.bg}>
                 <View className="flex-1 p-6 pb-12">
                         <View className="mb-6 flex-row items-center justify-between">
-                            <Text variant="subheading" className="tracking-tight">选择时间</Text>
+                            <Text variant="subheading">选择时间</Text>
                             <Button onPress={() => setIsPickerVisible(false)}
                                 accessibilityLabel="关闭日期选择器"
                                 variant="secondary"
@@ -206,9 +206,9 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                                             backgroundColor: year === y ? colors.border : "transparent",
                                             marginBottom: 4,
                                         }}
-                                        className="rounded-bento-sm py-3"
+                                        className="py-3"
                                     >
-                                        <ButtonText variant="ghost" style={{ color: year === y ? colors.white : colors.gray4, fontWeight: year === y ? "bold" : "normal", textAlign: "center" }}>
+                                        <ButtonText variant="ghost" style={{ color: year === y ? colors.white : colors.gray4, textAlign: "center" }}>
                                             {y}年
                                         </ButtonText>
                                     </Button>
@@ -226,13 +226,13 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                                             onPress={() => !isFuture && setMonth(m)}
                                             variant="ghost"
                                             style={{
-                                                backgroundColor: month === m ? colors.green : "transparent",
+                                                backgroundColor: month === m ? colors.border : "transparent",
                                                 marginBottom: 4,
                                                 opacity: isFuture ? 0.3 : 1,
                                             }}
-                                            className="rounded-bento-sm py-3"
+                                            className="py-3"
                                         >
-                                            <ButtonText variant="ghost" style={{ color: month === m ? colors.accentForeground : colors.gray4, fontWeight: month === m ? "bold" : "normal", textAlign: "center" }}>
+                                            <ButtonText variant="ghost" style={{ color: month === m ? colors.white : colors.gray4, textAlign: "center" }}>
                                                 {mName}
                                             </ButtonText>
                                         </Button>

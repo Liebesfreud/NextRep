@@ -10,7 +10,6 @@ import { bodyMetrics, workouts } from "@/db/schema";
 import { generateTrainingReportWithAI, type AiReportData } from "@/db/services/ai";
 import * as workoutService from "@/db/services/workout";
 import { useTheme } from "@/hooks/useTheme";
-import { BrandMark } from "@/components/ui/brand-mark";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
@@ -67,9 +66,9 @@ function getTodayDateStr() {
 }
 
 function getCoachLine(score: number, energy: EnergyOption) {
-    if (energy === "low") return "今天轻一点，先完成比冲强度更重要。";
-    if (score >= 75 && energy === "high") return "今天状态不错，适合完成一版完整训练。";
-    return "今天稳稳推进，就是最好的安排。";
+    if (energy === "low") return "今天以轻量训练为主。";
+    if (score >= 75 && energy === "high") return "今天可以完成完整训练。";
+    return "按计划推进即可。";
 }
 
 function getPlanTypeLabel(type: "strength" | "cardio") {
@@ -228,80 +227,77 @@ export default function AiCoachScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            <View className="border-b border-border bg-background/95 px-4 pb-3 pt-[60px]">
-                <BrandMark title="AI 教练" subtitle="Coach · 今天练什么" icon={Sparkles} />
+            <View className="border-b border-border bg-background px-4 pb-3 pt-[60px]">
+                <Text variant="title">AI 教练</Text>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 14 }}>
                 <Card>
-                    <Text variant="caption" className="text-[11px] font-extrabold tracking-[1.2px] text-accent">今日状态</Text>
-                    <Text variant="subheading" className="mt-2">先选一下今天的状态</Text>
+                    <Text variant="subheading">今日状态</Text>
 
                     <View className="mt-4 gap-3">
                         <FilterRow
                             title="精力"
-                            icon={<Flame size={14} color={colors.orange} />}
+                            icon={<Flame size={14} color={colors.white} />}
                             value={checkIn.energy}
                             options={[{ key: "high", label: "很好" }, { key: "medium", label: "一般" }, { key: "low", label: "疲劳" }]}
                             onChange={(value) => setCheckIn((prev) => ({ ...prev, energy: value as EnergyOption }))}
                         />
                         <FilterRow
                             title="时长"
-                            icon={<Clock3 size={14} color={colors.green} />}
+                            icon={<Clock3 size={14} color={colors.white} />}
                             value={checkIn.duration}
                             options={[{ key: "20", label: "20m" }, { key: "40", label: "40m" }, { key: "60", label: "60m+" }]}
                             onChange={(value) => setCheckIn((prev) => ({ ...prev, duration: value as DurationOption }))}
                         />
                         <FilterRow
                             title="地点"
-                            icon={<MapPin size={14} color={colors.red} />}
+                            icon={<MapPin size={14} color={colors.white} />}
                             value={checkIn.location}
                             options={[{ key: "gym", label: "健身房" }, { key: "home", label: "家里" }]}
                             onChange={(value) => setCheckIn((prev) => ({ ...prev, location: value as LocationOption }))}
                         />
                     </View>
 
-                    <Button onPress={handleGenerateReport} disabled={isLoading} className="mt-4 bg-accent py-3.5">
-                        {isLoading ? <ActivityIndicator size="small" color={colors.bg} /> : <Sparkles size={16} color={colors.bg} strokeWidth={2.6} />}
-                        <ButtonText className="text-[15px] text-accent-foreground">{isLoading ? "正在生成建议..." : "生成今日建议"}</ButtonText>
+                    <Button onPress={handleGenerateReport} disabled={isLoading} className="mt-4 py-3.5">
+                        {isLoading ? <ActivityIndicator size="small" color={colors.primaryForeground} /> : <Sparkles size={16} color={colors.primaryForeground} strokeWidth={2.2} />}
+                        <ButtonText>{isLoading ? "生成中" : "生成建议"}</ButtonText>
                     </Button>
                 </Card>
 
                 <Card>
-                    <Text variant="caption" className="text-[11px] font-extrabold tracking-[1.2px] text-accent">AI 建议</Text>
                     <View className="mt-2 flex-row items-center justify-between gap-3">
-                        <Text variant="subheading" className="flex-1">今天的建议</Text>
-                        <View className="rounded-full bg-accent/10 px-2.5 py-1.5">
-                            <Text className="text-xs font-black text-primary">{reportData?.intensityScore ?? 0} / 100</Text>
+                        <Text variant="subheading" className="flex-1">建议</Text>
+                        <View className="rounded-full border border-border px-2.5 py-1.5">
+                            <Text className="text-xs font-medium text-foreground">{reportData?.intensityScore ?? 0} / 100</Text>
                         </View>
                     </View>
 
-                    <View className="mt-3.5 rounded-[14px] bg-muted/50 p-3.5">
-                        <Text className="text-base font-extrabold">{coachLine}</Text>
-                        <Text variant="muted" className="mt-2 leading-[22px]">
-                            {reportData?.overallEvaluation || "生成建议后，这里会显示 AI 对你今天训练的判断。"}
+                    <View className="mt-3.5 rounded-[14px] border border-border bg-background p-3.5">
+                        <Text className="text-base font-semibold">{coachLine}</Text>
+                        <Text variant="muted" className="mt-2">
+                            {reportData?.overallEvaluation || "暂无建议"}
                         </Text>
                     </View>
                 </Card>
 
                 <Card>
-                    <Text variant="caption" className="text-[11px] font-extrabold tracking-[1.2px] text-accent">今日计划</Text>
-                    <Text variant="subheading" className="mt-2">今天的训练计划</Text>
+                    <Text variant="subheading">今日计划</Text>
 
                     {adjustedPlan.length === 0 ? (
-                        <View className="mt-3.5 rounded-[14px] bg-muted/40 p-4">
-                            <Text variant="muted" className="leading-[22px]">先生成建议，这里会给你 2 到 3 个今天该做的训练项。</Text>
+                        <View className="mt-3.5 rounded-[14px] border border-dashed border-border bg-background p-4">
+                            <Text variant="muted">暂无计划</Text>
                         </View>
                     ) : (
                         <View className="mt-3.5 gap-2.5">
                             {adjustedPlan.map((plan, index) => (
-                                <Card key={`${plan.name}-${index}`} className="rounded-[14px] bg-card/60 p-3.5">
+                                <Card key={`${plan.name}-${index}`} className="rounded-[14px] border border-border bg-background p-3.5">
                                     <View className="flex-row items-center justify-between gap-2.5">
                                         <View className="flex-1">
-                                            <Text className="text-base font-extrabold">{plan.name}</Text>
-                                            <Text variant="caption" className="mt-1 font-bold">{getPlanTypeLabel(plan.type)}</Text>
+                                            <Text className="text-base font-semibold">{plan.name}</Text>
+                                            <Text variant="caption" className="mt-1">{getPlanTypeLabel(plan.type)}</Text>
                                         </View>
-                                        <Text className="text-xs font-black text-accent">{plan.sets || plan.stats || "自定义"}</Text>
+                                        <Text className="text-xs text-muted-foreground">{plan.sets || plan.stats || "-"}</Text>
                                     </View>
                                 </Card>
                             ))}
@@ -313,14 +309,14 @@ export default function AiCoachScreen() {
                             onPress={() => setUseLiteMode((prev) => !prev)}
                             disabled={!reportData}
                             variant="outline"
-                            className={`flex-1 py-3 ${useLiteMode ? "border-accent bg-accent/10" : "border-border bg-muted/40"}`}
+                            className="flex-1 py-3"
                         >
-                            <ButtonText variant="outline" className={`text-[13px] ${useLiteMode ? "text-accent" : "text-foreground"}`}>{useLiteMode ? "已切到轻松版" : "换个更轻松的"}</ButtonText>
+                            <ButtonText variant="outline">{useLiteMode ? "轻松版" : "切换轻松版"}</ButtonText>
                         </Button>
 
-                        <Button onPress={handleApplyTodaysPlan} disabled={isApplying || adjustedPlan.length === 0} className="flex-1 bg-accent py-3">
-                            {isApplying ? <ActivityIndicator size="small" color={colors.bg} /> : <Plus size={16} color={colors.bg} strokeWidth={2.6} />}
-                            <ButtonText className="text-[13px] text-accent-foreground">应用到今日训练</ButtonText>
+                        <Button onPress={handleApplyTodaysPlan} disabled={isApplying || adjustedPlan.length === 0} className="flex-1 py-3">
+                            {isApplying ? <ActivityIndicator size="small" color={colors.primaryForeground} /> : <Plus size={16} color={colors.primaryForeground} strokeWidth={2.2} />}
+                            <ButtonText>加入今日训练</ButtonText>
                         </Button>
                     </View>
                 </Card>
@@ -340,7 +336,7 @@ function FilterRow({ title, icon, options, value, onChange }: { title: string; i
         <View>
             <View className="mb-2 flex-row items-center gap-1.5">
                 {icon}
-                <Text className="text-[13px] font-extrabold">{title}</Text>
+                <Text className="text-[13px] font-medium">{title}</Text>
             </View>
             <ToggleGroup value={value} onValueChange={onChange}>
                 {options.map((option) => {
@@ -349,10 +345,10 @@ function FilterRow({ title, icon, options, value, onChange }: { title: string; i
                         <ToggleGroupItem
                             key={option.key}
                             value={option.key}
-                            activeClassName="border-success bg-success/10"
-                            inactiveClassName="border-border bg-muted/40"
+                            activeClassName="border-primary bg-background"
+                            inactiveClassName="border-border bg-background"
                         >
-                            <Text className={active ? "text-xs font-black text-success" : "text-xs font-black text-foreground"}>{option.label}</Text>
+                            <Text className={active ? "text-xs font-medium text-foreground" : "text-xs text-muted-foreground"}>{option.label}</Text>
                         </ToggleGroupItem>
                     );
                 })}

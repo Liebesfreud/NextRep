@@ -1,7 +1,6 @@
 import { View } from "react-native";
 import { CheckCircle } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
-import { BrandMark } from "@/components/ui/brand-mark";
 import { Text } from "@/components/ui/text";
 
 type Props = {
@@ -18,20 +17,18 @@ export function HomeHeader({ greeting, userName, isCheckedIn }: Props) {
     }).format(now);
 
     return (
-        <View className="gap-4">
-            <BrandMark compact subtitle="TRAIN LOCAL · PLAN SMART" />
+        <View className="gap-3">
             <View className="flex-row items-end justify-between">
-            <View>
-                <Text variant="caption" className="mb-0.5 font-bold tracking-widest">
+            <View className="gap-1">
+                <Text variant="caption" className="text-muted-foreground">
                     {formattedDate}
                 </Text>
-                <Text variant="title" className="mt-1 font-extrabold">
-                    <Text className="text-accent">{greeting}, </Text>
-                    <Text className="opacity-90">{userName}</Text>
+                <Text variant="title" className="font-semibold">
+                    {greeting}，{userName}
                 </Text>
             </View>
             {isCheckedIn && (
-                <CheckCircle size={32} color={colors.green} strokeWidth={2.5} />
+                <CheckCircle size={24} color={colors.green} strokeWidth={2.25} />
             )}
             </View>
         </View>

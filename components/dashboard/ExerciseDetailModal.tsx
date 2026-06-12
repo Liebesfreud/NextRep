@@ -1,12 +1,12 @@
 import { View, ScrollView } from "react-native";
 import { type ReactNode } from "react";
 import { Activity, Calendar, Dumbbell, Target, TrendingUp, X } from "lucide-react-native";
-import { BottomSheetModal } from "@/components/ui/BottomSheetModal";
 import { useTheme } from "@/hooks/useTheme";
 import { getStrengthCategoryVisual } from "@/constants/exerciseVisuals";
 import { type StrengthExerciseAnalytics } from "@/db/services/dashboard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
 
 type Props = {
@@ -69,22 +69,21 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
     const recentBreakthroughs = exercise.breakthroughs.slice(0, 5);
 
     return (
-        <BottomSheetModal
+        <Sheet
             visible={visible}
             onClose={onClose}
             sheetHeight="82%"
-            backgroundColor={colors.bento}
         >
             <View className="flex-row justify-between items-start mb-5">
                 <View className="flex-row items-center gap-3 flex-1 pr-3">
-                    <View style={{ backgroundColor: visual.iconBg }} className="h-[46px] w-[46px] items-center justify-center rounded-xl">
-                        <Icon size={22} color={visual.accent} />
+                    <View className="h-[46px] w-[46px] items-center justify-center rounded-xl bg-secondary">
+                        <Icon size={22} color={colors.foreground} />
                     </View>
                     <View className="flex-1">
                         <Text className="text-xl font-black" numberOfLines={1}>
                             {exercise.name}
                         </Text>
-                        <Text style={{ color: visual.accent }} className="text-xs font-bold mt-1">
+                        <Text variant="muted" className="mt-1 text-xs">
                             {exercise.tag || "力量训练"}
                         </Text>
                     </View>
@@ -171,6 +170,6 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
                     )}
                 </Card>
             </ScrollView>
-        </BottomSheetModal>
+        </Sheet>
     );
 }

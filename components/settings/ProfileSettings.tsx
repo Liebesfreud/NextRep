@@ -74,9 +74,9 @@ function NumericInput({
                 value={value}
                 onChangeText={onChange}
                 placeholder={placeholder}
-                className={cn("min-h-0 min-w-12 border-0 bg-transparent p-0 text-right text-base font-extrabold", className)}
+                className={cn("min-h-0 min-w-12 border-0 bg-transparent p-0 text-right text-base font-semibold", className)}
             />
-            <Text variant="caption" className="font-semibold">
+            <Text variant="caption">
                 {unit}
             </Text>
         </View>
@@ -106,8 +106,8 @@ export function ProfileSettings({ profile, setProfile }: Props) {
         <Card className="overflow-hidden p-0">
             <View className="flex-row items-center gap-2 px-3.5 py-3">
                 <User size={14} color={colors.gray4} />
-                <Text variant="caption" className="font-extrabold uppercase tracking-[1.5px]">
-                    个人指标
+                <Text variant="caption" className="font-semibold">
+                    个人资料
                 </Text>
             </View>
             <Separator />
@@ -116,8 +116,8 @@ export function ProfileSettings({ profile, setProfile }: Props) {
                 <Input
                     value={profile.name}
                     onChangeText={(value) => setProfile((current) => ({ ...current, name: value }))}
-                    placeholder="输入昵称"
-                    className="min-h-0 min-w-20 border-0 bg-transparent p-0 text-right text-sm font-bold"
+                    placeholder="未填写"
+                    className="min-h-0 min-w-20 border-0 bg-transparent p-0 text-right text-sm font-medium"
                 />
             </RowField>
 
@@ -130,9 +130,8 @@ export function ProfileSettings({ profile, setProfile }: Props) {
                     <NumericInput
                         value={profile.height ? String(profile.height) : ""}
                         onChange={(value) => setProfile((current) => ({ ...current, height: value ? parseFloat(value) : null }))}
-                        placeholder="---"
+                        placeholder="--"
                         unit="cm"
-                        className="text-accent"
                     />
                 </View>
                 <Separator orientation="vertical" className="my-2" />
@@ -146,7 +145,6 @@ export function ProfileSettings({ profile, setProfile }: Props) {
                         onChange={(value) => setProfile((current) => ({ ...current, age: value ? parseInt(value, 10) : null }))}
                         placeholder="--"
                         unit="岁"
-                        className="text-primary"
                     />
                 </View>
             </View>
@@ -170,7 +168,6 @@ export function ProfileSettings({ profile, setProfile }: Props) {
                         onChange={(value) => setProfile((current) => ({ ...current, targetWeight: value ? parseFloat(value) : null }))}
                         placeholder="--"
                         unit="kg"
-                        className="text-primary"
                     />
                 </View>
                 <Separator orientation="vertical" className="my-2" />
@@ -184,7 +181,6 @@ export function ProfileSettings({ profile, setProfile }: Props) {
                         onChange={(value) => setProfile((current) => ({ ...current, targetBodyFat: value ? parseFloat(value) : null }))}
                         placeholder="--"
                         unit="%"
-                        className="text-accent"
                     />
                 </View>
             </View>

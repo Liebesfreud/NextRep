@@ -1,9 +1,8 @@
 import { View } from "react-native";
 import { Scale } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
-import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
 
@@ -53,13 +52,15 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
     const bodyFatStatusBg = bodyFatVal ? (bodyFatVal >= 25 ? `${colors.orange}1A` : bodyFatVal >= 15 ? `${colors.green}1A` : `${colors.orange}1A`) : colors.border;
     const weightGap = weightVal != null && targetWeight != null ? weightVal - targetWeight : null;
     const bodyFatGap = bodyFatVal != null && targetBodyFat != null ? bodyFatVal - targetBodyFat : null;
+    const toggleWeightExpanded = () => setExpandedMetric(expandedMetric === "weight" ? null : "weight");
+    const toggleBodyFatExpanded = () => setExpandedMetric(expandedMetric === "bodyFat" ? null : "bodyFat");
 
     return (
-        <Card className="gap-2.5 p-3">
+        <Card className="gap-3 p-4">
             {/* Header */}
             <View className="flex-row items-center px-0.5">
                 <Scale size={16} color={colors.red} />
-                <Text variant="caption" className="ml-1.5 font-bold tracking-[0.4px] opacity-90">
+                <Text variant="caption" className="ml-1.5 text-muted-foreground">
                     身体指标
                 </Text>
             </View>
@@ -68,92 +69,105 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
             <View className="flex-row gap-2.5">
 
                 {/* 左侧核心卡片（体重） */}
-                <AnimatedPressable
-                    onPress={() => setExpandedMetric(expandedMetric === "weight" ? null : "weight")}
-                    activeScale={0.98}
-                    activeOpacity={0.86}
+                <Button
+                    onPress={toggleWeightExpanded}
+                    variant="ghost"
                     className={cn(
-                        "min-h-[106px] flex-[1.3] justify-between rounded-2xl border bg-muted p-3",
+                        "min-h-[106px] h-auto flex-[1.3] justify-between rounded-2xl border p-3",
                         expandedMetric === "weight" ? "border-destructive/50" : "border-border"
                     )}
                 >
                     <View className="flex-row items-center">
-                        <Text variant="caption" className="font-semibold text-foreground opacity-80">
+                        <Text variant="caption" className="text-muted-foreground">
                             体重
                         </Text>
                     </View>
 
                     <View className="mb-2 mt-1.5 flex-row items-baseline">
-                        <Text className="text-[28px] font-extrabold tracking-[-1px] text-foreground">
+                        <Text className="text-[28px] font-semibold text-foreground">
                             {loading ? "-" : (weightVal ?? "-")}
                         </Text>
-                        <Text variant="caption" className="ml-1 font-semibold text-foreground opacity-50">
+                        <Text variant="caption" className="ml-1 text-muted-foreground">
                             kg
                         </Text>
                     </View>
 
                     {/* 趋势标签 */}
-                    <StatusBadge
-                        label={trendText}
-                        color={trendColor}
-                        backgroundColor={trendBgColor}
-                        className="rounded-md border-0 px-[7px] py-[3px]"
-                        textClassName="text-[10px] font-bold"
-                    />
+                    <View
+                        className="self-start rounded-md px-[7px] py-[3px]"
+                        style={{ backgroundColor: trendBgColor }}
+                    >
+                        <Text className="text-[10px] font-bold" style={{ color: trendColor }}>
+                            {trendText}
+                        </Text>
+                    </View>
 
-                    <Text className="mt-2 text-[10px] font-semibold text-muted-foreground" numberOfLines={2}>
+                    <Text className="mt-2 text-[10px] text-muted-foreground" numberOfLines={2}>
                         {targetWeight != null && weightGap != null
                             ? `目标 ${targetWeight}kg · ${weightGap === 0 ? "已达成" : `${weightGap > 0 ? "高于" : "低于"}目标 ${Math.abs(weightGap).toFixed(1)}kg`}`
-                            : "设置目标体重后显示差距"}
+                            : "未设置目标"}
                     </Text>
-                </AnimatedPressable>
+                </Button>
 
                 {/* 右侧辅助卡片区 */}
                 <View className="flex-1 gap-2.5">
 
                     {/* 右上卡片（体脂率） */}
-                    <AnimatedPressable
-                        onPress={() => setExpandedMetric(expandedMetric === "bodyFat" ? null : "bodyFat")}
-                        activeScale={0.98}
-                        activeOpacity={0.86}
+                    <Button
+                        onPress={toggleBodyFatExpanded}
+                        variant="ghost"
                         className={cn(
-                            "flex-1 justify-between rounded-2xl border bg-muted p-[9px]",
+                            "h-auto flex-1 justify-between rounded-2xl border p-[9px]",
                             expandedMetric === "bodyFat" ? "border-destructive/50" : "border-border"
                         )}
                     >
-                        <Text className="text-[11px] font-semibold text-foreground opacity-80">
+                        <Text className="text-[11px] text-muted-foreground">
                             体脂率
                         </Text>
                         <View className="mt-0.5 flex-row items-end justify-between">
                             <View className="flex-row items-baseline">
-                                <Text className="text-[17px] font-extrabold text-foreground">
+                                <Text className="text-[17px] font-semibold text-foreground">
                                     {loading ? "-" : (bodyFatVal ?? "-")}
                                 </Text>
-                                <Text className="ml-0.5 text-[9px] font-semibold text-foreground opacity-50">%</Text>
+                                <Text className="ml-0.5 text-[9px] text-muted-foreground">%</Text>
                             </View>
                             {bodyFatVal && (
-                                <StatusBadge label={bodyFatStatusText} color={bodyFatStatusColor} backgroundColor={bodyFatStatusBg} />
+                                <View
+                                    className="rounded-md px-2 py-0.5"
+                                    style={{ backgroundColor: bodyFatStatusBg }}
+                                >
+                                    <Text className="text-[10px] font-medium" style={{ color: bodyFatStatusColor }}>
+                                        {bodyFatStatusText}
+                                    </Text>
+                                </View>
                             )}
                         </View>
-                        <Text className="mt-[3px] text-[9px] font-semibold text-muted-foreground" numberOfLines={2}>
+                        <Text className="mt-[3px] text-[9px] text-muted-foreground" numberOfLines={2}>
                             {targetBodyFat != null && bodyFatGap != null
                                 ? `目标 ${targetBodyFat}% · ${bodyFatGap === 0 ? "已达成" : `${bodyFatGap > 0 ? "高于" : "低于"}目标 ${Math.abs(bodyFatGap).toFixed(1)}%`}`
-                                : "设置目标体脂后显示差距"}
+                                : "未设置目标"}
                         </Text>
-                    </AnimatedPressable>
+                    </Button>
 
                     {/* 右下卡片（BMI） */}
                     <Card
-                        className="flex-1 justify-between rounded-2xl border border-border bg-muted p-[9px]"
+                        className="flex-1 justify-between rounded-2xl border border-border p-[9px]"
                     >
-                        <Text className="text-[11px] font-semibold text-foreground opacity-80">
+                        <Text className="text-[11px] text-muted-foreground">
                             BMI
                         </Text>
                         <View className="mt-0.5 flex-row items-end justify-between">
-                            <Text className="text-[17px] font-extrabold text-foreground">
+                            <Text className="text-[17px] font-semibold text-foreground">
                                 {loading ? "-" : bmiVal}
                             </Text>
-                            <StatusBadge label={bmiStatus.text} color={bmiStatus.color} backgroundColor={bmiStatus.bg} />
+                            <View
+                                className="rounded-md px-2 py-0.5"
+                                style={{ backgroundColor: bmiStatus.bg }}
+                            >
+                                <Text className="text-[10px] font-medium" style={{ color: bmiStatus.color }}>
+                                    {bmiStatus.text}
+                                </Text>
+                            </View>
                         </View>
                     </Card>
 
