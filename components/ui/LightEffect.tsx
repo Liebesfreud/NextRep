@@ -1,5 +1,5 @@
 import React, { useId } from 'react';
-import { StyleSheet, ViewStyle } from 'react-native';
+import { ViewStyle } from 'react-native';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 type LightEffectProps = {
@@ -49,7 +49,7 @@ export function LightEffect({
             width={size}
             viewBox={`0 0 ${typeof size === 'number' ? size : 100} ${typeof size === 'number' ? size : 100}`}
             style={[
-                StyleSheet.absoluteFillObject, // By default fills the parent, but can be overridden by position
+                { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }, // By default fills the parent, but can be overridden by position
                 { pointerEvents: 'none' },     // CRITICAL: Prevent light effect from blocking touches
                 position,
                 style,

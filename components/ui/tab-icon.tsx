@@ -1,11 +1,11 @@
 import * as React from "react";
-import { View } from "react-native";
+import { View, type ColorValue } from "react-native";
 import { MotiView } from "moti";
 import { type LucideIcon } from "lucide-react-native";
 
 type TabIconProps = {
     icon: LucideIcon;
-    color: string;
+    color: ColorValue;
     size: number;
     focused: boolean;
 };

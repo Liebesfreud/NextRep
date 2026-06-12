@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, View, type ViewStyle } from "react-native";
+import { Platform, View, type ViewStyle } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
 
 const TAB_BAR_HEIGHT = 70;
@@ -45,7 +45,11 @@ export function TabBarBackground() {
     return (
         <View
             style={{
-                ...StyleSheet.absoluteFillObject,
+                position: "absolute",
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
                 backgroundColor: colors.card,
                 borderColor: colors.border,
                 borderWidth: 1,

@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { Tabs } from "expo-router";
+import { Tabs, ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Home, LayoutDashboard, Bot, Settings } from "lucide-react-native";
 import { View } from "react-native";
 import { ThemeProvider, useTheme } from "@/hooks/useTheme";
 import { initDatabase } from "@/db/client";
 import * as SplashScreen from "expo-splash-screen";
-import { ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from "@react-navigation/native";
 import { Button, ButtonText } from "@/components/ui/button";
 import { getTabBarStyle, TabBarBackground, TAB_BAR_ITEM_STYLE } from "@/components/ui/tab-bar-background";
 import { TabIcon } from "@/components/ui/tab-icon";

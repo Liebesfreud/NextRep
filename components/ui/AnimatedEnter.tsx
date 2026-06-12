@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { ViewStyle, StyleProp } from 'react-native';
 import { MotiView } from 'moti';
 import { ELEGANT_SPRING } from '@/constants/animations';
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from 'expo-router';
 
 interface AnimatedEnterProps {
     children: React.ReactNode;
