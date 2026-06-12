@@ -15,7 +15,7 @@ type ToggleGroupProps = ViewProps & {
 const ToggleGroup = React.forwardRef<React.ElementRef<typeof View>, ToggleGroupProps>(
     ({ className, value, onValueChange, ...props }, ref) => (
         <ToggleGroupContext.Provider value={{ value, onValueChange }}>
-            <View ref={ref} className={cn("flex-row flex-wrap gap-2", className)} {...props} />
+            <View ref={ref} className={cn("self-start flex-row flex-wrap gap-1 rounded-bento-sm bg-muted p-1", className)} {...props} />
         </ToggleGroupContext.Provider>
     )
 );
@@ -42,8 +42,8 @@ const ToggleGroupItem = React.forwardRef<React.ElementRef<typeof Pressable>, Tog
                 accessibilityRole="button"
                 accessibilityState={{ selected: active }}
                 className={cn(
-                    "items-center justify-center rounded-full border px-3 py-2 active:opacity-80 disabled:opacity-50",
-                    active ? (activeClassName ?? "border-primary bg-primary/15") : (inactiveClassName ?? "border-border bg-secondary"),
+                    "min-h-9 items-center justify-center rounded-md border border-transparent px-3 py-2 active:opacity-90 disabled:opacity-50",
+                    active ? (activeClassName ?? "border-border bg-background shadow-sm") : (inactiveClassName ?? "bg-transparent"),
                     className
                 )}
                 onPress={() => context.onValueChange(value)}

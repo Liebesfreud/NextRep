@@ -3,44 +3,44 @@
 
 export const Colors = {
     dark: {
-        bg: "#000000",         // --bg-app
-        bento: "#1C1C1E",      // --bg-bento
-        gray2: "#2C2C2E",      // --bg-2
-        gray3: "#3A3A3C",      // --bg-3
-        gray4: "#8E8D93",      // --text-muted
+        bg: "#09090B",
+        bento: "#111113",
+        gray2: "#18181B",
+        gray3: "#27272A",
+        gray4: "#A1A1AA",
         blue: "#0A84FF",       // info/accent-blue
-        green: "#30D158",      // success
+        green: "#22C55E",
         orange: "#FF9F0A",     // primary
-        red: "#FF453A",        // destructive
-        white: "#FFFFFF",       // --text-main
+        red: "#EF4444",
+        white: "#FAFAFA",
         black: "#000000",       // --text-inverse
-        card: "#1C1C1E",
-        border: "rgba(255,255,255,0.06)",
+        card: "#111113",
+        border: "rgba(255,255,255,0.09)",
         overlay: "rgba(0,0,0,0.6)",
-        primaryForeground: "#000000",
-        accentForeground: "#000000",
+        primaryForeground: "#052E16",
+        accentForeground: "#052E16",
         destructiveForeground: "#FFFFFF",
-        mutedForeground: "#8E8D93",
+        mutedForeground: "#A1A1AA",
     },
     light: {
-        bg: "#F2F2F7",
+        bg: "#FAFAFA",
         bento: "#FFFFFF",
-        gray2: "#F6F6F8",      // Lighter than System Gray 6, but not as white as previous iteration
-        gray3: "#F5F5F7",      // Even lighter gray for borders/panels
-        gray4: "#8E8D93",
+        gray2: "#F4F4F5",
+        gray3: "#E4E4E7",
+        gray4: "#71717A",
         blue: "#007AFF",
-        green: "#34C759",
+        green: "#16A34A",
         orange: "#FF9500",
-        red: "#FF3B30",
-        white: "#000000",
+        red: "#DC2626",
+        white: "#18181B",
         black: "#FFFFFF",
         card: "#FFFFFF",
-        border: "rgba(0,0,0,0.05)",
-        overlay: "rgba(0,0,0,0.35)",
-        primaryForeground: "#000000",
-        accentForeground: "#000000",
+        border: "rgba(24,24,27,0.08)",
+        overlay: "rgba(9,9,11,0.35)",
+        primaryForeground: "#FFFFFF",
+        accentForeground: "#052E16",
         destructiveForeground: "#FFFFFF",
-        mutedForeground: "#8E8D93",
+        mutedForeground: "#71717A",
     },
 } as const;
 

@@ -22,7 +22,7 @@ type Props = {
     sheetHeight?: `${number}%` | number;
     children: React.ReactNode;
     /** Sheet 背景色 */
-    backgroundColor: string;
+    backgroundColor?: string;
     /** 遮罩层背景色 */
     backdropColor?: string;
     /** 是否包裹 KeyboardAvoidingView（需要输入框时传 true）*/
@@ -41,6 +41,8 @@ export function BottomSheetModal({
     const { colors } = useTheme();
     const { height: screenHeight } = useWindowDimensions();
     const [isMounted, setIsMounted] = useState(visible);
+    const resolvedBackgroundColor = backgroundColor ?? colors.card;
+    const resolvedBackdropColor = backdropColor ?? colors.overlay;
     // 遮罩层透明度动画
     const backdropOpacity = useRef(new Animated.Value(0)).current;
     // 卡片滑动位移动画
@@ -107,11 +109,10 @@ export function BottomSheetModal({
 
     const modalBody = (
         <View style={[StyleSheet.absoluteFill, styles.modalRoot]}>
-            {/* 深色遮罩 —— 固定整屏，不参与 slide 动画 */}
+            {/* 遮罩层固定整屏，不参与 slide 动画 */}
             <Animated.View
-                style={[StyleSheet.absoluteFill, { backgroundColor: backdropColor ?? colors.overlay, opacity: backdropOpacity }]}
+                style={[StyleSheet.absoluteFill, { backgroundColor: resolvedBackdropColor, opacity: backdropOpacity }]}
             >
-                {/* disabled 控制触摸穿透，不触发布局重算 */}
                 <Pressable
                     style={StyleSheet.absoluteFill}
                     onPress={handleRequestClose}
@@ -119,28 +120,29 @@ export function BottomSheetModal({
                 />
             </Animated.View>
 
-            {/* 底部卡片 —— 从底部弹入 */}
             <Animated.View
                 style={[
                     styles.sheet,
                     sheetHeightStyle,
                     {
-                        backgroundColor,
+                        backgroundColor: resolvedBackgroundColor,
+                        borderTopColor: colors.border,
                         pointerEvents: visible ? "auto" : "none",
                         transform: [{ translateY: sheetTranslateY }],
                     },
                 ]}
             >
+                <View style={[styles.handle, { backgroundColor: colors.mutedForeground }]} />
                 {avoidKeyboard ? (
                     <KeyboardAvoidingView
-                        behavior={Platform.OS === "ios" ? "position" : "height"}
+                        behavior={Platform.OS === "ios" ? "padding" : "height"}
                         keyboardVerticalOffset={Platform.OS === "ios" ? 12 : 0}
-                        style={styles.sheetKeyboardAvoider}
+                        style={styles.sheetContent}
                     >
                         {children}
                     </KeyboardAvoidingView>
                 ) : (
-                    children
+                    <View style={styles.sheetContent}>{children}</View>
                 )}
             </Animated.View>
         </View>
@@ -173,13 +175,23 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        padding: 24,
-        paddingBottom: 48,
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        paddingHorizontal: 20,
+        paddingTop: 12,
+        paddingBottom: 28,
         overflow: "hidden",
     },
-    sheetKeyboardAvoider: {
+    handle: {
+        alignSelf: "center",
+        width: 36,
+        height: 4,
+        borderRadius: 999,
+        marginBottom: 12,
+        opacity: 0.4,
+    },
+    sheetContent: {
         flex: 1,
     },
 });

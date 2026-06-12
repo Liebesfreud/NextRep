@@ -12,10 +12,20 @@ type DialogProps = ViewProps & {
 
 const Dialog = React.forwardRef<React.ElementRef<typeof View>, DialogProps>(
     ({ visible, onClose, children, className, contentClassName, backdropClassName, ...props }, ref) => (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-            <View ref={ref} className={cn("flex-1 items-center justify-center px-5", className)} {...props}>
-                <Pressable className={cn("absolute inset-0 bg-black/60", backdropClassName)} onPress={onClose} />
-                <View className={cn("w-full rounded-bento-lg border border-border bg-card p-5", contentClassName)}>
+        <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
+            <View ref={ref} className={cn("flex-1 items-center justify-center px-6", className)} {...props}>
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="关闭弹窗"
+                    className={cn("absolute inset-0 bg-background/80", backdropClassName)}
+                    onPress={onClose}
+                />
+                <View
+                    className={cn(
+                        "w-full max-w-sm rounded-bento-lg border border-border bg-card p-6 shadow-sm shadow-black/10",
+                        contentClassName
+                    )}
+                >
                     {children}
                 </View>
             </View>

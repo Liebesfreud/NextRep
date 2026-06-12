@@ -1,6 +1,6 @@
 import * as React from "react";
 import { View } from "react-native";
-import { Dumbbell, Sparkles, type LucideIcon } from "lucide-react-native";
+import { Dumbbell, type LucideIcon } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
@@ -24,19 +24,23 @@ const BrandMark = React.memo(function BrandMark({
 
     return (
         <View className={cn("flex-row items-center gap-3", className)}>
-            <View className={cn("items-center justify-center rounded-2xl border border-accent/20 bg-accent/10", compact ? "h-9 w-9" : "h-11 w-11")}>
-                <Icon size={compact ? 18 : 21} color={colors.green} strokeWidth={2.7} />
-                {!compact ? (
-                    <View className="absolute -right-1 -top-1 h-4 w-4 items-center justify-center rounded-full bg-primary">
-                        <Sparkles size={9} color={colors.primaryForeground} strokeWidth={3} />
-                    </View>
-                ) : null}
+            <View
+                className={cn(
+                    "items-center justify-center rounded-xl border border-border bg-card",
+                    compact ? "h-9 w-9" : "h-11 w-11"
+                )}
+            >
+                <Icon size={compact ? 17 : 20} color={colors.green} strokeWidth={2.35} />
+                {!compact ? <View className="absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full bg-primary/70" /> : null}
             </View>
             <View className="flex-1">
                 <Text variant={compact ? "label" : "heading"} className="leading-none tracking-tight">
                     {title}
                 </Text>
-                <Text variant="caption" className="mt-1 text-[10px] font-extrabold uppercase tracking-[1.6px] text-accent">
+                <Text
+                    variant="caption"
+                    className={cn("mt-1 leading-4 text-muted-foreground", compact ? "text-[11px]" : "text-[12px]")}
+                >
                     {subtitle}
                 </Text>
             </View>

@@ -22,14 +22,14 @@ function getTabBarStyle(borderColor: string): ViewStyle {
         paddingTop: 0,
         ...Platform.select<ViewStyle>({
             web: {
-                boxShadow: "0 16px 32px rgba(0, 0, 0, 0.08)",
+                boxShadow: "0 10px 24px rgba(0, 0, 0, 0.06)",
             },
             default: {
                 shadowColor: "#000000",
-                shadowOffset: { width: 0, height: 16 },
-                shadowOpacity: 0.08,
-                shadowRadius: 32,
-                elevation: 8,
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.06,
+                shadowRadius: 24,
+                elevation: 5,
             },
         }),
     };
@@ -46,7 +46,9 @@ export function TabBarBackground() {
         <View
             style={{
                 ...StyleSheet.absoluteFillObject,
-                backgroundColor: colors.bento,
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                borderWidth: 1,
                 borderRadius: TAB_BAR_RADIUS,
                 overflow: "hidden",
             }}
@@ -57,32 +59,9 @@ export function TabBarBackground() {
                     top: 0,
                     left: 0,
                     right: 0,
-                    bottom: 0,
-                    backgroundColor: colors.white,
-                    opacity: 0.03,
-                }}
-            />
-            <View
-                style={{
-                    position: "absolute",
-                    top: -50,
-                    left: "10%",
-                    right: "10%",
-                    height: 50,
-                    backgroundColor: colors.white,
-                    borderRadius: 100,
-                    ...Platform.select<ViewStyle>({
-                        web: {
-                            boxShadow: `0 25px 40px ${colors.white}14`,
-                        },
-                        default: {
-                            shadowColor: colors.white,
-                            shadowOffset: { width: 0, height: 25 },
-                            shadowOpacity: 0.08,
-                            shadowRadius: 40,
-                            elevation: 0,
-                        },
-                    }),
+                    height: 1,
+                    backgroundColor: colors.border,
+                    opacity: 0.9,
                 }}
             />
         </View>

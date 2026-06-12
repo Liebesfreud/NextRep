@@ -6,22 +6,22 @@ import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-    "web:ring-offset-background web:transition-colors web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 flex-row items-center justify-center gap-2 rounded-bento-sm active:opacity-80 disabled:opacity-50",
+    "web:ring-offset-background web:transition-colors web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 flex-row items-center justify-center gap-2 rounded-md border border-transparent active:opacity-90 disabled:opacity-50",
     {
         variants: {
             variant: {
                 default: "bg-primary",
                 secondary: "bg-secondary",
                 destructive: "bg-destructive",
-                outline: "border border-border bg-transparent",
+                outline: "border-input bg-background",
                 ghost: "bg-transparent",
                 link: "bg-transparent web:underline-offset-4 web:hover:underline",
             },
             size: {
-                default: "h-12 px-5 py-3",
-                sm: "h-10 px-4 py-2",
-                lg: "h-14 px-6 py-4",
-                icon: "h-11 w-11",
+                default: "h-10 px-4 py-2 native:h-12",
+                sm: "h-9 px-3 native:h-10",
+                lg: "h-11 px-8 native:h-14",
+                icon: "h-10 w-10 native:h-12 native:w-12",
             },
         },
         defaultVariants: {
@@ -31,7 +31,7 @@ const buttonVariants = cva(
     }
 );
 
-const buttonTextVariants = cva("text-sm font-black", {
+const buttonTextVariants = cva("text-sm font-medium", {
     variants: {
         variant: {
             default: "text-primary-foreground",
@@ -43,9 +43,9 @@ const buttonTextVariants = cva("text-sm font-black", {
         },
         size: {
             default: "text-sm",
-            sm: "text-xs",
+            sm: "text-sm",
             lg: "text-base",
-            icon: "text-sm",
+            icon: "text-base",
         },
     },
     defaultVariants: {
@@ -74,7 +74,8 @@ type ButtonProps = PressableProps &
 function getIndicatorColor(variant: ButtonProps["variant"], colors: ReturnType<typeof useTheme>["colors"]) {
     if (variant === "default") return colors.primaryForeground;
     if (variant === "destructive") return colors.destructiveForeground;
-    return colors.orange;
+    if (variant === "link") return colors.orange;
+    return colors.white;
 }
 
 const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>(

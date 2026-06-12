@@ -9,7 +9,7 @@ type LightEffectProps = {
     color: string;
     /** 
      * Base opacity of the center of the light. 
-     * Should be strictly between 0.03 and 0.1 for subtle effect. 
+     * Should stay low for a restrained ambient glow.
      */
     opacity?: number;
     /** 
@@ -34,13 +34,12 @@ type LightEffectProps = {
 
 export function LightEffect({
     color,
-    opacity = 0.05, // Default to a very subtle 5% opacity
-    size = 200,     // Default large spread
+    opacity = 0.035,
+    size = 180,
     position,
     style,
 }: LightEffectProps) {
-    // Clamp opacity to ensure it is very subtle, max 0.15 just in case but usually stay <= 0.1
-    const clampedOpacity = Math.max(0.01, Math.min(opacity, 0.15));
+    const clampedOpacity = Math.max(0.008, Math.min(opacity, 0.08));
 
     const gradientId = `light-grad-${useId().replace(/:/g, '')}`;
 
@@ -57,10 +56,6 @@ export function LightEffect({
             ]}
         >
             <Defs>
-                {/* 
-                    Radial gradient to simulate a soft light source. 
-                    Uses a very smooth falloff from center to edge.
-                */}
                 <RadialGradient
                     id={gradientId}
                     cx="50%"
@@ -71,8 +66,8 @@ export function LightEffect({
                     fy="50%"
                 >
                     <Stop offset="0%" stopColor={color} stopOpacity={clampedOpacity} />
-                    <Stop offset="30%" stopColor={color} stopOpacity={clampedOpacity * 0.7} />
-                    <Stop offset="60%" stopColor={color} stopOpacity={clampedOpacity * 0.3} />
+                    <Stop offset="24%" stopColor={color} stopOpacity={clampedOpacity * 0.5} />
+                    <Stop offset="55%" stopColor={color} stopOpacity={clampedOpacity * 0.18} />
                     <Stop offset="100%" stopColor={color} stopOpacity="0" />
                 </RadialGradient>
             </Defs>

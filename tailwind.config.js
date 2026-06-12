@@ -53,8 +53,8 @@ module.exports = {
         bento: "16px",
       },
       borderRadius: {
-        "bento-lg": "16px",
-        "bento-sm": "12px",
+        "bento-lg": "14px",
+        "bento-sm": "10px",
       },
     },
   },

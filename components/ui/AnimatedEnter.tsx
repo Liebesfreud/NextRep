@@ -19,9 +19,8 @@ export const AnimatedEnter: React.FC<AnimatedEnterProps> = ({
     className,
     style,
     direction = 'up',
-    distance = 15, // 极简：位移距离不要超过 15px
+    distance = 8,
 }) => {
-    // 监听当前页面是否处于活动态
     const isFocused = useIsFocused();
 
     const initial = useMemo(() => {
@@ -55,7 +54,6 @@ export const AnimatedEnter: React.FC<AnimatedEnterProps> = ({
     return (
         <MotiView
             from={initial}
-            // 当从别的标签页切回来时通过重新改变 animate 值触发进场入场，切走时恢复至 initial（退场）
             animate={isFocused ? animate : initial}
             transition={transition}
             className={className}

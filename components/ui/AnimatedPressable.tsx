@@ -22,8 +22,8 @@ const AnimatedPressableComponent = React.forwardRef<any, AnimatedPressableProps>
         {
             children,
             style,
-            activeScale = 0.96, // 缩放比例控制在 0.96 到 1.0 之间
-            activeOpacity = 0.8,
+            activeScale = 0.985,
+            activeOpacity = 0.92,
             disabled,
             onPressIn,
             onPressOut,

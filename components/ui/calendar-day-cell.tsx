@@ -1,6 +1,5 @@
 import * as React from "react";
 import { View, type ViewStyle } from "react-native";
-import { useTheme } from "@/hooks/useTheme";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
@@ -30,13 +29,13 @@ const CalendarDayCell = React.memo(function CalendarDayCell({
     size = 34,
     className,
 }: CalendarDayCellProps) {
-    const { colors } = useTheme();
     const hasValueLabel = valueLabel !== null && valueLabel !== undefined;
-    const foregroundColor = selected
-        ? colors.primaryForeground
+    const dayTextClassName = selected
+        ? "text-primary-foreground"
         : marked || today || hasValueLabel
-            ? colors.green
-            : colors.white;
+            ? "text-primary"
+            : "text-foreground";
+    const valueTextClassName = selected ? "text-primary-foreground/80" : "text-primary";
 
     return (
         <View style={width ? { width } : undefined} className={cn("items-center", className)}>
@@ -48,31 +47,23 @@ const CalendarDayCell = React.memo(function CalendarDayCell({
                 style={{ width: size, height: size }}
             >
                 <View
-                    style={{
-                        width: size,
-                        height: size,
-                        borderRadius: size / 2,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        backgroundColor: selected
-                            ? colors.green
+                    style={{ width: size, height: size, borderRadius: size / 2 }}
+                    className={cn(
+                        "items-center justify-center border",
+                        selected
+                            ? "border-primary bg-primary"
                             : marked || hasValueLabel
-                                ? `${colors.green}18`
-                                : "transparent",
-                        borderWidth: today && !selected ? 1 : hasValueLabel ? 1 : 0,
-                        borderColor: today
-                            ? `${colors.green}66`
-                            : hasValueLabel
-                                ? `${colors.green}40`
-                                : "transparent",
-                        opacity: disabled ? 0.35 : 1,
-                    }}
+                                ? "border-primary/20 bg-primary/10"
+                                : today
+                                    ? "border-primary/45 bg-transparent"
+                                    : "border-transparent bg-transparent"
+                    )}
                 >
-                    <Text style={{ color: foregroundColor }} className="text-xs font-bold">
+                    <Text className={cn("text-xs font-bold", dayTextClassName)}>
                         {day}
                     </Text>
                     {hasValueLabel ? (
-                        <Text style={{ color: colors.green }} className="text-[8px] font-black leading-3">
+                        <Text numberOfLines={1} className={cn("text-[8px] font-black leading-3", valueTextClassName)}>
                             {valueLabel}
                         </Text>
                     ) : null}

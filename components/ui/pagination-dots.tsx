@@ -25,13 +25,13 @@ const PaginationDots = React.forwardRef<React.ElementRef<typeof View>, Paginatio
                             accessibilityLabel={`切换到第 ${index + 1} 页`}
                             accessibilityState={{ selected: active }}
                             onPress={() => onSelect?.(index)}
-                            className="h-5 w-6 items-center justify-center active:opacity-80"
+                            className="h-5 w-5 items-center justify-center active:opacity-80"
                         >
                             <MotiView
-                                animate={{ width: active ? 18 : 6, opacity: active ? 1 : 0.65 }}
+                                animate={{ width: active ? 14 : 5, opacity: active ? 1 : 0.72 }}
                                 transition={{ type: "timing", duration: 180 }}
                                 className="h-1.5 rounded-full"
-                                style={{ backgroundColor: active ? colors.green : colors.border }}
+                                style={{ backgroundColor: active ? colors.white : colors.border }}
                             />
                         </Pressable>
                     );

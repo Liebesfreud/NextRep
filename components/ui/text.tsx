@@ -3,17 +3,17 @@ import { Text as RNText, type TextProps as RNTextProps } from "react-native";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-const textVariants = cva("text-foreground", {
+const textVariants = cva("text-sm text-foreground", {
     variants: {
         variant: {
-            default: "text-base",
-            title: "text-3xl font-black tracking-tight",
-            heading: "text-2xl font-black tracking-tight",
-            subheading: "text-xl font-extrabold tracking-tight",
-            body: "text-base leading-6",
-            muted: "text-sm leading-5 text-muted-foreground",
-            caption: "text-xs leading-4 text-muted-foreground",
-            label: "text-sm font-bold",
+            default: "text-sm",
+            title: "text-3xl font-semibold tracking-tight",
+            heading: "text-2xl font-semibold tracking-tight",
+            subheading: "text-xl font-semibold tracking-tight",
+            body: "text-sm leading-6",
+            muted: "text-sm text-muted-foreground",
+            caption: "text-xs text-muted-foreground",
+            label: "text-sm font-medium leading-none",
         },
     },
     defaultVariants: {

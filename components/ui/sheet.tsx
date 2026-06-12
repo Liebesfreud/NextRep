@@ -6,4 +6,6 @@ function Sheet(props: SheetProps) {
     return <BottomSheetModal {...props} />;
 }
 
+Sheet.displayName = "Sheet";
+
 export { Sheet, type SheetProps };

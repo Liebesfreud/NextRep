@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useTheme } from "@/hooks/useTheme";
+import { type ViewStyle } from "react-native";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,10 @@ type CategoryBadgeProps = {
     textClassName?: string;
 };
 
+function withAlpha(color: string, alphaHex: string) {
+    return /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(color) ? `${color.slice(0, 7)}${alphaHex}` : undefined;
+}
+
 const CategoryBadge = React.memo(function CategoryBadge({
     label,
     selected = false,
@@ -22,25 +26,25 @@ const CategoryBadge = React.memo(function CategoryBadge({
     className,
     textClassName,
 }: CategoryBadgeProps) {
-    const { colors } = useTheme();
-    const accent = accentColor ?? colors.blue;
     const resolvedBackgroundColor = selected
-        ? selectedBackgroundColor ?? `${accent}1A`
-        : backgroundColor ?? colors.gray2;
+        ? selectedBackgroundColor ?? (accentColor ? withAlpha(accentColor, "1A") : undefined)
+        : backgroundColor ?? (accentColor ? withAlpha(accentColor, "12") : undefined);
+    const badgeStyle: ViewStyle | undefined = accentColor || resolvedBackgroundColor
+        ? {
+            backgroundColor: resolvedBackgroundColor,
+            borderColor: accentColor,
+        }
+        : undefined;
 
     return (
         <Badge
             variant={selected ? "default" : "secondary"}
-            style={{
-                backgroundColor: resolvedBackgroundColor,
-                borderColor: selected ? accent : `${accent}40`,
-                borderWidth: selected ? 1 : 0.75,
-            }}
+            style={badgeStyle}
             className={cn("px-3 py-2", className)}
         >
             <BadgeText
-                style={{ color: selected ? colors.white : colors.mutedForeground }}
-                className={cn(selected ? "font-extrabold" : "font-bold", textClassName)}
+                style={accentColor ? { color: accentColor } : undefined}
+                className={cn(selected ? "font-black" : "font-bold", textClassName)}
             >
                 {label}
             </BadgeText>

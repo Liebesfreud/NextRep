@@ -4,34 +4,40 @@ import { cn } from "@/lib/utils";
 import { Text } from "@/components/ui/text";
 
 const Card = React.forwardRef<React.ElementRef<typeof View>, ViewProps>(({ className, ...props }, ref) => (
-    <View ref={ref} className={cn("rounded-bento-lg border border-border bg-card p-4", className)} {...props} />
+    <View ref={ref} className={cn("rounded-xl border border-border bg-card p-6", className)} {...props} />
 ));
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<React.ElementRef<typeof View>, ViewProps>(({ className, ...props }, ref) => (
-    <View ref={ref} className={cn("mb-4 gap-1", className)} {...props} />
+    <View ref={ref} className={cn("gap-1.5", className)} {...props} />
 ));
 CardHeader.displayName = "CardHeader";
 
 const CardTitle = React.forwardRef<React.ElementRef<typeof Text>, React.ComponentPropsWithoutRef<typeof Text>>(
     ({ className, ...props }, ref) => (
-        <Text ref={ref} variant="subheading" className={cn("text-card-foreground", className)} {...props} />
+        <Text
+            ref={ref}
+            className={cn("text-lg font-semibold leading-none tracking-tight text-card-foreground", className)}
+            {...props}
+        />
     )
 );
 CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<React.ElementRef<typeof Text>, React.ComponentPropsWithoutRef<typeof Text>>(
-    ({ className, ...props }, ref) => <Text ref={ref} variant="muted" className={className} {...props} />
+    ({ className, ...props }, ref) => (
+        <Text ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
+    )
 );
 CardDescription.displayName = "CardDescription";
 
 const CardContent = React.forwardRef<React.ElementRef<typeof View>, ViewProps>(({ className, ...props }, ref) => (
-    <View ref={ref} className={cn("gap-3", className)} {...props} />
+    <View ref={ref} className={cn("gap-4", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
 
 const CardFooter = React.forwardRef<React.ElementRef<typeof View>, ViewProps>(({ className, ...props }, ref) => (
-    <View ref={ref} className={cn("mt-4 flex-row items-center gap-3", className)} {...props} />
+    <View ref={ref} className={cn("mt-6 flex-row items-center gap-2", className)} {...props} />
 ));
 CardFooter.displayName = "CardFooter";
 

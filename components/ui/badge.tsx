@@ -4,13 +4,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Text } from "@/components/ui/text";
 
-const badgeVariants = cva("self-start rounded-full border px-3 py-1", {
+const badgeVariants = cva("self-start rounded-full border px-2.5 py-0.5", {
     variants: {
         variant: {
-            default: "border-primary/20 bg-primary/15",
-            secondary: "border-border bg-secondary",
-            destructive: "border-destructive/20 bg-destructive/15",
-            outline: "border-border bg-transparent",
+            default: "border-transparent bg-primary",
+            secondary: "border-transparent bg-secondary",
+            destructive: "border-transparent bg-destructive",
+            outline: "border-border bg-background",
         },
     },
     defaultVariants: {
@@ -18,12 +18,12 @@ const badgeVariants = cva("self-start rounded-full border px-3 py-1", {
     },
 });
 
-const badgeTextVariants = cva("text-xs font-black", {
+const badgeTextVariants = cva("text-xs font-medium", {
     variants: {
         variant: {
-            default: "text-primary",
+            default: "text-primary-foreground",
             secondary: "text-secondary-foreground",
-            destructive: "text-destructive",
+            destructive: "text-destructive-foreground",
             outline: "text-foreground",
         },
     },

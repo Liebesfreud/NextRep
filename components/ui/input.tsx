@@ -11,10 +11,10 @@ const Input = React.forwardRef<React.ElementRef<typeof TextInput>, TextInputProp
             <TextInput
                 ref={ref}
                 className={cn(
-                    "min-h-12 rounded-bento-sm border border-border bg-secondary px-4 py-3 text-base text-foreground web:outline-none web:ring-offset-background web:focus-visible:ring-2 web:focus-visible:ring-ring disabled:opacity-50",
+                    "min-h-10 rounded-md border border-input bg-background px-3 py-2 text-base text-foreground placeholder:text-muted-foreground web:outline-none web:ring-offset-background web:focus-visible:ring-2 web:focus-visible:ring-ring disabled:opacity-50 native:min-h-12",
                     className
                 )}
-                placeholderTextColor={placeholderTextColor ?? colors.gray4}
+                placeholderTextColor={placeholderTextColor ?? colors.mutedForeground}
                 {...props}
             />
         );
