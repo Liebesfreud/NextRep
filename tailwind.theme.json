@@ -139,6 +139,12 @@
             "fontWeight": "400"
           }
         ],
+        "unit-compact": [
+          "5px",
+          {
+            "fontWeight": "400"
+          }
+        ],
         "stat-value": [
           "20px",
           {

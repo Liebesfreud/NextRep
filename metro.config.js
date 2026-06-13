@@ -4,6 +4,11 @@ const { withNativeWind } = require("nativewind/metro");
 const config = getDefaultConfig(__dirname);
 
 config.resolver.assetExts.push("wasm");
+config.resolver.blockList = [
+  ...config.resolver.blockList,
+  /[/\\]\.agents(?:[/\\].*)?$/,
+  /[/\\]\.codex(?:[/\\].*)?$/,
+];
 config.server = {
   ...config.server,
   enhanceMiddleware: (middleware) => (req, res, next) => {

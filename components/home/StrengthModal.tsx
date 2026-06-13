@@ -81,13 +81,13 @@ const StrengthSetRow = React.memo(function StrengthSetRow({ item, onDelete, onTo
                     className="h-6 w-6 items-center justify-center rounded-md"
                     style={{
                         backgroundColor: item.isCompleted ? "transparent" : colors.gray2,
-                        borderColor: item.isCompleted ? colors.green : "transparent",
+                        borderColor: item.isCompleted ? colors.orange : "transparent",
                         borderWidth: item.isCompleted ? 1 : 0,
                     }}
                 >
                     <Text
                         className="text-xs font-bold"
-                        style={{ color: item.isCompleted ? colors.green : colors.gray4 }}
+                        style={{ color: item.isCompleted ? colors.orange : colors.gray4 }}
                     >
                         {item.setNumber}
                     </Text>
@@ -126,7 +126,7 @@ const StrengthSetRow = React.memo(function StrengthSetRow({ item, onDelete, onTo
                     size="icon"
                     className="h-8 w-8 rounded-lg bg-transparent p-0"
                 >
-                    <View className="h-7 w-7 items-center justify-center rounded-lg" style={{ backgroundColor: item.isCompleted ? colors.green : colors.gray2 }}>
+                    <View className="h-7 w-7 items-center justify-center rounded-lg" style={{ backgroundColor: item.isCompleted ? colors.orange : colors.gray2 }}>
                         {item.isCompleted ? (
                             <Check size={16} color={colors.primaryForeground} strokeWidth={3} />
                         ) : (

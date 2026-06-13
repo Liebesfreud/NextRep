@@ -27,7 +27,7 @@ export function HomeHeader({ greeting, userName, isCheckedIn }: Props) {
                     {userName}
                 </Text>
                 {isCheckedIn && (
-                    <CheckCircle size={30} color={colors.green} strokeWidth={2.5} />
+                    <CheckCircle size={30} color={colors.orange} strokeWidth={2.5} />
                 )}
             </View>
         </View>

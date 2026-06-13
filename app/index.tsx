@@ -228,10 +228,10 @@ export default function HomeScreen() {
                 <HomeHeader greeting={greeting} userName={userName} isCheckedIn={isCheckedIn} />
 
                 <View className="flex-row gap-4">
-                    <View className="min-w-0 flex-[0.8]">
+                    <View className="min-w-0 flex-1">
                         <HomeStatsCard displayCal={displayCal} totalSets={totalSets} isAiPredicting={isAiPredicting} />
                     </View>
-                    <Card className="min-w-0 flex-[2.2] p-3">
+                    <Card className="min-w-0 flex-[2] justify-center p-2.5">
                         <MonthlyHeatmap refreshKey={`${workouts.length}-${isCheckedIn}`} />
                     </Card>
                 </View>

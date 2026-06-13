@@ -1,20 +1,34 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { View, ScrollView, type GestureResponderEvent } from "react-native";
+import { View, ScrollView, processColor, type GestureResponderEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
-import { X } from "lucide-react-native";
+import { CalendarCheck, X } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { getCheckinsByMonth, getWorkoutsByMonth } from "@/db/services/workout";
 import { Button, ButtonText } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
-import { cn } from "@/lib/utils";
 
 type Props = {
     refreshKey?: string;
 };
 
 const MONTH_FORMATTER = new Intl.DateTimeFormat("zh-CN", { month: "long" });
+const HEATMAP_CELL_SIZE = 15;
+const HEATMAP_GAP = 2;
+const HEATMAP_HEIGHT = HEATMAP_CELL_SIZE * 6 + HEATMAP_GAP * 5;
+const HEATMAP_FRAME_HEIGHT = HEATMAP_HEIGHT + 10;
+
+function withAlpha(color: string, alpha: number) {
+    const processed = processColor(color);
+    if (typeof processed !== "number") return color;
+
+    const red = (processed >> 16) & 255;
+    const green = (processed >> 8) & 255;
+    const blue = processed & 255;
+    return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
 
 export function MonthlyHeatmap({ refreshKey }: Props) {
     const { colors } = useTheme();
@@ -55,6 +69,8 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDay = new Date(year, month, 1).getDay();
     const monthName = useMemo(() => MONTH_FORMATTER.format(new Date(year, month)), [year, month]);
+    const placeholderColor = useMemo(() => withAlpha(colors.foreground, 0.01), [colors.foreground]);
+    const heatmapBorderColor = useMemo(() => withAlpha(colors.foreground, 0.01), [colors.foreground]);
 
     const playSwipeTransition = useCallback(() => {
         heatmapOpacity.value = withSequence(
@@ -108,64 +124,83 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
 
     return (
         <View
-            className="w-full flex-row justify-between"
+            className="w-full flex-row items-center justify-between"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onTouchCancel={() => { touchStartRef.current = null; }}
         >
-            <View className="self-stretch py-0.5">
-                <View className="flex-1 justify-center">
+            <View className="justify-around" style={{ height: HEATMAP_FRAME_HEIGHT }}>
+                <View className="gap-1">
                     <Button
                         onPress={() => setIsPickerVisible(true)}
                         variant="ghost"
                         className="h-auto items-start justify-start bg-transparent p-0"
                     >
-                        <View className="flex-row items-baseline">
-                            <Text variant="caption" className="font-normal text-muted-foreground font-variant-numeric-tabular-nums">
-                                {year}年
+                        <View>
+                            <Text variant="micro" className="font-medium font-variant-numeric-tabular-nums">
+                                {year}
                             </Text>
-                            <Text className="text-xl font-semibold font-variant-numeric-tabular-nums">{monthName}</Text>
+                            <Text className="text-xl font-black font-variant-numeric-tabular-nums">{monthName}</Text>
                         </View>
                     </Button>
                 </View>
 
-                <View className="flex-1 flex-row items-center gap-0.5">
-                    <Text className="text-2xl font-bold font-variant-numeric-tabular-nums">
-                        {monthlyCheckinCount}
-                    </Text>
-                    <Text className="text-unit text-tertiary">天</Text>
+                <Separator className="my-2" />
+
+                <View className="gap-1">
+                    <View className="flex-row items-center gap-1.5">
+                        <CalendarCheck size={13} color={colors.orange} />
+                        <Text variant="micro" className="font-medium">打卡</Text>
+                    </View>
+                    <View className="flex-row items-baseline gap-1.5">
+                        <Text className="text-xl font-black font-variant-numeric-tabular-nums">
+                            {monthlyCheckinCount}
+                        </Text>
+                        <Text className="text-unit text-tertiary">天</Text>
+                    </View>
                 </View>
             </View>
 
-            <Animated.View style={[{ gap: 3 }, heatmapAnimatedStyle]}>
-                {Array.from({ length: 6 }, (_, row) => (
-                    <View key={row} className="flex-row" style={{ gap: 3 }}>
-                        {Array.from({ length: 7 }, (_, column) => {
-                            const index = row * 7 + column;
-                            const day = index - firstDayIndex + 1;
-                            const isValidDay = day >= 1 && day <= daysInMonth;
-                            const isCheckedIn = isValidDay && Boolean(checkins[day]);
-                            const hasWorkout = isValidDay && Boolean(workoutDays[day]);
-                            const isToday = isValidDay && day === todayNum;
-                            const backgroundColor = isCheckedIn || hasWorkout
-                                ? colors.green
-                                : !isValidDay
-                                    ? "transparent"
-                                    : isToday
-                                        ? colors.border
-                                        : colors.gray2;
+            <View className="flex-1 items-center justify-center" style={{ height: HEATMAP_FRAME_HEIGHT }}>
+                <Animated.View
+                    className="rounded-sm border p-1"
+                    style={[{ gap: HEATMAP_GAP, borderColor: heatmapBorderColor }, heatmapAnimatedStyle]}
+                >
+                    {Array.from({ length: 6 }, (_, row) => (
+                        <View key={row} className="flex-row" style={{ gap: HEATMAP_GAP }}>
+                            {Array.from({ length: 7 }, (_, column) => {
+                                const index = row * 7 + column;
+                                const day = index - firstDayIndex + 1;
+                                const isValidDay = day >= 1 && day <= daysInMonth;
+                                const isCheckedIn = isValidDay && Boolean(checkins[day]);
+                                const hasWorkout = isValidDay && Boolean(workoutDays[day]);
+                                const isToday = isValidDay && day === todayNum;
+                                const backgroundColor = isCheckedIn || hasWorkout
+                                    ? colors.orange
+                                    : !isValidDay
+                                        ? placeholderColor
+                                        : isToday
+                                            ? colors.gray3
+                                            : colors.gray2;
 
-                            return (
-                                <View
-                                    key={index}
-                                    className={cn("h-3 w-3 shrink-0", isCheckedIn && "rounded-pill")}
-                                    style={{ backgroundColor, borderCurve: "continuous" } as any}
-                                />
-                            );
-                        })}
-                    </View>
-                ))}
-            </Animated.View>
+                                return (
+                                    <View
+                                        key={index}
+                                        className="shrink-0"
+                                        style={{
+                                            width: HEATMAP_CELL_SIZE,
+                                            height: HEATMAP_CELL_SIZE,
+                                            backgroundColor,
+                                            borderCurve: "continuous",
+                                            borderRadius: 3,
+                                        } as any}
+                                    />
+                                );
+                            })}
+                        </View>
+                    ))}
+                </Animated.View>
+            </View>
 
             <Sheet visible={isPickerVisible} onClose={() => setIsPickerVisible(false)} sheetHeight="50%" backgroundColor={colors.bg}>
                 <View className="flex-1 p-6" style={{ paddingBottom: Math.max(insets.bottom, 48) }}>
