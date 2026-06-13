@@ -1,4 +1,13 @@
+import {
+    DEFAULT_THEME_COLOR,
+    getThemeColor,
+    type ThemeColorName,
+} from "@/constants/themeColors";
+
 // Semantic color bridge that mirrors global.css tokens for runtime usage.
+
+const darkThemeColor = getThemeColor(DEFAULT_THEME_COLOR, "dark");
+const lightThemeColor = getThemeColor(DEFAULT_THEME_COLOR, "light");
 
 export const Colors = {
     dark: {
@@ -9,7 +18,7 @@ export const Colors = {
         gray4: "#636366",
         blue: "#0A84FF",       // info/accent-blue
         green: "#30D158",
-        orange: "#FF6B2C",     // primary brand accent
+        orange: darkThemeColor.accent, // backwards-compatible accent alias
         red: "#FF453A",
         white: "#FAFAFA",
         foreground: "#FAFAFA",
@@ -20,7 +29,7 @@ export const Colors = {
         destructiveForeground: "#FFFFFF",
         mutedForeground: "#A1A1AA",
         // DESIGN.md v3 semantic tokens
-        accent: "#FF6B2C",
+        accent: darkThemeColor.accent,
         surface: "#141419",
         surfaceElevated: "#1C1C24",
         textSecondary: "#8E8E93",
@@ -37,7 +46,7 @@ export const Colors = {
         gray4: "#71717A",
         blue: "#007AFF",
         green: "#30D158",
-        orange: "#E85D20",
+        orange: lightThemeColor.accent, // backwards-compatible accent alias
         red: "#DC2626",
         white: "#18181B",
         foreground: "#18181B",
@@ -48,7 +57,7 @@ export const Colors = {
         destructiveForeground: "#FFFFFF",
         mutedForeground: "#71717A",
         // DESIGN.md v3 semantic tokens — light mode
-        accent: "#E85D20",
+        accent: lightThemeColor.accent,
         surface: "#FFFFFF",
         surfaceElevated: "#F4F4F5",
         textSecondary: "#71717A",
@@ -60,4 +69,19 @@ export const Colors = {
 } as const;
 
 export type ColorScheme = "dark" | "light";
-export type ColorTheme = typeof Colors.dark;
+export type ColorTheme = {
+    [Key in keyof typeof Colors.dark]: string;
+};
+
+export function getColors(
+    scheme: ColorScheme,
+    themeColor: ThemeColorName = DEFAULT_THEME_COLOR,
+): ColorTheme {
+    const accent = getThemeColor(themeColor, scheme).accent;
+
+    return {
+        ...Colors[scheme],
+        accent,
+        orange: accent,
+    };
+}

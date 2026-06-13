@@ -17,7 +17,7 @@ module.exports = {
         ...themeTokens.theme.extend.colors,
         // Shadcn CSS variable mappings (override theme.json where conflicts exist)
         input: "var(--input)",
-        ring: "var(--ring)",
+        ring: "var(--theme-accent)",
         background: "var(--background)",
         foreground: "var(--foreground)",
         primary: {
@@ -42,8 +42,8 @@ module.exports = {
         },
         // DESIGN.md CSS variable mappings
         accent: {
-          DEFAULT: "var(--accent)",
-          foreground: "var(--accent-foreground)",
+          DEFAULT: "var(--theme-accent)",
+          foreground: "var(--theme-accent-foreground)",
         },
         success: {
           DEFAULT: "var(--success)",
