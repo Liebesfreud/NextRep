@@ -330,9 +330,9 @@ export function StrengthModal({
                 }}
                 style={{ borderColor: colors.border }}
                 variant="outline"
-                className="mb-4 h-auto justify-start rounded-lg px-4 py-4"
+                className="mb-4 h-auto min-h-20 justify-start rounded-lg px-4 py-4 native:h-auto"
             >
-                <View className="mr-4 h-12 w-12 items-center justify-center rounded-lg bg-secondary">
+                <View className="mr-3 h-12 w-12 items-center justify-center rounded-lg bg-secondary">
                     <Icon size={20} color={colors.foreground} />
                 </View>
                 <View className="flex-1 justify-center gap-2">

@@ -14,7 +14,7 @@ export function HomeStatsCard({ displayCal, totalSets, isAiPredicting }: Props) 
     const { colors } = useTheme();
 
     return (
-        <Card className="min-w-0 flex-1 justify-around p-2.5">
+        <Card className="h-full min-w-0 justify-around p-2.5">
             <View className="gap-1">
                 <View className="flex-row items-center gap-1.5">
                     <Flame size={13} color={colors.orange} />
@@ -26,7 +26,7 @@ export function HomeStatsCard({ displayCal, totalSets, isAiPredicting }: Props) 
                     ) : (
                         <Text className="text-xl font-bold font-variant-numeric-tabular-nums">{displayCal}</Text>
                     )}
-                    {!isAiPredicting && <Text variant="micro" className="font-normal">千卡</Text>}
+                    {!isAiPredicting && <Text className="text-unit text-tertiary">千卡</Text>}
                 </View>
             </View>
 
@@ -39,7 +39,7 @@ export function HomeStatsCard({ displayCal, totalSets, isAiPredicting }: Props) 
                 </View>
                 <View className="flex-row items-baseline gap-1.5">
                     <Text className="text-xl font-bold font-variant-numeric-tabular-nums">{totalSets}</Text>
-                    <Text variant="micro" className="font-normal">组</Text>
+                    <Text className="text-unit text-tertiary">组</Text>
                 </View>
             </View>
         </Card>

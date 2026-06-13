@@ -127,14 +127,14 @@ export function CardioModal({
                                     key={i}
                                     onPress={() => { setSelectedExercise(ex); setModalStep("form"); }}
                                     variant="outline"
-                                    className="h-auto w-full justify-between rounded-lg px-4 py-5"
+                                    className="h-auto min-h-20 w-full justify-between rounded-lg px-4 py-4 native:h-auto"
                                 >
                                     <View className="flex-1 flex-row items-center gap-3">
-                                        <View className="h-11 w-11 items-center justify-center rounded-lg bg-secondary">
+                                        <View className="h-12 w-12 items-center justify-center rounded-lg bg-secondary">
                                             <Icon size={20} color={colors.foreground} />
                                         </View>
-                                        <View className="flex-1 gap-2">
-                                            <Text className="text-lg font-bold">{ex}</Text>
+                                        <View className="flex-1 justify-center gap-2">
+                                            <Text variant="subheading">{ex}</Text>
                                             <Text variant="muted" className="text-xs">{visual.label}</Text>
                                         </View>
                                     </View>

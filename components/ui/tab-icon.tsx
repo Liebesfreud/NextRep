@@ -14,12 +14,14 @@ type TabIconProps = {
 const TabIcon = React.memo(function TabIcon({ icon: Icon, color, size, focused }: TabIconProps) {
     return (
         <View className="h-[72px] w-16 items-center justify-center overflow-hidden">
-            <MotiView
-                animate={{ scale: focused ? 1.08 : 1 }}
-                transition={SNAPPY_SPRING}
-            >
-                <Icon color={color} size={size} strokeWidth={focused ? 2.25 : 2} />
-            </MotiView>
+            <View style={{ transform: [{ translateY: 7 }] }}>
+                <MotiView
+                    animate={{ scale: focused ? 1.08 : 1 }}
+                    transition={SNAPPY_SPRING}
+                >
+                    <Icon color={color} size={size} strokeWidth={focused ? 2.25 : 2} />
+                </MotiView>
+            </View>
         </View>
     );
 });

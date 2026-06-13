@@ -8,14 +8,13 @@ import { getCheckinsByMonth, getWorkoutsByMonth } from "@/db/services/workout";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
+import { cn } from "@/lib/utils";
 
 type Props = {
     refreshKey?: string;
 };
 
 const MONTH_FORMATTER = new Intl.DateTimeFormat("zh-CN", { month: "long" });
-const HEATMAP_ROWS = 6;
-const HEATMAP_COLUMNS = 7;
 
 export function MonthlyHeatmap({ refreshKey }: Props) {
     const { colors } = useTheme();
@@ -101,13 +100,6 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
 
     // Compute week alignment (Monday = 0)
     const firstDayIndex = firstDay === 0 ? 6 : firstDay - 1;
-    const heatmapCells = useMemo(
-        () => Array.from({ length: HEATMAP_ROWS * HEATMAP_COLUMNS }, (_, index) => {
-            const day = index - firstDayIndex + 1;
-            return day >= 1 && day <= daysInMonth ? day : null;
-        }),
-        [daysInMonth, firstDayIndex]
-    );
 
     // Allowed selection range
     const years = useMemo(() => Array.from({ length: 5 }, (_, i) => currentYear - i), [currentYear]);
@@ -116,56 +108,61 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
 
     return (
         <View
-            className="w-full gap-4"
+            className="w-full flex-row justify-between"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onTouchCancel={() => { touchStartRef.current = null; }}
         >
-            <View className="flex-row items-center justify-between">
-                <Button
-                    onPress={() => setIsPickerVisible(true)}
-                    variant="ghost"
-                    className="h-auto bg-transparent p-0"
-                >
-                    <View className="flex-row items-baseline">
-                        <Text variant="body" className="font-variant-numeric-tabular-nums">{year}年</Text>
-                        <Text variant="subheading" className="font-bold font-variant-numeric-tabular-nums">{monthName}</Text>
-                    </View>
-                </Button>
+            <View className="self-stretch py-0.5">
+                <View className="flex-1 justify-center">
+                    <Button
+                        onPress={() => setIsPickerVisible(true)}
+                        variant="ghost"
+                        className="h-auto items-start justify-start bg-transparent p-0"
+                    >
+                        <View className="flex-row items-baseline">
+                            <Text variant="caption" className="font-normal text-muted-foreground font-variant-numeric-tabular-nums">
+                                {year}年
+                            </Text>
+                            <Text className="text-xl font-semibold font-variant-numeric-tabular-nums">{monthName}</Text>
+                        </View>
+                    </Button>
+                </View>
 
-                <View className="flex-row items-baseline gap-1">
-                    <Text className="text-stat-value font-bold font-variant-numeric-tabular-nums">
-                        {monthlyCheckinCount}天
+                <View className="flex-1 flex-row items-center gap-0.5">
+                    <Text className="text-2xl font-bold font-variant-numeric-tabular-nums">
+                        {monthlyCheckinCount}
                     </Text>
+                    <Text className="text-unit text-tertiary">天</Text>
                 </View>
             </View>
 
-            <Animated.View className="w-full gap-0.5" style={heatmapAnimatedStyle}>
-                {Array.from({ length: HEATMAP_ROWS }, (_, row) => (
-                    <View key={row} className="w-full flex-row gap-0.5">
-                        {heatmapCells
-                            .slice(row * HEATMAP_COLUMNS, (row + 1) * HEATMAP_COLUMNS)
-                            .map((day, column) => {
-                                if (day === null) {
-                                    return <View key={`empty-${row}-${column}`} className="h-5 flex-1" />;
-                                }
-
-                                const isCheckedIn = Boolean(checkins[day]);
-                                const isToday = day === todayNum;
-                                const backgroundColor = isCheckedIn
-                                    ? colors.green
+            <Animated.View style={[{ gap: 3 }, heatmapAnimatedStyle]}>
+                {Array.from({ length: 6 }, (_, row) => (
+                    <View key={row} className="flex-row" style={{ gap: 3 }}>
+                        {Array.from({ length: 7 }, (_, column) => {
+                            const index = row * 7 + column;
+                            const day = index - firstDayIndex + 1;
+                            const isValidDay = day >= 1 && day <= daysInMonth;
+                            const isCheckedIn = isValidDay && Boolean(checkins[day]);
+                            const hasWorkout = isValidDay && Boolean(workoutDays[day]);
+                            const isToday = isValidDay && day === todayNum;
+                            const backgroundColor = isCheckedIn || hasWorkout
+                                ? colors.green
+                                : !isValidDay
+                                    ? "transparent"
                                     : isToday
                                         ? colors.border
                                         : colors.gray2;
 
-                                return (
-                                    <View
-                                        key={day}
-                                        className="h-5 flex-1 rounded-sm"
-                                        style={{ backgroundColor, borderCurve: "continuous" } as any}
-                                    />
-                                );
-                            })}
+                            return (
+                                <View
+                                    key={index}
+                                    className={cn("h-3 w-3 shrink-0", isCheckedIn && "rounded-pill")}
+                                    style={{ backgroundColor, borderCurve: "continuous" } as any}
+                                />
+                            );
+                        })}
                     </View>
                 ))}
             </Animated.View>
