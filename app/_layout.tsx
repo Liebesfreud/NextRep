@@ -11,6 +11,7 @@ import { getTabBarStyle, TabBarBackground, TAB_BAR_ITEM_STYLE, useTabBarStyle } 
 import { TabIcon } from "@/components/ui/tab-icon";
 import { Text } from "@/components/ui/text";
 import { DottedBackground } from "@/components/ui/dotted-background";
+import { DURATION } from "@/constants/animations";
 import "../global.css";
 
 // Prevent auto hide
@@ -20,7 +21,7 @@ SplashScreen.preventAutoHideAsync().catch(() => { });
 
 function TabLayout() {
     const { colors, theme } = useTheme();
-    const tabBarStyle = useTabBarStyle(colors.border);
+    const tabBarStyle = useTabBarStyle();
     const [dbInitialized, setDbInitialized] = useState(false);
     const [dbError, setDbError] = useState<string | null>(null);
     const [retryKey, setRetryKey] = useState(0);
@@ -88,7 +89,15 @@ function TabLayout() {
                     tabBarActiveTintColor: colors.accent,
                     tabBarInactiveTintColor: colors.textTertiary,
                     tabBarItemStyle: TAB_BAR_ITEM_STYLE,
+                    tabBarIconStyle: { width: 80, height: 56 },
                     tabBarHideOnKeyboard: true,
+                    animation: "shift",
+                    transitionSpec: {
+                        animation: "timing",
+                        config: {
+                            duration: DURATION.standard,
+                        },
+                    },
                 }}
             >
                 <Tabs.Screen

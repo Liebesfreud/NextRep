@@ -38,24 +38,24 @@ export function ExerciseAnalytics({ data }: Props) {
 
     return (
         <>
-            <Card className="gap-3 p-4">
-                <View className="flex-row items-center justify-between px-0.5">
+            <Card className="gap-4 p-card-padding">
+                <View className="flex-row items-center justify-between">
                     <View className="flex-row items-center gap-1.5">
-                        <Target size={16} color={colors.orange} />
-                        <Text variant="caption">高频动作</Text>
+                        <Target size={18} color={colors.accent} />
+                        <Text variant="subheading" className="text-foreground">高频动作</Text>
                     </View>
                     <Button
                         onPress={() => router.push("/settings/exercises")}
                         accessibilityLabel="打开动作库"
                         variant="secondary"
                         size="icon"
-                        className="h-8 w-8 rounded-lg border border-border"
+                        className="h-9 w-9 rounded-pill bg-surface-elevated"
                     >
                         <Library size={17} color={colors.gray4} />
                     </Button>
                 </View>
 
-                <Card className="min-h-[112px] p-2">
+                <View className="min-h-[112px]">
                     {analytics.length === 0 ? (
                         <View className="items-center justify-center py-8">
                             <Target size={20} color={colors.gray4} />
@@ -72,28 +72,25 @@ export function ExerciseAnalytics({ data }: Props) {
                                 key={exercise.name}
                                 onPress={() => setSelectedExercise(exercise)}
                                 variant="ghost"
-                                className="h-auto justify-between rounded-xl p-2.5"
+                                className="h-auto justify-between rounded-lg px-2 py-3"
                             >
                                 <View className="flex-row items-center gap-3 flex-1">
                                     <View className="w-7 items-center">
-                                        <Text className="text-base font-semibold">
+                                        <Text className="text-body-semibold text-foreground font-variant-numeric-tabular-nums">
                                             {idx + 1}
                                         </Text>
                                     </View>
-                                    <View className="h-9 w-9 items-center justify-center rounded-md border border-border bg-muted">
-                                        <Icon size={18} color={colors.white} />
+                                    <View className="h-9 w-9 items-center justify-center rounded-md bg-surface-elevated">
+                                        <Icon size={18} color={visual.accent} />
                                     </View>
                                     <View className="flex-1">
-                                        <Text className="text-sm font-medium" numberOfLines={1}>
+                                        <Text className="text-body-semibold text-foreground" numberOfLines={1}>
                                             {exercise.name}
-                                        </Text>
-                                        <Text variant="caption" className="mt-0.5 text-muted-foreground" numberOfLines={1}>
-                                            {exercise.trainingDays} 天 · {exercise.records} 条记录 · 最高 {formatWeight(exercise.maxWeightKg)}
                                         </Text>
                                     </View>
                                 </View>
                                 <View className="items-end flex-row gap-1.5">
-                                    <Text variant="caption" className="text-foreground">
+                                    <Text variant="caption" className="text-foreground font-variant-numeric-tabular-nums">
                                         {formatVolume(exercise.totalVolumeKg)}
                                     </Text>
                                     <ChevronRight size={15} color={colors.gray4} />
@@ -101,7 +98,7 @@ export function ExerciseAnalytics({ data }: Props) {
                             </Button>
                         );
                     })}
-                </Card>
+                </View>
             </Card>
 
             <ExerciseDetailModal

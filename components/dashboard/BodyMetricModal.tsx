@@ -171,7 +171,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
             avoidKeyboard
         >
             <View className="flex-row justify-between items-center mb-6">
-                <Text variant="heading" className="tracking-tight">
+                <Text variant="heading" className="tracking-tight text-foreground">
                     {metricType === "weight" ? "记录体重" : "记录体脂率"}
                 </Text>
                 <Button onPress={onClose}

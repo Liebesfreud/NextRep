@@ -9,7 +9,7 @@ import { getUserProfile } from "./profile";
 export type DailySummary = {
     day: number;
     isWorkout: boolean;
-    workouts: { id: string; name: string; weight: string | null; sets: string | null; type: string }[];
+    workouts: { id: string; name: string; weight: string | null; sets: string | null; stats: string | null; type: string }[];
     volume: number;
     duration: number;
 };
@@ -577,6 +577,7 @@ export async function getDashboardData(year: number, month: number) {
             type: workouts.type,
             weight: workouts.weight,
             sets: workouts.sets,
+            stats: workouts.stats,
             createdAt: workouts.createdAt,
         })
             .from(workouts)
@@ -652,6 +653,7 @@ export async function getDashboardData(year: number, month: number) {
             name: w.name,
             weight: w.weight,
             sets: w.sets,
+            stats: w.stats,
             type: w.type,
         });
     });

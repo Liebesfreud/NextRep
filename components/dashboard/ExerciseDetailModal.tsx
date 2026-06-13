@@ -80,7 +80,7 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
                         <Icon size={22} color={colors.foreground} />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-xl font-black" numberOfLines={1}>
+                        <Text className="text-xl font-black text-foreground" numberOfLines={1}>
                             {exercise.name}
                         </Text>
                         <Text variant="muted" className="mt-1 text-xs">

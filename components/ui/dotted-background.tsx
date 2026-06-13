@@ -11,7 +11,7 @@ import Svg, {
 import { useTheme } from "@/hooks/useTheme";
 
 const DOT_SPACING = 16;
-const DOT_RADIUS = 1.2;
+const DOT_RADIUS = 1.25;
 
 export function DottedBackground() {
     const { colors, theme } = useTheme();
@@ -34,12 +34,12 @@ export function DottedBackground() {
                             cx={DOT_RADIUS}
                             cy={DOT_RADIUS}
                             r={DOT_RADIUS}
-                            fill={colors.textTertiary}
+                            fill={theme === "dark" ? colors.textTertiary : colors.textSecondary}
                         />
                     </Pattern>
                     <RadialGradient id="dot-fade" cx="50%" cy="42%" rx="72%" ry="68%">
-                        <Stop offset="0%" stopColor="white" stopOpacity={theme === "dark" ? 0.58 : 0.4} />
-                        <Stop offset="58%" stopColor="white" stopOpacity={theme === "dark" ? 0.32 : 0.22} />
+                        <Stop offset="0%" stopColor="white" stopOpacity={theme === "dark" ? 0.58 : 0.5} />
+                        <Stop offset="58%" stopColor="white" stopOpacity={theme === "dark" ? 0.32 : 0.3} />
                         <Stop offset="100%" stopColor="black" stopOpacity={0} />
                     </RadialGradient>
                     <Mask id="dot-mask">

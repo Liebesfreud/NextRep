@@ -4,11 +4,10 @@ import { useTheme } from "@/hooks/useTheme";
 
 const TAB_BAR_HEIGHT = 72;
 
-function getTabBarStyle(borderColor: string, bottomInset = 0): ViewStyle {
+function getTabBarStyle(bottomInset = 0): ViewStyle {
     return {
         backgroundColor: "transparent",
-        borderTopColor: borderColor,
-        borderTopWidth: 1,
+        borderTopWidth: 0,
         height: TAB_BAR_HEIGHT + bottomInset,
         paddingBottom: bottomInset,
     };
@@ -41,9 +40,9 @@ export function TabBarBackground() {
  * Hook that returns a safe-area-aware tab bar style.
  * Uses `useSafeAreaInsets` to avoid the home indicator on iPhone X+.
  */
-export function useTabBarStyle(borderColor: string): ViewStyle {
+export function useTabBarStyle(): ViewStyle {
     const insets = useSafeAreaInsets();
-    return getTabBarStyle(borderColor, insets.bottom);
+    return getTabBarStyle(insets.bottom);
 }
 
 export { getTabBarStyle, TAB_BAR_ITEM_STYLE };

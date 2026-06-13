@@ -24,7 +24,7 @@ export function HomeHeader({ greeting, userName, isCheckedIn }: Props) {
             <View className="flex-row items-center justify-between">
                 <Text variant="title" className="font-black">
                     <Text className="text-accent font-black">{greeting}，</Text>
-                    {userName}
+                    <Text className="text-foreground font-black">{userName}</Text>
                 </Text>
                 {isCheckedIn && (
                     <CheckCircle size={30} color={colors.orange} strokeWidth={2.5} />

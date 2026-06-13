@@ -62,6 +62,8 @@ module.exports = {
           elevated: "var(--surface-elevated)",
           hover: "var(--surface-hover)",
         },
+        "surface-elevated": "var(--surface-elevated)",
+        "surface-hover": "var(--surface-hover)",
         border: {
           DEFAULT: "var(--border)",
           strong: "var(--border-strong)",
@@ -88,6 +90,9 @@ module.exports = {
       addUtilities({
         ".font-variant-numeric-tabular-nums": {
           fontVariant: ["tabular-nums"],
+        },
+        ".text-secondary": {
+          color: "var(--text-secondary)",
         },
       });
     },
