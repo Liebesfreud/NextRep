@@ -215,7 +215,7 @@ import { cn } from "@/lib/utils";
 ### 4.6 Card Variants
 
 ```tsx
-<Card>                     {/* bg-surface + rounded-lg + p-card-padding */}
+<Card>                     {/* bg-surface + rounded-lg + border border-border + p-card-padding */}
 <CardHeader>               {/* gap-1.5 */}
 <CardTitle>                {/* text-lg font-semibold */}
 <CardDescription>          {/* text-sm text-muted-foreground */}
@@ -317,6 +317,8 @@ MICRO_INTERACTION_SPRING = { damping: 18, stiffness: 150, mass: 0.5 }
 - DON'T use `StyleSheet.create()` in new code — use NativeWind classes.
 - DON'T mix warm colors (orange + red + amber) in the same view.
 - DON'T animate everything — motion is seasoning, not the main course.
+- DON'T use `rounded-full` — use the design token `rounded-pill` (same value, correct name).
+- DON'T use arbitrary `rounded-[*]` values — use the standard tokens: `rounded-sm` `rounded-md` `rounded-lg` `rounded-xl` `rounded-pill`.
 
 ---
 
@@ -365,4 +367,4 @@ The `global.css` defines CSS variables consumed by NativeWind. `tailwind.config.
 - `var(--accent)` → `bg-accent`, `text-accent` (Shadcn default = gray)
 - `var(--border)` → `border-border`
 
-> **Note**: The DESIGN.md's custom tokens (surface, accent-orange, text-secondary, gap-*, rounded-*) are defined in `tailwind.theme.json` but **not yet loaded** by `tailwind.config.js`. Phase 1 of the migration roadmap will integrate them.
+> **Note**: Custom design tokens (surface, accent-orange, text-secondary, gap-*, rounded-*) are defined in `tailwind.theme.json` and loaded by `tailwind.config.js`.

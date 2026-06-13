@@ -213,7 +213,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                                 {`${chartRecords.length || 0} 次记录${trendDeltaText != null ? ` · ${trendDeltaText > 0 ? "+" : ""}${trendDeltaText.toFixed(1)} ${chartUnit}` : chartDelta !== null ? ` · ${chartDelta > 0 ? "+" : ""}${chartDelta.toFixed(1)} ${chartUnit}` : ""}`}
                             </Text>
                         </View>
-                        <View className="flex-row gap-1 rounded-[10px] bg-border p-[3px]">
+                        <View className="flex-row gap-1 rounded-md bg-border p-[3px]">
                             {([7, 30, 90] as const).map((range) => {
                                 const active = trendRange === range;
                                 return (
@@ -253,7 +253,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
                             </View>
                         </>
                     ) : (
-                        <View className="items-center rounded-[10px] bg-border py-[18px]">
+                        <View className="items-center rounded-md bg-border py-[18px]">
                             <Text variant="muted">至少两条记录后显示趋势图</Text>
                         </View>
                     )}

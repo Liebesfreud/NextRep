@@ -2,7 +2,7 @@ import { View, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/hooks/useTheme";
 
-const TAB_BAR_HEIGHT = 64;
+const TAB_BAR_HEIGHT = 72;
 
 function getTabBarStyle(borderColor: string, bottomInset = 0): ViewStyle {
     return {
@@ -11,12 +11,13 @@ function getTabBarStyle(borderColor: string, bottomInset = 0): ViewStyle {
         borderTopWidth: 1,
         height: TAB_BAR_HEIGHT + bottomInset,
         paddingBottom: bottomInset,
-        paddingTop: 6,
     };
 }
 
 const TAB_BAR_ITEM_STYLE: ViewStyle = {
     height: TAB_BAR_HEIGHT,
+    alignItems: "center",
+    justifyContent: "center",
 };
 
 export function TabBarBackground() {

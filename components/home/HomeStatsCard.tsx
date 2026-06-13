@@ -14,32 +14,26 @@ export function HomeStatsCard({ displayCal, totalSets, isAiPredicting }: Props) 
     const { colors } = useTheme();
 
     return (
-        <Card className="min-w-0 flex-1 justify-around p-4">
-            <View className="mb-4 gap-1">
-                <View className="mb-1 flex-row items-center gap-2">
+        <Card className="min-w-0 flex-1 justify-around p-3">
+            <View>
+                <View className="flex-row items-center gap-2">
                     <Flame size={14} color={colors.orange} />
-                    <Text variant="caption">消耗</Text>
-                </View>
-                <View className="flex-row items-baseline gap-1">
                     {isAiPredicting ? (
-                        <Text className="text-lg text-muted-foreground">计算中...</Text>
+                        <Text className="text-lg font-medium text-muted-foreground">计算中...</Text>
                     ) : (
-                        <Text className="text-2xl font-semibold">{displayCal}</Text>
+                        <Text className="text-2xl font-bold font-variant-numeric-tabular-nums">{displayCal}</Text>
                     )}
-                    {!isAiPredicting && <Text variant="caption">千卡</Text>}
+                    {!isAiPredicting && <Text variant="caption" className="font-normal">千卡</Text>}
                 </View>
             </View>
 
-            <Separator className="my-0.5" />
+            <Separator className="my-2" />
 
-            <View className="mt-4 gap-1">
-                <View className="mb-1 flex-row items-center gap-2">
+            <View>
+                <View className="flex-row items-center gap-2">
                     <Layers size={14} color={colors.green} />
-                    <Text variant="caption">总组数</Text>
-                </View>
-                <View className="flex-row items-baseline gap-1">
-                    <Text className="text-2xl font-semibold">{totalSets}</Text>
-                    <Text variant="caption">组</Text>
+                    <Text className="text-2xl font-bold font-variant-numeric-tabular-nums">{totalSets}</Text>
+                    <Text variant="caption" className="font-normal">组</Text>
                 </View>
             </View>
         </Card>

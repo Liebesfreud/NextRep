@@ -117,7 +117,7 @@ export default function ExerciseManagementScreen() {
                     borderColor: `${visual.accent}24`,
                     backgroundColor: visual.cardBg ?? colors.surface,
                 }}
-                className="mb-2 flex-row items-center overflow-hidden rounded-[14px] border p-0"
+                className="mb-2 flex-row items-center overflow-hidden rounded-lg border p-0"
             >
                 <Button
                     onPress={() => setSelectedExercise(item)}
@@ -173,7 +173,7 @@ export default function ExerciseManagementScreen() {
     ), [colors.textTertiary]);
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1 bg-background">
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1 bg-transparent">
             <View className="flex-row items-center justify-between border-b border-border bg-surface px-5 pb-4" style={{ paddingTop: insets.top + 16 }}>
                 <Button onPress={() => router.back()} variant="ghost" size="sm" className="h-auto gap-1 px-0 py-0">
                     <ChevronLeft size={24} color={colors.foreground} />
@@ -242,10 +242,10 @@ export default function ExerciseManagementScreen() {
                                         key={cat}
                                         onPress={() => setSelectedCategory(cat)}
                                         variant={isSelected ? "secondary" : "outline"}
-                                        className="h-auto rounded-full px-3 py-2"
-                                    >
-                                        <Text className="text-sm" style={{ color: isSelected ? accent : colors.foreground }}>
-                                            {cat}
+                                        className="h-auto rounded-pill px-3 py-2"
+                                        >
+                                            <Text className="text-sm" style={{ color: isSelected ? accent : colors.foreground }}>
+                                                {cat}
                                         </Text>
                                     </Button>
                                 );
@@ -272,9 +272,9 @@ export default function ExerciseManagementScreen() {
                                                 key={tag}
                                                 onPress={() => setNewTag(isSelected ? null : tag)}
                                                 variant={isSelected ? "secondary" : "outline"}
-                                                className="h-auto rounded-full px-3 py-2"
-                                            >
-                                                <Text className="text-sm" style={{ color: isSelected ? visual.accent : colors.foreground }}>
+                                                className="h-auto rounded-pill px-3 py-2"
+                                                >
+                                                    <Text className="text-sm" style={{ color: isSelected ? visual.accent : colors.foreground }}>
                                                     {tag}
                                                 </Text>
                                             </Button>

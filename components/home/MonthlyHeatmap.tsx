@@ -122,7 +122,7 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                         className="h-auto items-start justify-start bg-transparent p-0"
                     >
                         <View>
-                            <Text variant="caption" className="text-muted-foreground">
+                            <Text variant="caption" className="font-normal text-muted-foreground font-variant-numeric-tabular-nums">
                                 {year}
                             </Text>
                             <Text className="text-xl font-semibold">
@@ -132,16 +132,13 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                     </Button>
                 </View>
 
-                <View className="mt-4">
-                    <View className="mb-1 flex-row items-center gap-2">
+                <View className="mt-2">
+                    <View className="flex-row items-center gap-2">
                         <CalendarCheck size={12} color={colors.green} />
-                        <Text variant="caption">打卡</Text>
-                    </View>
-                    <View className="flex-row items-baseline gap-0.5">
-                        <Text className="text-2xl font-semibold">
+                        <Text className="text-2xl font-bold font-variant-numeric-tabular-nums">
                             {monthlyCheckinCount}
                         </Text>
-                        <Text variant="caption">天</Text>
+                        <Text variant="caption" className="font-normal">天</Text>
                     </View>
                 </View>
             </View>
@@ -166,13 +163,13 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                             return (
                                 <View
                                     key={i}
+                                    className="rounded-sm"
                                     style={{
-                                        width: 14,
-                                        height: 14,
-                                        minWidth: 14,
-                                        minHeight: 14,
+                                        width: 12,
+                                        height: 12,
+                                        minWidth: 12,
+                                        minHeight: 12,
                                         flexShrink: 0,
-                                        borderRadius: 4,
                                         backgroundColor: bg,
                                         borderCurve: "continuous",
                                     } as any}
@@ -191,7 +188,7 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
                                 accessibilityLabel="关闭日期选择器"
                                 variant="secondary"
                                 size="icon"
-                                className="h-8 w-8 rounded-full">
+                                className="h-8 w-8 rounded-pill">
                                 <X size={18} color={colors.gray4} />
                             </Button>
                         </View>

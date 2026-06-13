@@ -83,7 +83,7 @@ export function BottomSheetModal({
                         },
                     ]}
                 >
-                    <View style={[styles.handle, { backgroundColor: colors.mutedForeground }]} />
+                    <View className="rounded-pill" style={[styles.handle, { backgroundColor: colors.mutedForeground }]} />
                     {content}
                 </View>
             </View>
@@ -107,7 +107,6 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         width: 36,
         height: 4,
-        borderRadius: 999,
         marginBottom: 12,
         opacity: 0.4,
     },

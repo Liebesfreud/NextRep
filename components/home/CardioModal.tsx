@@ -117,7 +117,7 @@ export function CardioModal({
 
             {modalStep === "select" ? (
                 <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-                    <View className="gap-3">
+                    <View className="gap-4 pb-4">
                         {CARDIO_EXERCISES.map((ex, i) => {
                             const visual = getCardioExerciseVisual(ex, colors);
                             const Icon = visual.icon;
@@ -127,14 +127,14 @@ export function CardioModal({
                                     key={i}
                                     onPress={() => { setSelectedExercise(ex); setModalStep("form"); }}
                                     variant="outline"
-                                    className="w-full justify-between rounded-2xl p-[18px]"
+                                    className="h-auto w-full justify-between rounded-lg px-4 py-5"
                                 >
                                     <View className="flex-1 flex-row items-center gap-3">
-                                        <View className="h-11 w-11 items-center justify-center rounded-[14px] bg-secondary">
+                                        <View className="h-11 w-11 items-center justify-center rounded-lg bg-secondary">
                                             <Icon size={20} color={colors.foreground} />
                                         </View>
-                                        <View className="flex-1">
-                                            <Text className="mb-1.5 text-lg font-bold">{ex}</Text>
+                                        <View className="flex-1 gap-2">
+                                            <Text className="text-lg font-bold">{ex}</Text>
                                             <Text variant="muted" className="text-xs">{visual.label}</Text>
                                         </View>
                                     </View>

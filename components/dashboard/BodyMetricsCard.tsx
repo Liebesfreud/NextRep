@@ -73,7 +73,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                     onPress={toggleWeightExpanded}
                     variant="ghost"
                     className={cn(
-                        "min-h-[106px] h-auto flex-[1.3] justify-between rounded-2xl border p-3",
+                        "min-h-[106px] h-auto flex-[1.3] justify-between rounded-lg border p-3",
                         expandedMetric === "weight" ? "border-destructive/50" : "border-border"
                     )}
                 >
@@ -117,7 +117,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
                         onPress={toggleBodyFatExpanded}
                         variant="ghost"
                         className={cn(
-                            "h-auto flex-1 justify-between rounded-2xl border p-[9px]",
+                            "h-auto flex-1 justify-between rounded-lg border p-[9px]",
                             expandedMetric === "bodyFat" ? "border-destructive/50" : "border-border"
                         )}
                     >
@@ -151,7 +151,7 @@ export function BodyMetricsCard({ data, loading, expandedMetric, setExpandedMetr
 
                     {/* 右下卡片（BMI） */}
                     <Card
-                        className="flex-1 justify-between rounded-2xl border border-border p-[9px]"
+                        className="flex-1 justify-between rounded-lg border border-border p-[9px]"
                     >
                         <Text className="text-[11px] text-muted-foreground">
                             BMI

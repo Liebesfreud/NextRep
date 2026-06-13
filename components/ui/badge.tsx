@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Text } from "@/components/ui/text";
 
-const badgeVariants = cva("self-start rounded-full border px-2.5 py-0.5", {
+const badgeVariants = cva("self-start rounded-pill border px-2.5 py-0.5", {
     variants: {
         variant: {
             default: "border-transparent bg-accent",

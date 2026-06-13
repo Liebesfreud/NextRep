@@ -228,8 +228,8 @@ export default function AiCoachScreen() {
     };
 
     return (
-        <View className="flex-1 bg-background">
-            <View className="border-b border-border bg-background px-4 pb-3" style={{ paddingTop: insets.top + 16 }}>
+        <View className="flex-1 bg-transparent">
+            <View className="border-b border-border bg-transparent px-4 pb-3" style={{ paddingTop: insets.top + 16 }}>
                 <Text variant="title">AI 教练</Text>
             </View>
 
@@ -270,12 +270,12 @@ export default function AiCoachScreen() {
                 <Card>
                     <View className="mt-2 flex-row items-center justify-between gap-3">
                         <Text variant="subheading" className="flex-1">建议</Text>
-                        <View className="rounded-full border border-border px-2.5 py-1.5">
+                        <View className="rounded-pill border border-border px-2.5 py-1.5">
                             <Text className="text-xs font-medium text-foreground">{reportData?.intensityScore ?? 0} / 100</Text>
                         </View>
                     </View>
 
-                    <View className="mt-3.5 rounded-[14px] border border-border bg-background p-3.5">
+                    <View className="mt-3.5 rounded-lg border border-border bg-background p-3.5">
                         <Text className="text-base font-semibold">{coachLine}</Text>
                         <Text variant="muted" className="mt-2">
                             {reportData?.overallEvaluation || "暂无建议"}
@@ -287,13 +287,13 @@ export default function AiCoachScreen() {
                     <Text variant="subheading">今日计划</Text>
 
                     {adjustedPlan.length === 0 ? (
-                        <View className="mt-3.5 rounded-[14px] border border-dashed border-border bg-background p-4">
+                        <View className="mt-3.5 rounded-lg border border-dashed border-border bg-background p-4">
                             <Text variant="muted">暂无计划</Text>
                         </View>
                     ) : (
                         <View className="mt-3.5 gap-2.5">
                             {adjustedPlan.map((plan, index) => (
-                                <Card key={`${plan.name}-${index}`} className="rounded-[14px] border border-border bg-background p-3.5">
+                                <Card key={`${plan.name}-${index}`} className="rounded-lg bg-background p-3.5">
                                     <View className="flex-row items-center justify-between gap-2.5">
                                         <View className="flex-1">
                                             <Text className="text-base font-semibold">{plan.name}</Text>

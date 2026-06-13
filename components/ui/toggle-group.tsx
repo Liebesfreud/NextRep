@@ -15,7 +15,7 @@ type ToggleGroupProps = ViewProps & {
 const ToggleGroup = React.forwardRef<React.ElementRef<typeof View>, ToggleGroupProps>(
     ({ className, value, onValueChange, ...props }, ref) => (
         <ToggleGroupContext.Provider value={{ value, onValueChange }}>
-            <View ref={ref} className={cn("self-start flex-row flex-wrap gap-1 rounded-bento-sm bg-muted p-1", className)} {...props} />
+            <View ref={ref} className={cn("self-start flex-row flex-wrap gap-1 rounded-md bg-muted p-1", className)} {...props} />
         </ToggleGroupContext.Provider>
     )
 );

@@ -75,11 +75,7 @@ module.exports = {
       fontSize: {
         ...themeTokens.theme.extend.fontSize,
       },
-      borderRadius: {
-        ...themeTokens.theme.extend.borderRadius,
-        "bento-lg": "14px",
-        "bento-sm": "10px",
-      },
+      borderRadius: themeTokens.theme.extend.borderRadius,
       spacing: {
         bento: "16px",
         ...themeTokens.theme.extend.spacing,

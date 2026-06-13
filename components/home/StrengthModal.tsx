@@ -72,7 +72,7 @@ const StrengthSetRow = React.memo(function StrengthSetRow({ item, onDelete, onTo
             onLongPress={() => onDelete(item.id)}
             delayLongPress={500}
             className={cn(
-                "mb-1 flex-row items-center rounded-[10px] px-1 py-1.5",
+                "mb-1 flex-row items-center rounded-md px-1 py-1.5",
                 item.isCompleted && "bg-foreground/[0.03]"
             )}
         >
@@ -330,13 +330,13 @@ export function StrengthModal({
                 }}
                 style={{ borderColor: colors.border }}
                 variant="outline"
-                className="mb-2.5 h-auto justify-start rounded-[18px] px-3 py-3"
+                className="mb-4 h-auto justify-start rounded-lg px-4 py-4"
             >
-                <View className="mr-4 h-12 w-12 items-center justify-center rounded-2xl bg-secondary">
+                <View className="mr-4 h-12 w-12 items-center justify-center rounded-lg bg-secondary">
                     <Icon size={20} color={colors.foreground} />
                 </View>
-                <View className="flex-1 justify-center">
-                    <Text className="mb-1.5 text-base font-bold">{ex.name}</Text>
+                <View className="flex-1 justify-center gap-2">
+                    <Text className="text-base font-bold">{ex.name}</Text>
                     <Text variant="muted" className="text-xs">
                         {ex.tag || "力量训练"}
                     </Text>
@@ -412,7 +412,7 @@ export function StrengthModal({
                 {modalStep === "select" ? (
                     <View className="flex-1">
                         {/* Modern Search Bar */}
-                        <View className="mb-4 flex-row items-center rounded-2xl bg-secondary px-4 py-3">
+                        <View className="mb-4 flex-row items-center rounded-lg bg-secondary px-4 py-3">
                             <Search size={18} color={colors.gray4} />
                             <Input
                                 value={searchQuery}
@@ -434,9 +434,9 @@ export function StrengthModal({
                         </View>
 
                         {/* Filter Chips */}
-                        <View className="-mx-6 mb-4 px-6">
+                        <View className="-mx-5 mb-5 px-5">
                             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                <View className="flex-row gap-2 pb-2 pr-6">
+                                <View className="flex-row gap-3 pb-3 pr-5">
                                     {categories.map(cat => {
                                         const isSelected = selectedCategory === cat;
                                         const visual = cat === "全部" ? null : getStrengthCategoryVisual(cat, colors);
@@ -446,7 +446,7 @@ export function StrengthModal({
                                                 key={cat}
                                                 onPress={() => setSelectedCategory(cat)}
                                                 variant={isSelected ? "secondary" : "outline"}
-                                                className="h-auto rounded-full px-4 py-2"
+                                                className="h-auto rounded-pill px-4 py-2"
                                             >
                                                 <Text
                                                     className="text-sm"
@@ -473,7 +473,7 @@ export function StrengthModal({
                             removeClippedSubviews={Platform.OS !== "web"}
                             windowSize={7}
                             className="flex-1"
-                            contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
+                            contentContainerStyle={{ paddingBottom: 40 }}
                         />
                     </View>
                 ) : (

@@ -219,7 +219,7 @@ export default function HomeScreen() {
     // ─── Render ────────────────────────────────────────────────────────────────
 
     return (
-        <View className="flex-1 bg-background">
+        <View className="flex-1 bg-transparent">
             <ScrollView
                 className="flex-1"
                 contentContainerStyle={{ paddingHorizontal: 20, paddingTop: insets.top + 16, paddingBottom: 100 + Math.max(insets.bottom - 20, 0), gap: 16 }}
@@ -229,7 +229,7 @@ export default function HomeScreen() {
 
                 <View className="flex-row gap-4">
                     <HomeStatsCard displayCal={displayCal} totalSets={totalSets} isAiPredicting={isAiPredicting} />
-                    <Card className="flex-[2] p-4">
+                    <Card className="flex-[2] p-3">
                         <MonthlyHeatmap refreshKey={`${workouts.length}-${isCheckedIn}`} />
                     </Card>
                 </View>

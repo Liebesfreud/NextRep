@@ -107,7 +107,7 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
                     <StatTile label="累计容量" value={formatVolume(exercise.totalVolumeKg)} icon={<Target size={14} color={colors.orange} />} />
                 </View>
 
-                <Card className="mb-3 rounded-[14px] bg-secondary p-3.5">
+                <Card className="mb-3 rounded-lg bg-secondary p-3.5">
                     <View className="flex-row items-center justify-between mb-3">
                         <Text variant="label">最近训练</Text>
                         <Text variant="caption" className="font-bold">
@@ -142,7 +142,7 @@ export function ExerciseDetailModal({ visible, exercise, onClose }: Props) {
                     )}
                 </Card>
 
-                <Card className="rounded-[14px] bg-secondary p-3.5">
+                <Card className="rounded-lg bg-secondary p-3.5">
                     <Text variant="label" className="mb-3">重量里程碑</Text>
                     {recentBreakthroughs.length === 0 ? (
                         <Text variant="muted" className="py-2 font-bold">

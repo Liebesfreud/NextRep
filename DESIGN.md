@@ -594,7 +594,7 @@ NextRep uses a **"generous curve"** system:
 
 ### 8.2 Border Strategy
 
-- **Default: No borders.** Hierarchy comes from spacing and surface color, not lines.
+- **Default**: Cards have `border border-border` for visual anchoring in dark mode. Sub-regions use spacing and surface color for hierarchy.
 - **When borders are needed**: `border border-border` (12% white opacity)
 - **Emphasis borders**: `border border-border-strong` (24% white opacity)
 - **Accent border**: `border border-accent/30` — *only* for selected/active interactive cards
@@ -813,7 +813,7 @@ These follow the rn-primitives / Shadcn pattern closely. Identity comes from *to
 #### 9.2.3 Card Variants
 
 ```tsx
-<Card>                     {/* bg-surface rounded-lg p-card-padding, NO border by default */}
+<Card>                     {/* bg-surface rounded-lg border border-border p-card-padding */}
 <CardHeader>               {/* gap-1.5 */}
 <CardTitle>                {/* text-subheading text-primary */}
 <CardDescription>          {/* text-caption text-secondary */}
@@ -1360,7 +1360,7 @@ This eliminates the flash-of-light-mode on app launch. The Expo splash screen ba
 ### Phase 1: Token Unification (Low Effort, High Impact)
 
 1. **Map all existing code** from hardcoded colors → NativeWind token classes
-2. **Standardize Card padding**: Change base Card class from `p-6` → `p-card-padding`, no border by default
+2. **Standardize Card padding**: Change base Card class from `p-6` → `p-card-padding`, add `border border-border`
 3. **Resolve Shadcn vs NextRep token conflict**: Keep Shadcn tokens for infrastructure (inputs, toggles), use NextRep tokens for identity surfaces (cards, stats, exercises)
 4. **Add `tabular-nums`** to all Text variants that display numbers (`stat-value`, `hero-stat`, `large-stat`)
 5. **Replace `StyleSheet.create()`** in BottomSheetModal with NativeWind classes

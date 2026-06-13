@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Text } from "@/components/ui/text";
 
 const Card = React.forwardRef<React.ElementRef<typeof View>, ViewProps>(({ className, ...props }, ref) => (
-    <View ref={ref} className={cn("bg-surface rounded-lg p-card-padding", className)} {...props} />
+    <View ref={ref} className={cn("bg-surface rounded-lg border border-border p-card-padding", className)} {...props} />
 ));
 Card.displayName = "Card";
 

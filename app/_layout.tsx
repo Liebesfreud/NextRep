@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Home, LayoutDashboard, Bot, Settings } from "lucide-react-native";
+import { Gauge, Home, SlidersHorizontal, Sparkles } from "lucide-react-native";
 import { View } from "react-native";
 import { ThemeProvider, useTheme } from "@/hooks/useTheme";
 import { initDatabase } from "@/db/client";
@@ -10,6 +10,7 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { getTabBarStyle, TabBarBackground, TAB_BAR_ITEM_STYLE, useTabBarStyle } from "@/components/ui/tab-bar-background";
 import { TabIcon } from "@/components/ui/tab-icon";
 import { Text } from "@/components/ui/text";
+import { DottedBackground } from "@/components/ui/dotted-background";
 import "../global.css";
 
 // Prevent auto hide
@@ -73,12 +74,14 @@ function TabLayout() {
     if (!dbInitialized) return null;
 
     return (
-        <>
+        <View className="flex-1 bg-background">
             <StatusBar style={theme === "dark" ? "light" : "dark"} />
+            <DottedBackground />
             <Tabs
                 safeAreaInsets={{ bottom: 0 }}
                 screenOptions={{
                     headerShown: false,
+                    sceneStyle: { backgroundColor: "transparent" },
                     tabBarStyle: tabBarStyle,
                     tabBarBackground: () => <TabBarBackground />,
                     tabBarShowLabel: false,
@@ -93,7 +96,7 @@ function TabLayout() {
                     options={{
                         title: "首页",
                         tabBarAccessibilityLabel: "首页",
-                        tabBarIcon: ({ color, focused }) => <TabIcon icon={Home} color={color} size={20} focused={focused} />,
+                        tabBarIcon: ({ color, focused }) => <TabIcon icon={Home} color={color} size={24} focused={focused} />,
                     }}
                 />
                 <Tabs.Screen
@@ -101,7 +104,7 @@ function TabLayout() {
                     options={{
                         title: "看板",
                         tabBarAccessibilityLabel: "数据看板",
-                        tabBarIcon: ({ color, focused }) => <TabIcon icon={LayoutDashboard} color={color} size={20} focused={focused} />,
+                        tabBarIcon: ({ color, focused }) => <TabIcon icon={Gauge} color={color} size={24} focused={focused} />,
                     }}
                 />
                 <Tabs.Screen
@@ -109,7 +112,7 @@ function TabLayout() {
                     options={{
                         title: "AI 教练",
                         tabBarAccessibilityLabel: "AI 教练",
-                        tabBarIcon: ({ color, focused }) => <TabIcon icon={Bot} color={color} size={20} focused={focused} />,
+                        tabBarIcon: ({ color, focused }) => <TabIcon icon={Sparkles} color={color} size={24} focused={focused} />,
                     }}
                 />
                 <Tabs.Screen
@@ -117,7 +120,7 @@ function TabLayout() {
                     options={{
                         title: "设置",
                         tabBarAccessibilityLabel: "设置",
-                        tabBarIcon: ({ color, focused }) => <TabIcon icon={Settings} color={color} size={20} focused={focused} />,
+                        tabBarIcon: ({ color, focused }) => <TabIcon icon={SlidersHorizontal} color={color} size={24} focused={focused} />,
                     }}
                 />
                 <Tabs.Screen
@@ -127,7 +130,7 @@ function TabLayout() {
                     }}
                 />
             </Tabs>
-        </>
+        </View>
     );
 }
 
@@ -135,8 +138,15 @@ function TabLayout() {
 
 function RootNavigationWrapper() {
     const { theme } = useTheme();
+    const navigationTheme = theme === "dark" ? DarkTheme : DefaultTheme;
+
     return (
-        <NavigationThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
+        <NavigationThemeProvider
+            value={{
+                ...navigationTheme,
+                colors: { ...navigationTheme.colors, background: "transparent" },
+            }}
+        >
             <TabLayout />
         </NavigationThemeProvider>
     );

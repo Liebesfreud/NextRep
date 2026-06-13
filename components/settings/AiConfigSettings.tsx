@@ -162,12 +162,12 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
               >
                 <View
                   className={cn(
-                    "h-5 w-5 items-center justify-center rounded-full border-2",
+                    "h-5 w-5 items-center justify-center rounded-pill border-2",
                     isActive ? "border-accent" : "border-border-strong"
                   )}
                 >
                   {isActive && (
-                    <View className="h-2.5 w-2.5 rounded-full bg-accent" />
+                    <View className="h-2.5 w-2.5 rounded-pill bg-accent" />
                   )}
                 </View>
               </Button>

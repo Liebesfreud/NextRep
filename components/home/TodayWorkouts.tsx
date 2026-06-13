@@ -227,7 +227,7 @@ export function TodayWorkouts({
                         variant="ghost"
                         className="h-auto flex-row items-center gap-1.5 px-0 py-0"
                     >
-                        <Text className="text-lg font-semibold">
+                        <Text className="text-lg font-bold">
                             {titleText}
                         </Text>
                         <View className="rounded-md border border-border p-1">
@@ -237,7 +237,7 @@ export function TodayWorkouts({
 
                     {workouts.length > 0 && (
                         <Badge variant="secondary" className="px-2 py-0.5">
-                            <BadgeText variant="secondary">
+                            <BadgeText variant="secondary" className="font-semibold font-variant-numeric-tabular-nums">
                                 {workouts.length} 次
                             </BadgeText>
                         </Badge>
@@ -252,7 +252,7 @@ export function TodayWorkouts({
                         size="sm"
                         className="h-auto px-2.5 py-1.5"
                     >
-                        <ButtonText variant="ghost" size="sm" className="text-[11px]">返回今天</ButtonText>
+                        <ButtonText variant="ghost" size="sm" className="text-[11px] font-medium">返回今天</ButtonText>
                     </Button>
                 )}
             </View>
@@ -263,7 +263,7 @@ export function TodayWorkouts({
                     {cardioWorkouts.length > 0 && (
                         <Card className="gap-2 p-3">
                             <View className="flex-row justify-between items-center ml-1">
-                                <Text variant="caption">
+                                <Text variant="caption" className="font-semibold">
                                     有氧训练
                                 </Text>
                                 <Button onPress={handleOpenCardio} variant="ghost" size="icon"
@@ -279,12 +279,12 @@ export function TodayWorkouts({
                                     </View>
                                     <View className="flex-1">
                                         <View className="flex-row justify-between items-center">
-                                            <Text className="text-sm font-medium">{w.name}</Text>
+                                            <Text className="text-sm font-semibold">{w.name}</Text>
                                             <View className="rounded-md border border-border px-2 py-0.5">
-                                                <Text className="text-xs text-muted-foreground">{formatTime(w.createdAt)}</Text>
+                                                <Text className="text-xs font-normal text-muted-foreground font-variant-numeric-tabular-nums">{formatTime(w.createdAt)}</Text>
                                             </View>
                                         </View>
-                                        {w.stats && <Text className="mt-0.5 text-xs text-muted-foreground">{w.stats}</Text>}
+                                        {w.stats && <Text className="mt-0.5 text-xs font-medium text-muted-foreground font-variant-numeric-tabular-nums">{w.stats}</Text>}
                                     </View>
                                 </Button>
                             ))}
@@ -295,7 +295,7 @@ export function TodayWorkouts({
                     {strengthWorkouts.length > 0 && (
                         <Card className="gap-2 p-3">
                             <View className="flex-row justify-between items-center ml-1 mb-0.5">
-                                <Text variant="caption">
+                                <Text variant="caption" className="font-semibold">
                                     力量训练
                                 </Text>
                                 <Button onPress={handleOpenStrength} variant="ghost" size="icon"
@@ -311,12 +311,12 @@ export function TodayWorkouts({
                                     </View>
                                     <View className="flex-1">
                                         <View className="flex-row justify-between items-center">
-                                            <Text className="text-sm font-medium">{w.name}</Text>
+                                            <Text className="text-sm font-semibold">{w.name}</Text>
                                             <View className="rounded-md border border-border px-2 py-0.5">
-                                                <Text variant="caption" className="text-xs text-muted-foreground">{formatTime(w.createdAt)}</Text>
+                                                <Text variant="caption" className="text-xs font-normal text-muted-foreground font-variant-numeric-tabular-nums">{formatTime(w.createdAt)}</Text>
                                             </View>
                                         </View>
-                                        <Text className="mt-0.5 text-xs text-muted-foreground">
+                                        <Text className="mt-0.5 text-xs font-medium text-muted-foreground font-variant-numeric-tabular-nums">
                                             {w.weight && <Text className="opacity-90">{w.weight}</Text>}
                                             {w.weight && w.sets && <Text className="text-muted-foreground"> • </Text>}
                                             {w.sets && <Text className="text-muted-foreground">{formatSets(w.sets)}</Text>}
@@ -344,7 +344,7 @@ export function TodayWorkouts({
                             variant="outline"
                             className="flex-1 py-3">
                             <Activity size={16} color={colors.foreground} />
-                            <ButtonText variant="outline" className="text-sm">有氧运动</ButtonText>
+                            <ButtonText variant="outline" className="text-sm font-semibold">有氧运动</ButtonText>
                         </Button>
                     )}
                     {strengthWorkouts.length === 0 && (
@@ -352,7 +352,7 @@ export function TodayWorkouts({
                             variant="outline"
                             className="flex-1 py-3">
                             <Dumbbell size={16} color={colors.foreground} />
-                            <ButtonText variant="outline" className="text-sm">力量训练</ButtonText>
+                            <ButtonText variant="outline" className="text-sm font-semibold">力量训练</ButtonText>
                         </Button>
                     )}
                 </View>
@@ -365,13 +365,13 @@ export function TodayWorkouts({
                         variant="outline"
                         className="flex-1 py-3">
                         <Activity size={16} color={colors.foreground} />
-                        <ButtonText variant="outline" className="text-sm">补录有氧</ButtonText>
+                        <ButtonText variant="outline" className="text-sm font-semibold">补录有氧</ButtonText>
                     </Button>
                     <Button onPress={handleOpenStrength}
                         variant="outline"
                         className="flex-1 py-3">
                         <Dumbbell size={16} color={colors.foreground} />
-                        <ButtonText variant="outline" className="text-sm">补录力量</ButtonText>
+                        <ButtonText variant="outline" className="text-sm font-semibold">补录力量</ButtonText>
                     </Button>
                 </View>
             )}
@@ -384,7 +384,7 @@ export function TodayWorkouts({
                     className="w-full py-4"
                 >
                     <CheckCircle size={18} color={colors.primaryForeground} strokeWidth={2.25} />
-                    <ButtonText className="text-base">
+                    <ButtonText className="text-base font-semibold">
                         {isPending ? "打卡中..." : isToday ? "完成今日打卡" : "补打卡"}
                     </ButtonText>
                 </Button>
@@ -394,7 +394,7 @@ export function TodayWorkouts({
                     className="w-full flex-row items-center justify-center gap-2 rounded-lg border border-border py-4"
                 >
                     <CheckCircle size={18} color={colors.green} strokeWidth={2.5} />
-                    <Text className="text-base">{isToday ? "今日已打卡" : "已补打卡"}</Text>
+                    <Text className="text-base font-semibold">{isToday ? "今日已打卡" : "已补打卡"}</Text>
                 </View>
             )}
 

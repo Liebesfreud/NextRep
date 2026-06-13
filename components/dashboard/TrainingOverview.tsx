@@ -105,7 +105,7 @@ function ToggleAction({ label, active, onPress }: { label: string; active: boole
             variant="secondary"
             size="sm"
             hitSlop={8}
-            className="min-h-8 rounded-full border border-border px-3"
+            className="min-h-8 rounded-pill border border-border px-3"
         >
             <ButtonText variant="secondary" size="sm" className={active ? "text-foreground" : "text-muted-foreground"}>
                 {label}
@@ -426,7 +426,7 @@ export function TrainingOverview({
                             variant="ghost"
                             size="icon"
                             disabled={activeReviewPage === 0}
-                            className="h-8 w-8 rounded-full"
+                            className="h-8 w-8 rounded-pill"
                         >
                             <ChevronLeft size={16} color={activeReviewPage === 0 ? colors.gray4 : colors.foreground} />
                         </Button>
@@ -442,7 +442,7 @@ export function TrainingOverview({
                             variant="ghost"
                             size="icon"
                             disabled={activeReviewPage === reviewPages.length - 1}
-                            className="h-8 w-8 rounded-full"
+                            className="h-8 w-8 rounded-pill"
                         >
                             <ChevronRight size={16} color={activeReviewPage === reviewPages.length - 1 ? colors.gray4 : colors.foreground} />
                         </Button>

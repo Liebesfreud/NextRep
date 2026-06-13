@@ -55,7 +55,7 @@ export function ExerciseAnalytics({ data }: Props) {
                     </Button>
                 </View>
 
-                <Card className="min-h-[112px] border border-border p-2">
+                <Card className="min-h-[112px] p-2">
                     {analytics.length === 0 ? (
                         <View className="items-center justify-center py-8">
                             <Target size={20} color={colors.gray4} />
@@ -80,7 +80,7 @@ export function ExerciseAnalytics({ data }: Props) {
                                             {idx + 1}
                                         </Text>
                                     </View>
-                                    <View className="h-9 w-9 items-center justify-center rounded-[10px] border border-border bg-muted">
+                                    <View className="h-9 w-9 items-center justify-center rounded-md border border-border bg-muted">
                                         <Icon size={18} color={colors.white} />
                                     </View>
                                     <View className="flex-1">
