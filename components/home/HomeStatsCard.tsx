@@ -14,26 +14,32 @@ export function HomeStatsCard({ displayCal, totalSets, isAiPredicting }: Props) 
     const { colors } = useTheme();
 
     return (
-        <Card className="min-w-0 flex-1 justify-around p-3">
-            <View>
-                <View className="flex-row items-center gap-2">
-                    <Flame size={14} color={colors.orange} />
+        <Card className="min-w-0 flex-1 justify-around p-2.5">
+            <View className="gap-1">
+                <View className="flex-row items-center gap-1.5">
+                    <Flame size={13} color={colors.orange} />
+                    <Text variant="micro" className="font-medium">燃脂</Text>
+                </View>
+                <View className="flex-row items-baseline gap-1.5">
                     {isAiPredicting ? (
-                        <Text className="text-lg font-medium text-muted-foreground">计算中...</Text>
+                        <Text className="text-sm font-medium text-muted-foreground">计算中...</Text>
                     ) : (
-                        <Text className="text-2xl font-bold font-variant-numeric-tabular-nums">{displayCal}</Text>
+                        <Text className="text-xl font-bold font-variant-numeric-tabular-nums">{displayCal}</Text>
                     )}
-                    {!isAiPredicting && <Text variant="caption" className="font-normal">千卡</Text>}
+                    {!isAiPredicting && <Text variant="micro" className="font-normal">千卡</Text>}
                 </View>
             </View>
 
             <Separator className="my-2" />
 
-            <View>
-                <View className="flex-row items-center gap-2">
-                    <Layers size={14} color={colors.green} />
-                    <Text className="text-2xl font-bold font-variant-numeric-tabular-nums">{totalSets}</Text>
-                    <Text variant="caption" className="font-normal">组</Text>
+            <View className="gap-1">
+                <View className="flex-row items-center gap-1.5">
+                    <Layers size={13} color={colors.green} />
+                    <Text variant="micro" className="font-medium">组数</Text>
+                </View>
+                <View className="flex-row items-baseline gap-1.5">
+                    <Text className="text-xl font-bold font-variant-numeric-tabular-nums">{totalSets}</Text>
+                    <Text variant="micro" className="font-normal">组</Text>
                 </View>
             </View>
         </Card>

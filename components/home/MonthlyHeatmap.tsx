@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { View, ScrollView, type GestureResponderEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
-import { X, CalendarCheck } from "lucide-react-native";
+import { X } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { getCheckinsByMonth, getWorkoutsByMonth } from "@/db/services/workout";
 import { Button, ButtonText } from "@/components/ui/button";
@@ -14,6 +14,8 @@ type Props = {
 };
 
 const MONTH_FORMATTER = new Intl.DateTimeFormat("zh-CN", { month: "long" });
+const HEATMAP_ROWS = 6;
+const HEATMAP_COLUMNS = 7;
 
 export function MonthlyHeatmap({ refreshKey }: Props) {
     const { colors } = useTheme();
@@ -94,12 +96,18 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
         else goToNext();
     }, [goToNext, goToPrev]);
 
-    const totalCells = 42; // Strictly 6 weeks * 7 days to maintain fixed height
     const todayNum = (year === currentYear && month === currentMonth) ? currentDate : -1;
     const monthlyCheckinCount = Object.values(checkins).filter(Boolean).length;
 
     // Compute week alignment (Monday = 0)
     const firstDayIndex = firstDay === 0 ? 6 : firstDay - 1;
+    const heatmapCells = useMemo(
+        () => Array.from({ length: HEATMAP_ROWS * HEATMAP_COLUMNS }, (_, index) => {
+            const day = index - firstDayIndex + 1;
+            return day >= 1 && day <= daysInMonth ? day : null;
+        }),
+        [daysInMonth, firstDayIndex]
+    );
 
     // Allowed selection range
     const years = useMemo(() => Array.from({ length: 5 }, (_, i) => currentYear - i), [currentYear]);
@@ -108,74 +116,56 @@ export function MonthlyHeatmap({ refreshKey }: Props) {
 
     return (
         <View
-            className="flex-row justify-between items-center w-full"
+            className="w-full gap-4"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onTouchCancel={() => { touchStartRef.current = null; }}
         >
-            {/* Left Panel: Summary */}
-            <View className="justify-center" style={{ paddingVertical: 2 }}>
-                <View>
-                    <Button
-                        onPress={() => setIsPickerVisible(true)}
-                        variant="ghost"
-                        className="h-auto items-start justify-start bg-transparent p-0"
-                    >
-                        <View>
-                            <Text variant="caption" className="font-normal text-muted-foreground font-variant-numeric-tabular-nums">
-                                {year}
-                            </Text>
-                            <Text className="text-xl font-semibold">
-                                {monthName}
-                            </Text>
-                        </View>
-                    </Button>
-                </View>
-
-                <View className="mt-2">
-                    <View className="flex-row items-center gap-2">
-                        <CalendarCheck size={12} color={colors.green} />
-                        <Text className="text-2xl font-bold font-variant-numeric-tabular-nums">
-                            {monthlyCheckinCount}
-                        </Text>
-                        <Text variant="caption" className="font-normal">天</Text>
+            <View className="flex-row items-center justify-between">
+                <Button
+                    onPress={() => setIsPickerVisible(true)}
+                    variant="ghost"
+                    className="h-auto bg-transparent p-0"
+                >
+                    <View className="flex-row items-baseline">
+                        <Text variant="body" className="font-variant-numeric-tabular-nums">{year}年</Text>
+                        <Text variant="subheading" className="font-bold font-variant-numeric-tabular-nums">{monthName}</Text>
                     </View>
+                </Button>
+
+                <View className="flex-row items-baseline gap-1">
+                    <Text className="text-stat-value font-bold font-variant-numeric-tabular-nums">
+                        {monthlyCheckinCount}天
+                    </Text>
                 </View>
             </View>
 
-            {/* Right Panel: Minimalist Heatmap Grid */}
-            <Animated.View style={[{ gap: 3 }, heatmapAnimatedStyle]}>
-                {Array.from({ length: 6 }).map((_, r) => (
-                    <View key={r} style={{ flexDirection: "row", gap: 3 }}>
-                        {Array.from({ length: 7 }).map((_, c) => {
-                            const i = r * 7 + c;
-                            const dayNum = i - firstDayIndex + 1;
-                            const isValidDay = dayNum >= 1 && dayNum <= daysInMonth;
-                            const isCheckedIn = isValidDay && checkins[dayNum];
-                            const isToday = isValidDay && dayNum === todayNum;
+            <Animated.View className="w-full gap-0.5" style={heatmapAnimatedStyle}>
+                {Array.from({ length: HEATMAP_ROWS }, (_, row) => (
+                    <View key={row} className="w-full flex-row gap-0.5">
+                        {heatmapCells
+                            .slice(row * HEATMAP_COLUMNS, (row + 1) * HEATMAP_COLUMNS)
+                            .map((day, column) => {
+                                if (day === null) {
+                                    return <View key={`empty-${row}-${column}`} className="h-5 flex-1" />;
+                                }
 
-                            // Compute background logic
-                            let bg: string = colors.gray2;
-                            if (isCheckedIn) bg = colors.green;
-                            else if (!isValidDay) bg = "transparent";
-                            else if (isToday) bg = colors.border;
+                                const isCheckedIn = Boolean(checkins[day]);
+                                const isToday = day === todayNum;
+                                const backgroundColor = isCheckedIn
+                                    ? colors.green
+                                    : isToday
+                                        ? colors.border
+                                        : colors.gray2;
 
-                            return (
-                                <View
-                                    key={i}
-                                    className="rounded-sm"
-                                    style={{
-                                        width: 12,
-                                        height: 12,
-                                        minWidth: 12,
-                                        minHeight: 12,
-                                        flexShrink: 0,
-                                        backgroundColor: bg,
-                                        borderCurve: "continuous",
-                                    } as any}
-                                />
-                            );
-                        })}
+                                return (
+                                    <View
+                                        key={day}
+                                        className="h-5 flex-1 rounded-sm"
+                                        style={{ backgroundColor, borderCurve: "continuous" } as any}
+                                    />
+                                );
+                            })}
                     </View>
                 ))}
             </Animated.View>

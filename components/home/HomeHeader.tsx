@@ -17,20 +17,18 @@ export function HomeHeader({ greeting, userName, isCheckedIn }: Props) {
     }).format(now);
 
     return (
-        <View className="gap-3">
-            <View className="flex-row items-end justify-between">
-            <View className="gap-1">
-                <Text variant="caption" className="font-normal text-muted-foreground">
-                    {formattedDate}
-                </Text>
+        <View className="gap-1">
+            <Text variant="caption" className="font-normal text-muted-foreground">
+                {formattedDate}
+            </Text>
+            <View className="flex-row items-center justify-between">
                 <Text variant="title" className="font-black">
                     <Text className="text-accent font-black">{greeting}，</Text>
                     {userName}
                 </Text>
-            </View>
-            {isCheckedIn && (
-                <CheckCircle size={24} color={colors.green} strokeWidth={2.25} />
-            )}
+                {isCheckedIn && (
+                    <CheckCircle size={30} color={colors.green} strokeWidth={2.5} />
+                )}
             </View>
         </View>
     );

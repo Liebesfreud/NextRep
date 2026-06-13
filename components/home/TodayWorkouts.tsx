@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Plus, Dumbbell, Activity, CheckCircle, Calendar, ChevronLeft, ChevronRight, X } from "lucide-react-native";
+import { Plus, Dumbbell, Activity, CheckCircle, ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { getCheckinsByMonth, type WorkoutItem } from "@/db/services/workout";
-import { Badge, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonText } from "@/components/ui/button";
 import { CalendarDayCell } from "@/components/ui/calendar-day-cell";
 import { Card } from "@/components/ui/card";
@@ -219,68 +218,52 @@ export function TodayWorkouts({
 
     return (
         <Card className="gap-4 p-4">
-            <View className="flex-row justify-between items-center px-1">
-                <View className="flex-row items-center gap-2">
-                    {/* 标题 / 已选日期 */}
-                    <Button
-                        onPress={() => setShowDatePicker(true)}
-                        variant="ghost"
-                        className="h-auto flex-row items-center gap-1.5 px-0 py-0"
-                    >
-                        <Text className="text-lg font-bold">
-                            {titleText}
-                        </Text>
-                        <View className="rounded-md border border-border p-1">
-                            <Calendar size={13} color={colors.gray4} />
-                        </View>
-                    </Button>
-
-                    {workouts.length > 0 && (
-                        <Badge variant="secondary" className="px-2 py-0.5">
-                            <BadgeText variant="secondary" className="font-semibold font-variant-numeric-tabular-nums">
-                                {workouts.length} 次
-                            </BadgeText>
-                        </Badge>
-                    )}
-                </View>
+            <View className="flex-row items-center justify-between px-1">
+                <Button
+                    onPress={() => setShowDatePicker(true)}
+                    accessibilityLabel="切换训练日期"
+                    variant="ghost"
+                    className="h-auto px-0 py-0"
+                >
+                    <Text className="text-lg font-bold">{titleText}</Text>
+                </Button>
 
                 {/* 非今日时显示"返回今天"快捷按钮 */}
                 {!isToday && (
                     <Button
                         onPress={() => onDateChange(toDateStr(new Date()))}
-                        variant="ghost"
+                        variant="secondary"
                         size="sm"
-                        className="h-auto px-2.5 py-1.5"
+                        className="h-8 rounded-md px-3 py-0"
                     >
-                        <ButtonText variant="ghost" size="sm" className="text-[11px] font-medium">返回今天</ButtonText>
+                        <ButtonText variant="secondary" size="sm" className="text-xs font-semibold">返回今天</ButtonText>
                     </Button>
                 )}
             </View>
 
             {workouts.length > 0 ? (
-                <View className="gap-4">
-                    {/* Cardio */}
+                <View className="gap-3">
                     {cardioWorkouts.length > 0 && (
-                        <Card className="gap-2 p-3">
-                            <View className="flex-row justify-between items-center ml-1">
-                                <Text variant="caption" className="font-semibold">
+                        <View className="gap-1.5">
+                            <View className="flex-row items-center justify-between px-1">
+                                <Text variant="caption" className="font-semibold text-accent">
                                     有氧训练
                                 </Text>
                                 <Button onPress={handleOpenCardio} variant="ghost" size="icon"
-                                    className="h-6 w-6 rounded-md border border-border">
-                                    <Plus size={14} color={colors.foreground} strokeWidth={2.5} />
+                                    className="h-6 w-6 rounded-md">
+                                    <Plus size={14} color={colors.orange} strokeWidth={2.5} />
                                 </Button>
                             </View>
                             {cardioWorkouts.map((w) => (
                                 <Button key={w.id} onPress={() => openEditModal(w)} variant="ghost"
-                                    className="-mx-1.5 h-auto flex-row items-center gap-2.5 rounded-lg p-1.5">
-                                    <View className="h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted">
-                                        <Activity size={16} color={colors.foreground} />
+                                    className="h-auto flex-row items-center gap-2.5 rounded-lg bg-accent/10 p-2">
+                                    <View className="h-9 w-9 items-center justify-center rounded-lg bg-accent/10">
+                                        <Activity size={16} color={colors.orange} />
                                     </View>
                                     <View className="flex-1">
-                                        <View className="flex-row justify-between items-center">
-                                            <Text className="text-sm font-semibold">{w.name}</Text>
-                                            <View className="rounded-md border border-border px-2 py-0.5">
+                                        <View className="flex-row items-center justify-between">
+                                            <Text className="text-sm font-semibold text-accent">{w.name}</Text>
+                                            <View className="rounded-md px-2 py-0.5">
                                                 <Text className="text-xs font-normal text-muted-foreground font-variant-numeric-tabular-nums">{formatTime(w.createdAt)}</Text>
                                             </View>
                                         </View>
@@ -288,31 +271,30 @@ export function TodayWorkouts({
                                     </View>
                                 </Button>
                             ))}
-                        </Card>
+                        </View>
                     )}
 
-                    {/* Strength */}
                     {strengthWorkouts.length > 0 && (
-                        <Card className="gap-2 p-3">
-                            <View className="flex-row justify-between items-center ml-1 mb-0.5">
+                        <View className={cardioWorkouts.length > 0 ? "gap-1.5 border-t border-border pt-3" : "gap-1.5"}>
+                            <View className="flex-row items-center justify-between px-1">
                                 <Text variant="caption" className="font-semibold">
                                     力量训练
                                 </Text>
                                 <Button onPress={handleOpenStrength} variant="ghost" size="icon"
-                                    className="h-6 w-6 rounded-md border border-border">
+                                    className="h-6 w-6 rounded-md">
                                     <Plus size={14} color={colors.foreground} strokeWidth={2.5} />
                                 </Button>
                             </View>
                             {strengthWorkouts.map((w) => (
                                 <Button key={w.id} onPress={() => openEditModal(w)} variant="ghost"
-                                    className="-mx-1.5 h-auto flex-row items-center gap-2.5 rounded-lg p-1.5">
-                                    <View className="h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted">
-                                        <Dumbbell size={16} color={colors.gray4} />
+                                    className="h-auto flex-row items-center gap-2.5 rounded-lg p-2">
+                                    <View className="h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                                        <Dumbbell size={16} color={colors.foreground} />
                                     </View>
                                     <View className="flex-1">
-                                        <View className="flex-row justify-between items-center">
+                                        <View className="flex-row items-center justify-between">
                                             <Text className="text-sm font-semibold">{w.name}</Text>
-                                            <View className="rounded-md border border-border px-2 py-0.5">
+                                            <View className="rounded-md px-2 py-0.5">
                                                 <Text variant="caption" className="text-xs font-normal text-muted-foreground font-variant-numeric-tabular-nums">{formatTime(w.createdAt)}</Text>
                                             </View>
                                         </View>
@@ -324,7 +306,7 @@ export function TodayWorkouts({
                                     </View>
                                 </Button>
                             ))}
-                        </Card>
+                        </View>
                     )}
                 </View>
             ) : (
