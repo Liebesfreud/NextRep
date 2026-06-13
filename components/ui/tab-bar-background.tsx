@@ -1,38 +1,17 @@
-import { Platform, View, type ViewStyle } from "react-native";
+import { View, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/hooks/useTheme";
 
-const TAB_BAR_HEIGHT = 70;
-const TAB_BAR_RADIUS = 12;
+const TAB_BAR_HEIGHT = 64;
 
-function getTabBarStyle(borderColor: string, bottomOffset = 20): ViewStyle {
+function getTabBarStyle(borderColor: string, bottomInset = 0): ViewStyle {
     return {
-        position: "absolute",
-        bottom: bottomOffset,
-        marginHorizontal: 20,
-        left: 0,
-        right: 0,
         backgroundColor: "transparent",
-        borderColor,
         borderTopColor: borderColor,
-        borderWidth: 1,
         borderTopWidth: 1,
-        borderRadius: TAB_BAR_RADIUS,
-        height: TAB_BAR_HEIGHT,
-        paddingBottom: 0,
-        paddingTop: 0,
-        ...Platform.select<ViewStyle>({
-            web: {
-                boxShadow: "0 6px 16px rgba(0, 0, 0, 0.04)",
-            },
-            default: {
-                shadowColor: "#000000",
-                shadowOffset: { width: 0, height: 6 },
-                shadowOpacity: 0.04,
-                shadowRadius: 16,
-                elevation: 3,
-            },
-        }),
+        height: TAB_BAR_HEIGHT + bottomInset,
+        paddingBottom: bottomInset,
+        paddingTop: 6,
     };
 }
 
@@ -51,25 +30,9 @@ export function TabBarBackground() {
                 right: 0,
                 bottom: 0,
                 left: 0,
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                borderWidth: 1,
-                borderRadius: TAB_BAR_RADIUS,
-                overflow: "visible",
+                backgroundColor: colors.surface,
             }}
-        >
-            <View
-                style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 1,
-                    backgroundColor: colors.border,
-                    opacity: 0.9,
-                }}
-            />
-        </View>
+        />
     );
 }
 
@@ -79,9 +42,7 @@ export function TabBarBackground() {
  */
 export function useTabBarStyle(borderColor: string): ViewStyle {
     const insets = useSafeAreaInsets();
-    // Ensure at least 20px from bottom, plus the safe area inset for home indicator
-    const bottomOffset = Math.max(20, insets.bottom > 0 ? insets.bottom + 8 : 20);
-    return getTabBarStyle(borderColor, bottomOffset);
+    return getTabBarStyle(borderColor, insets.bottom);
 }
 
 export { getTabBarStyle, TAB_BAR_ITEM_STYLE };

@@ -16,8 +16,8 @@ export function SettingsHeader({ onSave, isPending, isSaved }: Props) {
     return (
         <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-3">
-                <View className="items-center justify-center rounded-lg border border-border bg-card h-10 w-10">
-                    <Settings size={18} color={colors.foreground} strokeWidth={2} />
+                <View className="items-center justify-center rounded-md bg-surface h-8 w-8">
+                    <Settings size={16} color={colors.accent} strokeWidth={2} />
                 </View>
                 <Text variant="heading">设置</Text>
             </View>
@@ -30,10 +30,10 @@ export function SettingsHeader({ onSave, isPending, isSaved }: Props) {
                 className="min-w-20"
             >
                 {isSaved
-                    ? <Check size={15} color={colors.foreground} strokeWidth={3} />
-                    : <Save size={15} color={colors.primaryForeground} strokeWidth={2.5} />
+                    ? <Check size={15} color={colors.accent} strokeWidth={3} />
+                    : <Save size={15} color={colors.accent} strokeWidth={2.5} />
                 }
-                <ButtonText variant={isSaved ? "outline" : "default"} size="sm">
+                <ButtonText variant={isSaved ? "outline" : "default"} size="sm" className={isSaved ? "text-accent" : ""}>
                     {isPending ? "保存中" : isSaved ? "已保存" : "保存"}
                 </ButtonText>
             </Button>

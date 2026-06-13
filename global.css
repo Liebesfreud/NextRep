@@ -2,62 +2,122 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   DESIGN.md v3 Dark-First CSS Cascade
+   :root = dark mode (default)
+   .light = light mode overrides
+   ============================================================ */
+
+/* --- Dark Theme (Default — splash screen + loading fallback) --- */
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #111113;
-  --card-foreground: #fafafa;
-  --secondary: #18181b;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --primary: #fafafa;
-  --primary-foreground: #18181b;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --accent: #27272a;
-  --success: #fafafa;
-  --border: rgba(255, 255, 255, 0.09);
-  --input: rgba(255, 255, 255, 0.06);
-  --ring: #fafafa;
+  --background: #0A0A0F;
+  --foreground: #F5F5F7;
+  --card: #141419;
+  --card-foreground: #F5F5F7;
+  --primary: #F5F5F7;
+  --primary-foreground: #0A0A0F;
+  --secondary: #1C1C24;
+  --secondary-foreground: #F5F5F7;
+  --muted: #222230;
+  --muted-foreground: #8E8E93;
+  --accent: #FF6B2C;
+  --accent-foreground: #FFFFFF;
+  --destructive: #FF453A;
+  --destructive-foreground: #FFFFFF;
+  --success: #30D158;
+  --success-foreground: #FFFFFF;
+  --warning: #FFD60A;
+  --warning-foreground: #0A0A0F;
+  --info: #0A84FF;
+  --info-foreground: #FFFFFF;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --input: rgba(255, 255, 255, 0.07);
+  --ring: #FF6B2C;
+  --overlay: rgba(0, 0, 0, 0.60);
+  --radius: 16px;
+
+  /* Mapped surface tokens */
+  --surface: #141419;
+  --surface-elevated: #1C1C24;
+  --surface-hover: #222230;
+
+  /* Mapped text token */
+  --tertiary: #636366;
 }
 
-.light {
-  --background: #fafafa;
-  --foreground: #18181b;
-  --card: #ffffff;
-  --card-foreground: #18181b;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --primary: #18181b;
-  --primary-foreground: #fafafa;
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
-  --accent: #f4f4f5;
-  --success: #18181b;
-  --border: rgba(24, 24, 27, 0.08);
-  --input: rgba(24, 24, 27, 0.05);
-  --ring: #18181b;
-}
-
+/* --- Dark Theme (Explicit — NativeWind darkMode: "class" requires .dark rules) --- */
 .dark {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #111113;
-  --card-foreground: #fafafa;
-  --secondary: #18181b;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --primary: #fafafa;
-  --primary-foreground: #18181b;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --accent: #27272a;
-  --success: #fafafa;
-  --border: rgba(255, 255, 255, 0.09);
-  --input: rgba(255, 255, 255, 0.06);
-  --ring: #fafafa;
+  --background: #0A0A0F;
+  --foreground: #F5F5F7;
+  --card: #141419;
+  --card-foreground: #F5F5F7;
+  --primary: #F5F5F7;
+  --primary-foreground: #0A0A0F;
+  --secondary: #1C1C24;
+  --secondary-foreground: #F5F5F7;
+  --muted: #222230;
+  --muted-foreground: #8E8E93;
+  --accent: #FF6B2C;
+  --accent-foreground: #FFFFFF;
+  --destructive: #FF453A;
+  --destructive-foreground: #FFFFFF;
+  --success: #30D158;
+  --success-foreground: #FFFFFF;
+  --warning: #FFD60A;
+  --warning-foreground: #0A0A0F;
+  --info: #0A84FF;
+  --info-foreground: #FFFFFF;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --input: rgba(255, 255, 255, 0.07);
+  --ring: #FF6B2C;
+  --overlay: rgba(0, 0, 0, 0.60);
+  --radius: 16px;
+
+  /* Mapped surface tokens */
+  --surface: #141419;
+  --surface-elevated: #1C1C24;
+  --surface-hover: #222230;
+
+  /* Mapped text token */
+  --tertiary: #636366;
+}
+
+/* --- Light Theme Overrides --- */
+.light {
+  --background: #FAFAFA;
+  --foreground: #18181B;
+  --card: #FFFFFF;
+  --card-foreground: #18181B;
+  --primary: #18181B;
+  --primary-foreground: #FAFAFA;
+  --secondary: #F4F4F5;
+  --secondary-foreground: #18181B;
+  --muted: #F4F4F5;
+  --muted-foreground: #71717A;
+  --accent: #E85D20;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --success: #30D158;
+  --success-foreground: #FFFFFF;
+  --warning: #FFD60A;
+  --warning-foreground: #18181B;
+  --info: #007AFF;
+  --info-foreground: #FFFFFF;
+  --border: rgba(24, 24, 27, 0.08);
+  --border-strong: rgba(24, 24, 27, 0.14);
+  --input: rgba(24, 24, 27, 0.05);
+  --ring: #E85D20;
+  --overlay: rgba(9, 9, 11, 0.35);
+  --radius: 16px;
+
+  /* Mapped surface tokens */
+  --surface: #FFFFFF;
+  --surface-elevated: #F4F4F5;
+  --surface-hover: #E4E4E7;
+
+  /* Mapped text token */
+  --tertiary: #A1A1AA;
 }

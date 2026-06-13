@@ -82,10 +82,10 @@ function TabLayout() {
                     tabBarStyle: tabBarStyle,
                     tabBarBackground: () => <TabBarBackground />,
                     tabBarShowLabel: false,
-                    tabBarLabelPosition: 'beside-icon',
-                    tabBarActiveTintColor: colors.white,
-                    tabBarInactiveTintColor: colors.gray4,
+                    tabBarActiveTintColor: colors.accent,
+                    tabBarInactiveTintColor: colors.textTertiary,
                     tabBarItemStyle: TAB_BAR_ITEM_STYLE,
+                    tabBarHideOnKeyboard: true,
                 }}
             >
                 <Tabs.Screen
@@ -93,7 +93,7 @@ function TabLayout() {
                     options={{
                         title: "首页",
                         tabBarAccessibilityLabel: "首页",
-                        tabBarIcon: ({ color, size, focused }) => <TabIcon icon={Home} color={color} size={size} focused={focused} />,
+                        tabBarIcon: ({ color, focused }) => <TabIcon icon={Home} color={color} size={20} focused={focused} />,
                     }}
                 />
                 <Tabs.Screen
@@ -101,7 +101,7 @@ function TabLayout() {
                     options={{
                         title: "看板",
                         tabBarAccessibilityLabel: "数据看板",
-                        tabBarIcon: ({ color, size, focused }) => <TabIcon icon={LayoutDashboard} color={color} size={size} focused={focused} />,
+                        tabBarIcon: ({ color, focused }) => <TabIcon icon={LayoutDashboard} color={color} size={20} focused={focused} />,
                     }}
                 />
                 <Tabs.Screen
@@ -109,7 +109,7 @@ function TabLayout() {
                     options={{
                         title: "AI 教练",
                         tabBarAccessibilityLabel: "AI 教练",
-                        tabBarIcon: ({ color, size, focused }) => <TabIcon icon={Bot} color={color} size={size} focused={focused} />,
+                        tabBarIcon: ({ color, focused }) => <TabIcon icon={Bot} color={color} size={20} focused={focused} />,
                     }}
                 />
                 <Tabs.Screen
@@ -117,7 +117,7 @@ function TabLayout() {
                     options={{
                         title: "设置",
                         tabBarAccessibilityLabel: "设置",
-                        tabBarIcon: ({ color, size, focused }) => <TabIcon icon={Settings} color={color} size={size} focused={focused} />,
+                        tabBarIcon: ({ color, focused }) => <TabIcon icon={Settings} color={color} size={20} focused={focused} />,
                     }}
                 />
                 <Tabs.Screen

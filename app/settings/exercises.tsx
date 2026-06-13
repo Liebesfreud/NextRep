@@ -115,7 +115,7 @@ export default function ExerciseManagementScreen() {
             <Card
                 style={{
                     borderColor: `${visual.accent}24`,
-                    backgroundColor: visual.cardBg ?? colors.gray2,
+                    backgroundColor: visual.cardBg ?? colors.surface,
                 }}
                 className="mb-2 flex-row items-center overflow-hidden rounded-[14px] border p-0"
             >
@@ -145,7 +145,7 @@ export default function ExerciseManagementScreen() {
                             最近 {formatDate(item.latestDateStr)}
                         </Text>
                     </View>
-                    <ChevronRight size={18} color={colors.gray4} className="ml-1.5" />
+                    <ChevronRight size={18} color={colors.textTertiary} className="ml-1.5" />
                 </Button>
                 {isPreset ? (
                     <Button
@@ -165,16 +165,16 @@ export default function ExerciseManagementScreen() {
 
     const renderEmptyList = useCallback(() => (
         <View className="items-center justify-center py-12">
-            <Dumbbell size={24} color={colors.gray4} />
+            <Dumbbell size={24} color={colors.textTertiary} />
             <Text variant="muted" className="mt-3">
                 暂无结果
             </Text>
         </View>
-    ), [colors.gray4]);
+    ), [colors.textTertiary]);
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1 bg-background">
-            <View className="flex-row items-center justify-between border-b border-border bg-card px-5 pb-4" style={{ paddingTop: insets.top + 16 }}>
+            <View className="flex-row items-center justify-between border-b border-border bg-surface px-5 pb-4" style={{ paddingTop: insets.top + 16 }}>
                 <Button onPress={() => router.back()} variant="ghost" size="sm" className="h-auto gap-1 px-0 py-0">
                     <ChevronLeft size={24} color={colors.foreground} />
                     <ButtonText variant="ghost" className="text-base text-foreground">返回</ButtonText>
@@ -185,8 +185,8 @@ export default function ExerciseManagementScreen() {
 
             <View className="px-5 pb-2.5 pt-4">
                     <View className="mb-3 flex-row gap-2.5">
-                        <View className="h-11 flex-1 flex-row items-center rounded-bento-sm bg-secondary px-3.5">
-                            <Search size={18} color={colors.gray4} />
+                        <View className="h-11 flex-1 flex-row items-center rounded-sm bg-secondary px-3.5">
+                            <Search size={18} color={colors.textTertiary} />
                             <Input
                                 value={searchQuery}
                                 onChangeText={setSearchQuery}
@@ -201,7 +201,7 @@ export default function ExerciseManagementScreen() {
                                     size="icon"
                                     className="h-7 w-7"
                                 >
-                                    <X size={16} color={colors.gray4} />
+                                    <X size={16} color={colors.textTertiary} />
                                 </Button>
                             ) : null}
                         </View>

@@ -1,19 +1,55 @@
 import { MotiProps } from 'moti';
 
-// 核心设计原则："优雅且克制"
-// 高阻尼（Damping）、低刚度（Stiffness），不使用 ease-in-out，全面拥抱物理模型
-export const ELEGANT_SPRING: MotiProps['transition'] = {
+// DESIGN.md v3 — "Snappy athletic" motion personality
+// 高刚度 (stiffness)、中等阻尼 (damping)，物理驱动，不用 ease-in-out
+
+// §11.1 Spring Presets
+
+/** Snappy athletic — default for buttons, toggles, cards */
+export const SNAPPY_SPRING: MotiProps['transition'] = {
     type: 'spring',
-    damping: 20,    // 高阻尼，干脆不回弹
-    stiffness: 90,  // 低刚度，响应轻柔
-    mass: 1,
-    overshootClamping: true, // 防止回弹过度
+    damping: 20,
+    stiffness: 300,
+    mass: 0.8,
 };
 
-// 微交互：用于点击按钮等需要极快响应的场景
-export const MICRO_INTERACTION_SPRING = {
-    damping: 18,
+/** Gentle — for layout changes, filtering, chart animations */
+export const GENTLE_SPRING: MotiProps['transition'] = {
+    type: 'spring',
+    damping: 25,
     stiffness: 150,
-    mass: 0.5,
-    overshootClamping: true,
+    mass: 1.0,
 };
+
+/** Bouncy — celebrations, PRs, confetti only */
+export const BOUNCY_SPRING: MotiProps['transition'] = {
+    type: 'spring',
+    damping: 12,
+    stiffness: 200,
+    mass: 0.6,
+};
+
+// §11.2 Duration Scale
+export const DURATION = {
+    micro: 150,       // button press, toggle flip
+    standard: 250,    // card expand, value change
+    emphasis: 400,    // screen entry, stat reveal
+    celebration: 800, // PR banner, workout complete
+    skeleton: 1500,   // shimmer cycle
+} as const;
+
+// §11.3 Stagger Patterns
+export const STAGGER = {
+    fast: 50,         // card list entry
+    dramatic: 100,    // hero + stat reveal
+    list: 30,         // long scrollable lists
+    chart: 30,        // bar chart entrance
+} as const;
+
+// --- Backward compatibility aliases ---
+
+/** @deprecated Use SNAPPY_SPRING instead */
+export const ELEGANT_SPRING = SNAPPY_SPRING;
+
+/** @deprecated Use SNAPPY_SPRING for interactions */
+export const MICRO_INTERACTION_SPRING = SNAPPY_SPRING;

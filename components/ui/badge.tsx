@@ -7,9 +7,11 @@ import { Text } from "@/components/ui/text";
 const badgeVariants = cva("self-start rounded-full border px-2.5 py-0.5", {
     variants: {
         variant: {
-            default: "border-transparent bg-primary",
+            default: "border-transparent bg-accent",
             secondary: "border-transparent bg-secondary",
             destructive: "border-transparent bg-destructive",
+            success: "border-transparent bg-success",
+            warning: "border-transparent bg-warning",
             outline: "border-border bg-background",
         },
     },
@@ -21,9 +23,11 @@ const badgeVariants = cva("self-start rounded-full border px-2.5 py-0.5", {
 const badgeTextVariants = cva("text-xs font-medium", {
     variants: {
         variant: {
-            default: "text-primary-foreground",
+            default: "text-white",
             secondary: "text-secondary-foreground",
             destructive: "text-destructive-foreground",
+            success: "text-white",
+            warning: "text-black",
             outline: "text-foreground",
         },
     },

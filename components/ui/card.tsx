@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Text } from "@/components/ui/text";
 
 const Card = React.forwardRef<React.ElementRef<typeof View>, ViewProps>(({ className, ...props }, ref) => (
-    <View ref={ref} className={cn("rounded-xl border border-border bg-card p-6", className)} {...props} />
+    <View ref={ref} className={cn("bg-surface rounded-lg p-card-padding", className)} {...props} />
 ));
 Card.displayName = "Card";
 
@@ -17,7 +17,7 @@ const CardTitle = React.forwardRef<React.ElementRef<typeof Text>, React.Componen
     ({ className, ...props }, ref) => (
         <Text
             ref={ref}
-            className={cn("text-lg font-semibold leading-none tracking-tight text-card-foreground", className)}
+            className={cn("text-subheading text-foreground", className)}
             {...props}
         />
     )
@@ -26,13 +26,13 @@ CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<React.ElementRef<typeof Text>, React.ComponentPropsWithoutRef<typeof Text>>(
     ({ className, ...props }, ref) => (
-        <Text ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
+        <Text ref={ref} className={cn("text-caption text-muted-foreground", className)} {...props} />
     )
 );
 CardDescription.displayName = "CardDescription";
 
 const CardContent = React.forwardRef<React.ElementRef<typeof View>, ViewProps>(({ className, ...props }, ref) => (
-    <View ref={ref} className={cn("gap-4", className)} {...props} />
+    <View ref={ref} className={cn("gap-item-gap", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
 

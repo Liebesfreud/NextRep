@@ -1,3 +1,5 @@
+const themeTokens = require("./tailwind.theme.json");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: "class",
@@ -11,7 +13,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        border: "var(--border)",
+        // DESIGN.md hex values from tailwind.theme.json (base layer)
+        ...themeTokens.theme.extend.colors,
+        // Shadcn CSS variable mappings (override theme.json where conflicts exist)
         input: "var(--input)",
         ring: "var(--ring)",
         background: "var(--background)",
@@ -36,18 +40,60 @@ module.exports = {
           DEFAULT: "var(--card)",
           foreground: "var(--card-foreground)",
         },
+        // DESIGN.md CSS variable mappings
+        accent: {
+          DEFAULT: "var(--accent)",
+          foreground: "var(--accent-foreground)",
+        },
+        success: {
+          DEFAULT: "var(--success)",
+          foreground: "var(--success-foreground)",
+        },
+        warning: {
+          DEFAULT: "var(--warning)",
+          foreground: "var(--warning-foreground)",
+        },
+        info: {
+          DEFAULT: "var(--info)",
+          foreground: "var(--info-foreground)",
+        },
+        surface: {
+          DEFAULT: "var(--surface)",
+          elevated: "var(--surface-elevated)",
+          hover: "var(--surface-hover)",
+        },
+        border: {
+          DEFAULT: "var(--border)",
+          strong: "var(--border-strong)",
+        },
+        tertiary: "var(--tertiary)",
+        overlay: "var(--overlay)",
       },
       fontFamily: {
         sans: ["System"],
       },
-      spacing: {
-        bento: "16px",
+      fontSize: {
+        ...themeTokens.theme.extend.fontSize,
       },
       borderRadius: {
+        ...themeTokens.theme.extend.borderRadius,
         "bento-lg": "14px",
         "bento-sm": "10px",
       },
+      spacing: {
+        bento: "16px",
+        ...themeTokens.theme.extend.spacing,
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function ({ addUtilities }) {
+      addUtilities({
+        ".font-variant-numeric-tabular-nums": {
+          fontVariant: ["tabular-nums"],
+        },
+      });
+    },
+  ],
 };

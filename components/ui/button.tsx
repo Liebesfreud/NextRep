@@ -11,6 +11,7 @@ const buttonVariants = cva(
         variants: {
             variant: {
                 default: "bg-primary",
+                accent: "bg-accent",
                 secondary: "bg-secondary",
                 destructive: "bg-destructive",
                 outline: "border-input bg-background",
@@ -33,14 +34,15 @@ const buttonVariants = cva(
 
 const buttonTextVariants = cva("text-sm font-medium", {
     variants: {
-        variant: {
-            default: "text-primary-foreground",
-            secondary: "text-secondary-foreground",
-            destructive: "text-destructive-foreground",
-            outline: "text-foreground",
-            ghost: "text-foreground",
-            link: "text-primary",
-        },
+            variant: {
+                default: "text-accent",
+                accent: "text-white",
+                secondary: "text-secondary-foreground",
+                destructive: "text-destructive-foreground",
+                outline: "text-foreground",
+                ghost: "text-foreground",
+                link: "text-primary",
+            },
         size: {
             default: "text-sm",
             sm: "text-sm",
@@ -73,6 +75,7 @@ type ButtonProps = PressableProps &
 
 function getIndicatorColor(variant: ButtonProps["variant"], colors: ReturnType<typeof useTheme>["colors"]) {
     if (variant === "default") return colors.primaryForeground;
+    if (variant === "accent") return colors.white;
     if (variant === "destructive") return colors.destructiveForeground;
     if (variant === "link") return colors.orange;
     return colors.white;

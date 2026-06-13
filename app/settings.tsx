@@ -72,7 +72,7 @@ export default function SettingsScreen() {
     return (
         <KeyboardAvoidingView className="flex-1 bg-background" behavior={Platform.OS === "ios" ? "padding" : undefined}>
             <ScrollView
-                contentContainerStyle={{ paddingHorizontal: 20, paddingTop: insets.top + 16, paddingBottom: 120, gap: 20 }}
+                contentContainerStyle={{ paddingHorizontal: 20, paddingTop: insets.top + 16, paddingBottom: 100, gap: 16 }}
                 showsVerticalScrollIndicator={false}
             >
                 <SettingsHeader
@@ -81,12 +81,12 @@ export default function SettingsScreen() {
                     isSaved={isSaved}
                 />
 
-                <AppearanceSettings />
-
                 <ProfileSettings
                     profile={profile}
                     setProfile={setProfile}
                 />
+
+                <AppearanceSettings />
 
                 <AiConfigSettings
                     profile={profile}
