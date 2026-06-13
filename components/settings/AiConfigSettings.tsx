@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Alert, LayoutAnimation, Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { Activity, ChevronDown, Plus, ShieldCheck, Trash2, Zap } from "lucide-react-native";
-import { MotiView } from "moti";
-import { SNAPPY_SPRING } from "@/constants/animations";
+import Animated, { FadeIn, FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { type UserProfileData } from "@/db/services/profile";
 import { testAIConnection } from "@/db/services/ai";
 import { useTheme } from "@/hooks/useTheme";
@@ -26,7 +25,6 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
   const [collapsed, setCollapsed] = useState(true);
 
   const toggleCollapse = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setCollapsed((p) => !p);
   };
 
@@ -129,16 +127,18 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
               <Text variant="caption">总计</Text>
             </View>
           </View>
-          <MotiView
-            animate={{ rotate: collapsed ? "0deg" : "180deg" }}
-            transition={SNAPPY_SPRING}
+          <Animated.View
+            key={collapsed ? "collapsed" : "expanded"}
+            entering={FadeIn.duration(150)}
+            style={{ transform: [{ rotate: collapsed ? "0deg" : "180deg" }] }}
           >
             <ChevronDown size={14} color={colors.textTertiary} />
-          </MotiView>
+          </Animated.View>
         </View>
       </Pressable>
 
-      {!collapsed && (<>
+      {!collapsed && (
+        <Animated.View entering={FadeInDown.duration(220)} exiting={FadeOutUp.duration(160)}>
       {/* Config list */}
       {profile.aiConfigs.map((config, index) => {
         const isActive = profile.activeAiConfigId === config.id;
@@ -249,7 +249,7 @@ export function AiConfigSettings({ profile, setProfile }: Props) {
           isLast
         />
       </View>
-        </>
+        </Animated.View>
       )}
     </Card>
   );

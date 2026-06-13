@@ -1,8 +1,7 @@
 import * as React from "react";
 import { View, type ColorValue } from "react-native";
 import { type LucideIcon } from "lucide-react-native";
-import { MotiView } from "moti";
-import { SNAPPY_SPRING } from "@/constants/animations";
+import Animated, { FadeIn, ZoomIn } from "react-native-reanimated";
 
 type TabIconProps = {
     icon: LucideIcon;
@@ -15,12 +14,12 @@ const TabIcon = React.memo(function TabIcon({ icon: Icon, color, size, focused }
     return (
         <View className="h-[72px] w-16 items-center justify-center overflow-hidden">
             <View style={{ transform: [{ translateY: 7 }] }}>
-                <MotiView
-                    animate={{ scale: focused ? 1.08 : 1 }}
-                    transition={SNAPPY_SPRING}
+                <Animated.View
+                    key={focused ? "focused" : "idle"}
+                    entering={focused ? ZoomIn.duration(180) : FadeIn.duration(120)}
                 >
                     <Icon color={color} size={size} strokeWidth={focused ? 2.25 : 2} />
-                </MotiView>
+                </Animated.View>
             </View>
         </View>
     );

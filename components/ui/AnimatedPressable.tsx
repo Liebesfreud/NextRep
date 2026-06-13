@@ -5,7 +5,7 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from 'react-native-reanimated';
-import { MICRO_INTERACTION_SPRING } from '@/constants/animations';
+import { SNAPPY_SPRING } from '@/constants/animations';
 import { cssInterop } from 'nativewind';
 
 const AnimatedPressableBase = Animated.createAnimatedComponent(Pressable);
@@ -39,8 +39,8 @@ const AnimatedPressableComponent = React.forwardRef<any, AnimatedPressableProps>
                 onPressIn?.(e);
                 return;
             }
-            scale.value = withSpring(activeScale, MICRO_INTERACTION_SPRING);
-            opacity.value = withSpring(activeOpacity, MICRO_INTERACTION_SPRING);
+            scale.value = withSpring(activeScale, SNAPPY_SPRING);
+            opacity.value = withSpring(activeOpacity, SNAPPY_SPRING);
             onPressIn?.(e);
         }, [activeOpacity, activeScale, disabled, onPressIn, opacity, scale]);
 
@@ -49,8 +49,8 @@ const AnimatedPressableComponent = React.forwardRef<any, AnimatedPressableProps>
                 onPressOut?.(e);
                 return;
             }
-            scale.value = withSpring(1, MICRO_INTERACTION_SPRING);
-            opacity.value = withSpring(1, MICRO_INTERACTION_SPRING);
+            scale.value = withSpring(1, SNAPPY_SPRING);
+            opacity.value = withSpring(1, SNAPPY_SPRING);
             onPressOut?.(e);
         }, [disabled, onPressOut, opacity, scale]);
 

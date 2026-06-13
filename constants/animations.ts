@@ -1,4 +1,4 @@
-import { MotiProps } from 'moti';
+import type { WithSpringConfig } from 'react-native-reanimated';
 
 // DESIGN.md v3 — "Snappy athletic" motion personality
 // 高刚度 (stiffness)、中等阻尼 (damping)，物理驱动，不用 ease-in-out
@@ -6,24 +6,21 @@ import { MotiProps } from 'moti';
 // §11.1 Spring Presets
 
 /** Snappy athletic — default for buttons, toggles, cards */
-export const SNAPPY_SPRING: MotiProps['transition'] = {
-    type: 'spring',
+export const SNAPPY_SPRING: WithSpringConfig = {
     damping: 20,
     stiffness: 300,
     mass: 0.8,
 };
 
 /** Gentle — for layout changes, filtering, chart animations */
-export const GENTLE_SPRING: MotiProps['transition'] = {
-    type: 'spring',
+export const GENTLE_SPRING: WithSpringConfig = {
     damping: 25,
     stiffness: 150,
     mass: 1.0,
 };
 
 /** Bouncy — celebrations, PRs, confetti only */
-export const BOUNCY_SPRING: MotiProps['transition'] = {
-    type: 'spring',
+export const BOUNCY_SPRING: WithSpringConfig = {
     damping: 12,
     stiffness: 200,
     mass: 0.6,
@@ -45,11 +42,3 @@ export const STAGGER = {
     list: 30,         // long scrollable lists
     chart: 30,        // bar chart entrance
 } as const;
-
-// --- Backward compatibility aliases ---
-
-/** @deprecated Use SNAPPY_SPRING instead */
-export const ELEGANT_SPRING = SNAPPY_SPRING;
-
-/** @deprecated Use SNAPPY_SPRING for interactions */
-export const MICRO_INTERACTION_SPRING = SNAPPY_SPRING;

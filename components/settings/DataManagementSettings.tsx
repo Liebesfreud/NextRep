@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Alert, LayoutAnimation, Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { ChevronDown, Download, Trash2, Upload } from "lucide-react-native";
-import { MotiView } from "moti";
-import { SNAPPY_SPRING } from "@/constants/animations";
+import Animated, { FadeIn, FadeInDown, FadeOutUp } from "react-native-reanimated";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
@@ -20,7 +19,6 @@ export function DataManagementSettings() {
   const [collapsed, setCollapsed] = useState(true);
 
   const toggleCollapse = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setCollapsed((p) => !p);
   };
 
@@ -117,15 +115,17 @@ export function DataManagementSettings() {
         <Text variant="caption" className="font-semibold text-tertiary">
           数据
         </Text>
-        <MotiView
-          animate={{ rotate: collapsed ? "0deg" : "180deg" }}
-          transition={SNAPPY_SPRING}
+        <Animated.View
+          key={collapsed ? "collapsed" : "expanded"}
+          entering={FadeIn.duration(150)}
+          style={{ transform: [{ rotate: collapsed ? "0deg" : "180deg" }] }}
         >
           <ChevronDown size={14} color={colors.textTertiary} />
-        </MotiView>
+        </Animated.View>
       </Pressable>
 
-      {!collapsed && (<>
+      {!collapsed && (
+        <Animated.View entering={FadeInDown.duration(220)} exiting={FadeOutUp.duration(160)}>
       <SettingsRow
         label="导出备份"
         icon={<Download size={15} color={colors.textSecondary} />}
@@ -148,7 +148,7 @@ export function DataManagementSettings() {
         disabled={isPending}
         isLast
       />
-        </>
+        </Animated.View>
       )}
     </Card>
   );

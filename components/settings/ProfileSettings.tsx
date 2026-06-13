@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { LayoutAnimation, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Calendar, ChevronDown, Ruler, Target, User, Venus } from "lucide-react-native";
-import { MotiView } from "moti";
-import { SNAPPY_SPRING } from "@/constants/animations";
+import Animated, { FadeIn, FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { type UserProfileData } from "@/db/services/profile";
 import { useTheme } from "@/hooks/useTheme";
 import { Button, ButtonText } from "@/components/ui/button";
@@ -78,7 +77,6 @@ export function ProfileSettings({ profile, setProfile }: Props) {
   const [collapsed, setCollapsed] = useState(true);
 
   const toggleCollapse = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setCollapsed((p) => !p);
   };
 
@@ -103,15 +101,17 @@ export function ProfileSettings({ profile, setProfile }: Props) {
         <Text variant="caption" className="font-semibold text-tertiary">
           个人资料
         </Text>
-        <MotiView
-          animate={{ rotate: collapsed ? "0deg" : "180deg" }}
-          transition={SNAPPY_SPRING}
+        <Animated.View
+          key={collapsed ? "collapsed" : "expanded"}
+          entering={FadeIn.duration(150)}
+          style={{ transform: [{ rotate: collapsed ? "0deg" : "180deg" }] }}
         >
           <ChevronDown size={14} color={colors.textTertiary} />
-        </MotiView>
+        </Animated.View>
       </Pressable>
 
-      {!collapsed && (<>
+      {!collapsed && (
+        <Animated.View entering={FadeInDown.duration(220)} exiting={FadeOutUp.duration(160)}>
       <SettingsRow
         label="昵称"
         icon={<User size={15} color={colors.textSecondary} strokeWidth={2} />}
@@ -203,7 +203,7 @@ export function ProfileSettings({ profile, setProfile }: Props) {
         }
         isLast
       />
-        </>
+        </Animated.View>
       )}
     </Card>
   );
