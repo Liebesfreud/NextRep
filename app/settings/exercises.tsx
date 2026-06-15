@@ -1,33 +1,18 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { View, ScrollView, Alert, KeyboardAvoidingView, Platform, FlatList } from "react-native";
-import { ChevronLeft, ChevronRight, Dumbbell, Plus, Search, Trash2, X } from "lucide-react-native";
+import { ChevronLeft, Plus, Search, X } from "lucide-react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/hooks/useTheme";
-import { getStrengthPresets, addStrengthPreset, removeStrengthPreset, type StrengthPresetItem } from "@/db/services/workout";
+import { getStrengthPresets, addStrengthPreset, type StrengthPresetItem } from "@/db/services/workout";
 import { getStrengthExerciseAnalytics, type StrengthExerciseAnalytics } from "@/db/services/dashboard";
 import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
 import { ExerciseDetailModal } from "@/components/dashboard/ExerciseDetailModal";
+import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
-
-function formatWeight(value: number | null | undefined) {
-    if (!value) return "--";
-    return Number.isInteger(value) ? `${value} kg` : `${value.toFixed(1)} kg`;
-}
-
-function formatVolume(value: number) {
-    if (!value) return "0 kg";
-    if (value >= 1000) return `${(value / 1000).toFixed(1)} t`;
-    return `${Math.round(value)} kg`;
-}
-
-function formatDate(dateStr: string | null | undefined) {
-    if (!dateStr) return "未训练";
-    return dateStr.slice(5).replace("-", "/");
-}
 
 export default function ExerciseManagementScreen() {
     const { colors } = useTheme();
@@ -83,20 +68,6 @@ export default function ExerciseManagementScreen() {
         await loadData();
     }, [loadData, newName, newTag, presetNames]);
 
-    const handleDelete = useCallback((name: string) => {
-        Alert.alert("删除动作", `确定要从动作库删除 "${name}" 吗？历史训练记录不会被删除。`, [
-            { text: "取消", style: "cancel" },
-            {
-                text: "删除",
-                style: "destructive",
-                onPress: async () => {
-                    await removeStrengthPreset(name);
-                    await loadData();
-                }
-            }
-        ]);
-    }, [loadData]);
-
     const filteredExercises = useMemo(
         () => analytics.filter((item) => {
             const matchSearch = !normalizedSearchQuery || item.name.toLowerCase().includes(normalizedSearchQuery);
@@ -107,91 +78,53 @@ export default function ExerciseManagementScreen() {
     );
 
     const renderExerciseItem = useCallback(({ item }: { item: StrengthExerciseAnalytics }) => {
-        const visual = getStrengthCategoryVisual(item.tag, colors);
-        const Icon = visual.icon;
-        const isPreset = presetNames.has(item.name);
-
         return (
-            <Card
-                style={{
-                    borderColor: `${visual.accent}24`,
-                    backgroundColor: visual.cardBg ?? colors.surface,
-                }}
-                className="mb-2 flex-row items-center overflow-hidden rounded-lg border p-0"
-            >
-                <Button
+            <Card className="mb-1.5 overflow-hidden p-0">
+                <AnimatedPressable
                     onPress={() => setSelectedExercise(item)}
-                    variant="ghost"
-                    className="flex-1 justify-start rounded-none py-3 pl-3 pr-1"
+                    activeScale={0.99}
+                    className="min-h-12 flex-row items-center gap-3 px-card-padding py-2"
+                    accessibilityRole="button"
+                    accessibilityLabel={`查看 ${item.name} 训练详情`}
                 >
-                    <View style={{ backgroundColor: visual.iconBg }} className="mr-3 h-[42px] w-[42px] items-center justify-center rounded-xl">
-                        <Icon size={19} color={visual.accent} />
-                    </View>
-                    <View className="flex-1">
-                        <View className="flex-row items-center gap-2">
-                            <Text className="flex-1 text-[15px] font-black" numberOfLines={1}>
-                                {item.name}
-                            </Text>
-                            {!isPreset ? (
-                                <Text variant="caption" className="text-[10px] font-extrabold">
-                                    历史
-                                </Text>
-                            ) : null}
-                        </View>
-                        <Text variant="caption" className="mt-1 font-bold" numberOfLines={1}>
-                            {item.tag || "力量训练"} · {item.trainingDays} 天 · 最高 {formatWeight(item.maxWeightKg)} · {formatVolume(item.totalVolumeKg)}
-                        </Text>
-                        <Text variant="caption" className="mt-0.5 text-[10px] font-semibold">
-                            最近 {formatDate(item.latestDateStr)}
-                        </Text>
-                    </View>
-                    <ChevronRight size={18} color={colors.textTertiary} className="ml-1.5" />
-                </Button>
-                {isPreset ? (
-                    <Button
-                        onPress={() => handleDelete(item.name)}
-                        accessibilityLabel={`删除动作 ${item.name}`}
-                        variant="ghost"
-                        size="icon"
-                        hitSlop={8}
-                        className="h-auto self-stretch rounded-none"
-                    >
-                        <Trash2 size={18} color={`${colors.red}99`} />
-                    </Button>
-                ) : null}
+                    <Text variant="caption" className="w-20 shrink-0 text-muted-foreground" numberOfLines={1}>
+                        {item.tag || "力量训练"}
+                    </Text>
+                    <Text variant="body-semibold" className="min-w-0 flex-1 text-right" numberOfLines={1}>
+                        {item.name}
+                    </Text>
+                </AnimatedPressable>
             </Card>
         );
-    }, [colors, handleDelete, presetNames]);
+    }, []);
 
     const renderEmptyList = useCallback(() => (
-        <View className="items-center justify-center py-12">
-            <Dumbbell size={24} color={colors.textTertiary} />
-            <Text variant="muted" className="mt-3">
-                暂无结果
-            </Text>
-        </View>
-    ), [colors.textTertiary]);
+        <Card className="items-center justify-center border-dashed py-12">
+            <Text variant="body-semibold">暂无结果</Text>
+            <Text variant="caption" className="mt-1">调整搜索词或分类筛选</Text>
+        </Card>
+    ), []);
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1 bg-transparent">
-            <View className="flex-row items-center justify-between border-b border-border bg-surface px-5 pb-4" style={{ paddingTop: insets.top + 16 }}>
-                <Button onPress={() => router.back()} variant="ghost" size="sm" className="h-auto gap-1 px-0 py-0">
-                    <ChevronLeft size={24} color={colors.foreground} />
-                    <ButtonText variant="ghost" className="text-base text-foreground">返回</ButtonText>
+            <View className="flex-row items-center justify-between px-edge-x pb-4" style={{ paddingTop: insets.top + 16 }}>
+                <Button onPress={() => router.back()} accessibilityLabel="返回设置" variant="ghost" size="icon" className="-ml-3">
+                    <ChevronLeft size={22} color={colors.foreground} />
                 </Button>
-                <Text className="text-lg font-semibold">动作库</Text>
-                <View className="w-[60px]" />
+                <Text variant="title" className="font-black">动作库</Text>
+                <View className="h-12 w-12" />
             </View>
 
-            <View className="px-5 pb-2.5 pt-4">
-                    <View className="mb-3 flex-row gap-2.5">
-                        <View className="h-11 flex-1 flex-row items-center rounded-sm bg-secondary px-3.5">
+            <View className="pb-3" style={{ paddingHorizontal: 20 }}>
+                <Card className="gap-4 p-card-padding">
+                    <View className="flex-row gap-3">
+                        <View className="min-h-12 flex-1 flex-row items-center rounded-lg bg-surface-elevated px-3">
                             <Search size={18} color={colors.textTertiary} />
                             <Input
                                 value={searchQuery}
                                 onChangeText={setSearchQuery}
                                 placeholder="搜索动作"
-                                className="ml-2.5 min-h-0 flex-1 border-0 bg-transparent p-0 text-[15px] font-bold"
+                                className="ml-2 min-h-0 flex-1 border-0 bg-transparent p-0 text-body"
                             />
                             {searchQuery.length > 0 ? (
                                 <Button
@@ -208,44 +141,42 @@ export default function ExerciseManagementScreen() {
                         <Button
                             onPress={() => setIsCreating(!isCreating)}
                             accessibilityLabel={isCreating ? "取消新增动作" : "新增动作"}
-                            variant={isCreating ? "outline" : "secondary"}
+                            variant={isCreating ? "outline" : "accent"}
                             size="icon"
-                            className={isCreating ? "border-border bg-background" : undefined}
                         >
-                            {isCreating ? <X size={20} color={colors.foreground} /> : <Plus size={20} color={colors.foreground} />}
+                            {isCreating ? <X size={19} color={colors.foreground} /> : <Plus size={19} color={colors.white} />}
                         </Button>
                     </View>
 
-                    <View className="mb-3 flex-row gap-2.5">
-                        <Card className="flex-1 p-3">
-                            <Text variant="caption" className="font-extrabold uppercase tracking-widest">动作库</Text>
-                            <Text className="mt-1 text-xl font-black">{libraryCount}</Text>
-                        </Card>
-                        <Card className="flex-1 p-3">
-                            <Text variant="caption" className="font-extrabold uppercase tracking-widest">已训练</Text>
-                            <Text className="mt-1 text-xl font-black">{trainedCount}</Text>
-                        </Card>
-                        <Card className="flex-1 p-3">
-                            <Text variant="caption" className="font-extrabold uppercase tracking-widest">筛选后</Text>
-                            <Text className="mt-1 text-xl font-black">{filteredExercises.length}</Text>
-                        </Card>
+                    <View className="flex-row rounded-lg bg-surface-elevated p-card-padding">
+                        {[
+                            { label: "动作", value: libraryCount },
+                            { label: "已训练", value: trainedCount },
+                            { label: "当前结果", value: filteredExercises.length },
+                        ].map((stat, index) => (
+                            <View key={stat.label} className={`flex-1 items-center gap-1 ${index > 0 ? "border-l border-border" : ""}`}>
+                                <Text className="text-stat-value font-variant-numeric-tabular-nums">{stat.value}</Text>
+                                <Text variant="micro">{stat.label}</Text>
+                            </View>
+                        ))}
                     </View>
 
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-5 px-5">
-                        <View className="flex-row gap-2 pb-2 pr-5">
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-card-padding px-card-padding">
+                        <View className="flex-row gap-2 pr-card-padding">
                             {categories.map((cat) => {
                                 const isSelected = selectedCategory === cat;
                                 const visual = cat === "全部" ? null : getStrengthCategoryVisual(cat, colors);
-                                const accent = visual?.accent ?? colors.blue;
+                                const accent = visual?.accent ?? colors.accent;
                                 return (
                                     <Button
                                         key={cat}
                                         onPress={() => setSelectedCategory(cat)}
                                         variant={isSelected ? "secondary" : "outline"}
-                                        className="h-auto rounded-pill px-3 py-2"
-                                        >
-                                            <Text className="text-sm" style={{ color: isSelected ? accent : colors.foreground }}>
-                                                {cat}
+                                        size="sm"
+                                        className="rounded-pill"
+                                    >
+                                        <Text variant="caption" className={isSelected ? "font-semibold" : "text-muted-foreground"} style={isSelected ? { color: accent } : undefined}>
+                                            {cat}
                                         </Text>
                                     </Button>
                                 );
@@ -254,14 +185,14 @@ export default function ExerciseManagementScreen() {
                     </ScrollView>
 
                     {isCreating && (
-                        <Card className="mt-1.5 p-3.5">
+                        <View className="gap-3 rounded-lg bg-surface-elevated p-card-padding">
+                            <Text variant="body-semibold">新增动作</Text>
                             <Input
                                 value={newName}
                                 onChangeText={setNewName}
                                 placeholder="例如：杠铃卧推"
-                                className="mb-2.5 h-[42px] font-semibold"
                             />
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3">
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                 <View className="flex-row gap-2">
                                     {STRENGTH_CATEGORIES.map((tag) => {
                                         const visual = getStrengthCategoryVisual(tag, colors);
@@ -272,9 +203,10 @@ export default function ExerciseManagementScreen() {
                                                 key={tag}
                                                 onPress={() => setNewTag(isSelected ? null : tag)}
                                                 variant={isSelected ? "secondary" : "outline"}
-                                                className="h-auto rounded-pill px-3 py-2"
-                                                >
-                                                    <Text className="text-sm" style={{ color: isSelected ? visual.accent : colors.foreground }}>
+                                                size="sm"
+                                                className="rounded-pill"
+                                            >
+                                                <Text variant="caption" className={isSelected ? "font-semibold" : "text-muted-foreground"} style={isSelected ? { color: visual.accent } : undefined}>
                                                     {tag}
                                                 </Text>
                                             </Button>
@@ -285,12 +217,14 @@ export default function ExerciseManagementScreen() {
                             <Button
                                 onPress={handleAdd}
                                 disabled={!newName.trim()}
+                                variant="accent"
                             >
-                                <ButtonText>保存动作</ButtonText>
+                                <ButtonText variant="accent">保存动作</ButtonText>
                             </Button>
-                        </Card>
+                        </View>
                     )}
-                </View>
+                </Card>
+            </View>
 
             <View className="flex-1">
                 <FlatList
@@ -304,7 +238,7 @@ export default function ExerciseManagementScreen() {
                     maxToRenderPerBatch={8}
                     removeClippedSubviews={Platform.OS !== "web"}
                     windowSize={7}
-                    contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: 110 + Math.max(insets.bottom, 0) + 20 }}
+                    contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 0, paddingBottom: 110 + Math.max(insets.bottom, 0) + 20 }}
                 />
             </View>
 

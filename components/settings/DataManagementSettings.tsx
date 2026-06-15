@@ -1,14 +1,57 @@
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { Alert, View } from "react-native";
-import { Database, Download, Trash2, Upload } from "lucide-react-native";
+import { ChevronRight, Database, Download, Trash2, Upload } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { clearDatabase, exportAllData, importAllData } from "@/db/services/data";
 import { useTheme } from "@/hooks/useTheme";
+import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { SettingsRow } from "@/components/ui/settings-row";
+import { cn } from "@/lib/utils";
+
+type DataActionProps = {
+  title: string;
+  description: string;
+  icon: ReactNode;
+  onPress: () => void;
+  disabled: boolean;
+  destructive?: boolean;
+};
+
+function DataAction({ title, description, icon, onPress, disabled, destructive = false }: DataActionProps) {
+  const { colors } = useTheme();
+
+  return (
+    <AnimatedPressable
+      onPress={onPress}
+      disabled={disabled}
+      activeScale={0.99}
+      className={cn(
+        "min-h-20 flex-row items-center gap-3 rounded-lg bg-surface-elevated p-card-padding",
+        disabled && "opacity-50"
+      )}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled }}
+    >
+      <View className={cn(
+        "h-10 w-10 shrink-0 items-center justify-center rounded-md",
+        "bg-surface-hover"
+      )}>
+        {icon}
+      </View>
+      <View className="min-w-0 flex-1 gap-1">
+        <Text variant="body-semibold" className={destructive ? "text-destructive" : undefined} numberOfLines={1}>{title}</Text>
+        <Text variant="caption" className={destructive ? "text-destructive/70" : "text-muted-foreground"} numberOfLines={1}>{description}</Text>
+      </View>
+      <View className="shrink-0">
+        <ChevronRight size={17} color={colors.textTertiary} />
+      </View>
+    </AnimatedPressable>
+  );
+}
 
 export function DataManagementSettings() {
   const { colors } = useTheme();
@@ -100,40 +143,36 @@ export function DataManagementSettings() {
   };
 
   return (
-    <View className="gap-3">
-      <Card className="overflow-hidden p-0">
-        <View className="flex-row items-center gap-2 p-card-padding pb-2">
-          <Database size={18} color={colors.accent} />
-          <Text variant="subheading">数据管理</Text>
-        </View>
-        <SettingsRow
-          label={pendingAction === "export" ? "正在导出" : "导出备份"}
-          icon={<Download size={16} color={colors.textSecondary} />}
+    <Card className="gap-4 p-card-padding">
+      <View className="flex-row items-center gap-2">
+        <Database size={18} color={colors.accent} />
+        <Text variant="subheading">数据管理</Text>
+      </View>
+
+      <View className="gap-2">
+        <DataAction
+          title={pendingAction === "export" ? "正在导出" : "导出备份"}
+          description="生成完整的 JSON 数据文件"
+          icon={<Download size={18} color={colors.textSecondary} />}
           onPress={handleExport}
           disabled={isPending}
         />
-        <SettingsRow
-          label={pendingAction === "import" ? "正在导入" : "导入数据"}
-          icon={<Upload size={16} color={colors.textSecondary} />}
+        <DataAction
+          title={pendingAction === "import" ? "正在导入" : "导入数据"}
+          description="从备份文件恢复全部记录"
+          icon={<Upload size={18} color={colors.textSecondary} />}
           onPress={handleImport}
           disabled={isPending}
-          isLast
         />
-      </Card>
-
-      <Card className="overflow-hidden border-destructive/20 p-0">
-        <View className="px-3.5 pt-3">
-          <Text variant="micro" className="text-destructive">危险区域</Text>
-        </View>
-        <SettingsRow
-          variant="destructive"
-          label={pendingAction === "clear" ? "正在清空" : "清空所有记录"}
-          icon={<Trash2 size={16} color={colors.red} />}
+        <DataAction
+          title={pendingAction === "clear" ? "正在清空" : "清空所有记录"}
+          description="永久删除训练与身体数据"
+          icon={<Trash2 size={18} color={colors.red} />}
           onPress={handleClear}
           disabled={isPending}
-          isLast
+          destructive
         />
-      </Card>
-    </View>
+      </View>
+    </Card>
   );
 }

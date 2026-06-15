@@ -90,8 +90,8 @@ export function SettingsRow({
   return (
     <Wrapper
       className={cn(
-        "h-auto flex-row items-center px-3.5 py-2.5",
-        isChip && "py-3",
+        "min-h-12 flex-row items-center px-card-padding py-3",
+        isChip && "min-h-14 py-3",
         !isLast && "border-b border-border",
         disabled && "opacity-50",
         className

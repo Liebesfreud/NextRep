@@ -93,10 +93,10 @@ export function ProfileSettings({ profile, setProfile }: Props) {
   const goalLabel = goalOptions.find((option) => option.value === profile.goal)?.label ?? "未设置目标";
 
   return (
-    <Card className="overflow-hidden p-0">
+    <Card className="gap-4 p-card-padding">
       <Pressable
         onPress={toggleCollapse}
-        className="gap-4 p-card-padding"
+        className="gap-4"
         accessibilityRole="button"
         accessibilityLabel={collapsed ? "展开个人资料" : "收起个人资料"}
       >
@@ -126,98 +126,98 @@ export function ProfileSettings({ profile, setProfile }: Props) {
       </Pressable>
 
       {!collapsed && (
-        <Animated.View className="border-t border-border" entering={FadeInDown.duration(220)} exiting={FadeOutUp.duration(160)}>
-      <SettingsRow
-        label="昵称"
-        icon={<User size={15} color={colors.textSecondary} strokeWidth={2} />}
-        value={
-          <Input
-            value={profile.name}
-            onChangeText={(v) => setProfile((c) => ({ ...c, name: v }))}
-            placeholder="未填写"
-            className="min-h-0 min-w-24 border-0 bg-transparent p-0 text-right text-body text-foreground"
+        <Animated.View className="overflow-hidden rounded-lg bg-surface-elevated" entering={FadeInDown.duration(220)} exiting={FadeOutUp.duration(160)}>
+          <SettingsRow
+            label="昵称"
+            icon={<User size={15} color={colors.textSecondary} strokeWidth={2} />}
+            value={
+              <Input
+                value={profile.name}
+                onChangeText={(v) => setProfile((c) => ({ ...c, name: v }))}
+                placeholder="未填写"
+                className="min-h-0 min-w-24 border-0 bg-transparent p-0 text-right text-body text-foreground"
+              />
+            }
           />
-        }
-      />
 
-      <SettingsRow
-        label="身高"
-        icon={<Ruler size={15} color={colors.textSecondary} strokeWidth={2} />}
-        value={
-          <NumInput
-            value={profile.height ? String(profile.height) : ""}
-            onChange={(v) => setProfile((c) => ({ ...c, height: v ? parseFloat(v) : null }))}
-            placeholder="--"
-            unit="cm"
+          <SettingsRow
+            label="身高"
+            icon={<Ruler size={15} color={colors.textSecondary} strokeWidth={2} />}
+            value={
+              <NumInput
+                value={profile.height ? String(profile.height) : ""}
+                onChange={(v) => setProfile((c) => ({ ...c, height: v ? parseFloat(v) : null }))}
+                placeholder="--"
+                unit="cm"
+              />
+            }
           />
-        }
-      />
 
-      <SettingsRow
-        label="年龄"
-        icon={<Calendar size={15} color={colors.textSecondary} strokeWidth={2} />}
-        value={
-          <NumInput
-            value={profile.age ? String(profile.age) : ""}
-            onChange={(v) => setProfile((c) => ({ ...c, age: v ? parseInt(v, 10) : null }))}
-            placeholder="--"
-            unit="岁"
+          <SettingsRow
+            label="年龄"
+            icon={<Calendar size={15} color={colors.textSecondary} strokeWidth={2} />}
+            value={
+              <NumInput
+                value={profile.age ? String(profile.age) : ""}
+                onChange={(v) => setProfile((c) => ({ ...c, age: v ? parseInt(v, 10) : null }))}
+                placeholder="--"
+                unit="岁"
+              />
+            }
           />
-        }
-      />
 
-      <SettingsRow
-        variant="chip"
-        label="性别"
-        icon={<Venus size={15} color={colors.textSecondary} strokeWidth={2} />}
-        value={
-          <ChipPicker
-            value={profile.gender}
-            options={genderOptions}
-            onChange={(v) => setProfile((c) => ({ ...c, gender: v }))}
+          <SettingsRow
+            variant="chip"
+            label="性别"
+            icon={<Venus size={15} color={colors.textSecondary} strokeWidth={2} />}
+            value={
+              <ChipPicker
+                value={profile.gender}
+                options={genderOptions}
+                onChange={(v) => setProfile((c) => ({ ...c, gender: v }))}
+              />
+            }
           />
-        }
-      />
 
-      <SettingsRow
-        label="目标体重"
-        icon={<Target size={15} color={colors.textSecondary} strokeWidth={2} />}
-        value={
-          <NumInput
-            value={profile.targetWeight ? String(profile.targetWeight) : ""}
-            onChange={(v) => setProfile((c) => ({ ...c, targetWeight: v ? parseFloat(v) : null }))}
-            placeholder="--"
-            unit="kg"
+          <SettingsRow
+            label="目标体重"
+            icon={<Target size={15} color={colors.textSecondary} strokeWidth={2} />}
+            value={
+              <NumInput
+                value={profile.targetWeight ? String(profile.targetWeight) : ""}
+                onChange={(v) => setProfile((c) => ({ ...c, targetWeight: v ? parseFloat(v) : null }))}
+                placeholder="--"
+                unit="kg"
+              />
+            }
           />
-        }
-      />
 
-      <SettingsRow
-        label="目标体脂"
-        icon={<Target size={15} color={colors.textSecondary} strokeWidth={2} />}
-        value={
-          <NumInput
-            value={profile.targetBodyFat ? String(profile.targetBodyFat) : ""}
-            onChange={(v) => setProfile((c) => ({ ...c, targetBodyFat: v ? parseFloat(v) : null }))}
-            placeholder="--"
-            unit="%"
+          <SettingsRow
+            label="目标体脂"
+            icon={<Target size={15} color={colors.textSecondary} strokeWidth={2} />}
+            value={
+              <NumInput
+                value={profile.targetBodyFat ? String(profile.targetBodyFat) : ""}
+                onChange={(v) => setProfile((c) => ({ ...c, targetBodyFat: v ? parseFloat(v) : null }))}
+                placeholder="--"
+                unit="%"
+              />
+            }
           />
-        }
-      />
 
-      <SettingsRow
-        variant="chip"
-        label="训练目标"
-        icon={<Target size={15} color={colors.textSecondary} strokeWidth={2} />}
-        value={
-          <ChipPicker
-            value={profile.goal}
-            options={goalOptions}
-            onChange={(v) => setProfile((c) => ({ ...c, goal: v }))}
+          <SettingsRow
+            variant="chip"
+            label="训练目标"
+            icon={<Target size={15} color={colors.textSecondary} strokeWidth={2} />}
+            value={
+              <ChipPicker
+                value={profile.goal}
+                options={goalOptions}
+                onChange={(v) => setProfile((c) => ({ ...c, goal: v }))}
+              />
+            }
+            isLast
           />
-        }
-        isLast
-      />
         </Animated.View>
       )}
     </Card>
