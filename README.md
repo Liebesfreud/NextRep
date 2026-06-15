@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/app-1.3.0-34C759" alt="应用版本 1.3.0" />
-  <img src="https://img.shields.io/badge/Expo-55-000020?logo=expo" alt="Expo SDK 55" />
-  <img src="https://img.shields.io/badge/React_Native-0.83-61DAFB?logo=react" alt="React Native 0.83" />
+  <img src="https://img.shields.io/badge/app-2.0.0-34C759" alt="应用版本 2.0.0" />
+  <img src="https://img.shields.io/badge/Expo-56-000020?logo=expo" alt="Expo SDK 56" />
+  <img src="https://img.shields.io/badge/React_Native-0.85.3-61DAFB?logo=react" alt="React Native 0.85.3" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License" /></a>
 </p>
 
@@ -34,7 +34,7 @@ NextRep 使用设备本地 SQLite 保存训练、打卡、身体指标和个人�
 
 | 范围 | 技术 |
 | --- | --- |
-| 应用框架 | Expo SDK 55、React Native 0.83、React 19 |
+| 应用框架 | Expo SDK 56、React Native 0.85.3、React 19 |
 | 路由 | Expo Router |
 | UI | NativeWind 4、React Native Reusables 风格组件、Lucide |
 | 动画 | Reanimated 4、Moti |

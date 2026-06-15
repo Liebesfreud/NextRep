@@ -2,6 +2,7 @@ import { type ReactNode, useState } from "react";
 import { Alert, View } from "react-native";
 import { ChevronRight, Database, Download, Trash2, Upload } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
+import { File } from "expo-file-system";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { clearDatabase, exportAllData, importAllData } from "@/db/services/data";
@@ -80,12 +81,18 @@ export function DataManagementSettings() {
     if (isPending) return;
     setPendingAction("import");
     try {
-      const result = await DocumentPicker.getDocumentAsync({ type: "application/json" });
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ["application/json", "text/json", "text/plain", "application/octet-stream"],
+        copyToCacheDirectory: false,
+      });
       if (result.canceled) {
         setPendingAction(null);
         return;
       }
-      const content = await FileSystem.readAsStringAsync(result.assets[0].uri);
+      const asset = result.assets[0];
+      const content = asset.file
+        ? await asset.file.text()
+        : await new File(asset.uri).text();
       const data = JSON.parse(content);
       Alert.alert(
         "确认导入",
@@ -110,7 +117,7 @@ export function DataManagementSettings() {
         { onDismiss: () => setPendingAction(null) }
       );
     } catch (error: any) {
-      Alert.alert("导入失败", "文件格式不正确");
+      Alert.alert("导入失败", error?.message || "文件格式不正确");
       setPendingAction(null);
     }
   };

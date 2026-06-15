@@ -2,6 +2,9 @@ import { db } from "../client";
 import { workouts, strengthPresets, dailyCheckins, bodyMetrics, userProfile } from "../schema";
 import { getUserProfile, type AIConfigItem, type UserProfileData } from "./profile";
 
+const CURRENT_BACKUP_VERSION = 2;
+const SUPPORTED_BACKUP_VERSIONS = new Set([1, CURRENT_BACKUP_VERSION]);
+
 // ─── Export All Data ──────────────────────────────────────────────────────────
 
 export async function exportAllData() {
@@ -20,7 +23,7 @@ export async function exportAllData() {
     ]);
 
     return {
-        version: 2,
+        version: CURRENT_BACKUP_VERSION,
         exportedAt: new Date().toISOString(),
         workouts: workoutRows.map((w) => ({
             ...w,
@@ -114,8 +117,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function optionalString(value: unknown, field: string): string | null {
     if (value === undefined || value === null) return null;
-    if (typeof value !== "string") throw new Error(`Invalid import payload: ${field} must be a string`);
-    return value;
+    if (typeof value === "string") return value;
+    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+    throw new Error(`Invalid import payload: ${field} must be a string`);
 }
 
 function requiredString(value: unknown, field: string): string {
@@ -127,22 +131,32 @@ function requiredString(value: unknown, field: string): string {
 
 function optionalNumber(value: unknown, field: string): number | null {
     if (value === undefined || value === null) return null;
-    if (typeof value !== "number" || !Number.isFinite(value)) {
+    const normalized = typeof value === "string" && value.trim() !== "" ? Number(value) : value;
+    if (typeof normalized !== "number" || !Number.isFinite(normalized)) {
         throw new Error(`Invalid import payload: ${field} must be a number`);
     }
-    return value;
+    return normalized;
 }
 
 function requiredNumber(value: unknown, field: string): number {
-    if (typeof value !== "number" || !Number.isFinite(value)) {
+    const normalized = typeof value === "string" && value.trim() !== "" ? Number(value) : value;
+    if (typeof normalized !== "number" || !Number.isFinite(normalized)) {
         throw new Error(`Invalid import payload: ${field} must be a number`);
     }
-    return value;
+    return normalized;
 }
 
 function parseImportDate(value: unknown, field: string): Date {
-    const raw = typeof value === "string" || typeof value === "number" ? value : null;
+    let raw = typeof value === "string" || typeof value === "number" ? value : null;
     if (raw === null) throw new Error(`Invalid import payload: ${field} must be a date`);
+
+    // Older SQLite exports may contain Unix seconds rather than ISO strings or milliseconds.
+    if (typeof raw === "string" && /^-?\d+(?:\.\d+)?$/.test(raw.trim())) {
+        raw = Number(raw);
+    }
+    if (typeof raw === "number" && Math.abs(raw) < 100_000_000_000) {
+        raw *= 1000;
+    }
 
     const date = new Date(raw);
     if (Number.isNaN(date.getTime())) {
@@ -168,10 +182,52 @@ function readOptionalRecord(payload: Record<string, unknown>, key: string): Reco
     return value;
 }
 
+function normalizeBackupVersion(value: unknown): number | null {
+    if (value === undefined || value === null || value === "") return null;
+
+    const version = typeof value === "number" ? value : Number(value);
+    if (!Number.isFinite(version)) {
+        throw new Error("Invalid import payload: version must be a number");
+    }
+
+    if (!Number.isInteger(version)) {
+        throw new Error("Invalid import payload: version must be an integer");
+    }
+
+    return version;
+}
+
+function unwrapImportPayload(input: Record<string, unknown>): Record<string, unknown> {
+    const hasRootData = ["workouts", "strengthPresets", "dailyCheckins", "bodyMetrics", "userProfile", "apiConfig"]
+        .some((key) => key in input);
+    if (hasRootData) return input;
+
+    // Accept backups wrapped by file/export tooling as { version, data: { ... } }.
+    if (isRecord(input.data)) {
+        return {
+            ...input.data,
+            version: input.data.version ?? input.version,
+        };
+    }
+
+    return input;
+}
+
 function validateImportPayload(input: unknown): ImportPayload {
     if (!isRecord(input)) throw new Error("Invalid import payload: root must be an object");
 
-    const workoutsRows = readOptionalArray(input, "workouts").map((row, index): ImportedWorkout => ({
+    const payload = unwrapImportPayload(input);
+    const version = normalizeBackupVersion(payload.version);
+    if (version !== null && !SUPPORTED_BACKUP_VERSIONS.has(version)) {
+        throw new Error(`Unsupported backup version: ${String(payload.version)}`);
+    }
+
+    const recognizedKeys = ["workouts", "strengthPresets", "dailyCheckins", "bodyMetrics", "userProfile", "apiConfig"];
+    if (!recognizedKeys.some((key) => key in payload)) {
+        throw new Error("Invalid import payload: no NextRep data found");
+    }
+
+    const workoutsRows = readOptionalArray(payload, "workouts").map((row, index): ImportedWorkout => ({
         id: requiredString(row.id, `workouts[${index}].id`),
         type: requiredString(row.type, `workouts[${index}].type`),
         name: requiredString(row.name, `workouts[${index}].name`),
@@ -181,21 +237,21 @@ function validateImportPayload(input: unknown): ImportPayload {
         createdAt: parseImportDate(row.createdAt, `workouts[${index}].createdAt`),
     }));
 
-    const strengthPresetRows = readOptionalArray(input, "strengthPresets").map((row, index): ImportedStrengthPreset => ({
+    const strengthPresetRows = readOptionalArray(payload, "strengthPresets").map((row, index): ImportedStrengthPreset => ({
         id: requiredString(row.id, `strengthPresets[${index}].id`),
         name: requiredString(row.name, `strengthPresets[${index}].name`),
         tag: optionalString(row.tag, `strengthPresets[${index}].tag`),
         createdAt: parseImportDate(row.createdAt, `strengthPresets[${index}].createdAt`),
     }));
 
-    const dailyCheckinRows = readOptionalArray(input, "dailyCheckins").map((row, index): ImportedDailyCheckin => ({
+    const dailyCheckinRows = readOptionalArray(payload, "dailyCheckins").map((row, index): ImportedDailyCheckin => ({
         id: requiredString(row.id, `dailyCheckins[${index}].id`),
         dateStr: requiredString(row.dateStr, `dailyCheckins[${index}].dateStr`),
         aiEstimatedCal: optionalNumber(row.aiEstimatedCal, `dailyCheckins[${index}].aiEstimatedCal`),
         createdAt: parseImportDate(row.createdAt, `dailyCheckins[${index}].createdAt`),
     }));
 
-    const bodyMetricRows = readOptionalArray(input, "bodyMetrics").map((row, index): ImportedBodyMetric => ({
+    const bodyMetricRows = readOptionalArray(payload, "bodyMetrics").map((row, index): ImportedBodyMetric => ({
         id: requiredString(row.id, `bodyMetrics[${index}].id`),
         metricType: requiredString(row.metricType, `bodyMetrics[${index}].metricType`),
         value: requiredNumber(row.value, `bodyMetrics[${index}].value`),
@@ -203,8 +259,8 @@ function validateImportPayload(input: unknown): ImportPayload {
         createdAt: parseImportDate(row.createdAt, `bodyMetrics[${index}].createdAt`),
     }));
 
-    const rawUserProfile = readOptionalRecord(input, "userProfile");
-    const rawApiConfig = readOptionalRecord(input, "apiConfig");
+    const rawUserProfile = readOptionalRecord(payload, "userProfile");
+    const rawApiConfig = readOptionalRecord(payload, "apiConfig");
 
     return {
         workouts: workoutsRows,
