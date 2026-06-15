@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { Activity, Dumbbell, Leaf, Plus, RotateCcw, Target } from "lucide-react-native";
+import { Activity, Dumbbell, Plus, Target } from "lucide-react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { type AiReportData } from "@/db/services/ai";
 import { useTheme } from "@/hooks/useTheme";
@@ -10,11 +10,8 @@ import { Text } from "@/components/ui/text";
 export type PlanItem = AiReportData["todaysPlan"][number];
 
 type Props = {
-    report: AiReportData | null;
     plan: PlanItem[];
-    useLiteMode: boolean;
     isApplying: boolean;
-    onToggleLite: () => void;
     onApply: () => void;
 };
 
@@ -39,7 +36,7 @@ function PlanRow({ item, index }: { item: PlanItem; index: number }) {
     );
 }
 
-export function CoachPlanSection({ report, plan, useLiteMode, isApplying, onToggleLite, onApply }: Props) {
+export function CoachPlanSection({ plan, isApplying, onApply }: Props) {
     const { colors } = useTheme();
 
     return (
@@ -63,50 +60,17 @@ export function CoachPlanSection({ report, plan, useLiteMode, isApplying, onTogg
                     ) : (
                         <View className="items-center justify-center rounded-lg border border-dashed border-border bg-surface-elevated py-8">
                             <Dumbbell size={24} color={colors.textTertiary} />
-                            <Text variant="body-semibold" className="mt-3">暂无计划</Text>
+                            <Text variant="body-semibold" className="mt-3">等待生成今日计划</Text>
+                            <Text variant="caption" className="mt-1 text-muted-foreground">计划会根据教练结论自动生成</Text>
                         </View>
                     )}
 
-                    <View className="flex-row gap-3">
-                        <Button variant="outline" className="flex-1" disabled={!report} onPress={onToggleLite}>
-                            <RotateCcw size={16} color={colors.foreground} />
-                            <ButtonText variant="outline">{useLiteMode ? "恢复标准版" : "切换轻松版"}</ButtonText>
-                        </Button>
-                        <Button variant="accent" className="flex-1" loading={isApplying} disabled={plan.length === 0} onPress={onApply}>
-                            {!isApplying && <Plus size={16} color={colors.white} />}
-                            <ButtonText variant="accent">加入训练</ButtonText>
-                        </Button>
-                    </View>
+                    <Button variant="accent" loading={isApplying} disabled={plan.length === 0} onPress={onApply}>
+                        {!isApplying && <Plus size={16} color={colors.white} />}
+                        <ButtonText variant="accent">加入今日训练</ButtonText>
+                    </Button>
                 </Card>
             </Animated.View>
-
-            {report && (
-                <Animated.View entering={FadeInDown.delay(120).duration(300).springify()}>
-                    <Card className="gap-4 p-card-padding">
-                        <View className="flex-row items-center gap-2">
-                            <Leaf size={18} color={colors.success} />
-                            <Text variant="subheading">动作与恢复</Text>
-                        </View>
-
-                        <View className="gap-3">
-                            <View className="gap-2 rounded-lg bg-surface-elevated p-card-padding">
-                                <Text variant="micro" className="text-muted-foreground">动作提醒</Text>
-                                {report.movementSuggestions.length > 0 ? report.movementSuggestions.map((suggestion, index) => (
-                                    <View key={`${suggestion}-${index}`} className="flex-row gap-3">
-                                        <Text variant="caption" className="text-accent font-variant-numeric-tabular-nums">{index + 1}</Text>
-                                        <Text variant="body" className="min-w-0 flex-1 text-muted-foreground">{suggestion}</Text>
-                                    </View>
-                                )) : <Text variant="body" className="text-muted-foreground">暂无动作提醒</Text>}
-                            </View>
-
-                            <View className="gap-2 rounded-lg bg-surface-elevated p-card-padding">
-                                <Text variant="micro" className="text-muted-foreground">恢复安排</Text>
-                                <Text variant="body" className="text-muted-foreground">{report.recoveryPlan}</Text>
-                            </View>
-                        </View>
-                    </Card>
-                </Animated.View>
-            )}
         </>
     );
 }
