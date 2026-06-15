@@ -34,7 +34,7 @@ function ChipPicker({
             onPress={() => onChange(isSelected ? null : opt.value)}
             variant={isSelected ? "default" : "secondary"}
             size="sm"
-            className="h-auto rounded-lg px-3 py-1.5"
+            className="h-10 rounded-md px-3 py-0 native:h-11"
           >
             <ButtonText variant={isSelected ? "default" : "secondary"} size="sm">
               {opt.label}
@@ -66,7 +66,7 @@ function NumInput({
         placeholder={placeholder}
         className="min-h-0 w-14 border-0 bg-transparent p-0 text-right text-body-semibold text-foreground font-variant-numeric-tabular-nums"
       />
-      <Text variant="caption">{unit}</Text>
+      <Text variant="caption" className="text-muted-foreground">{unit}</Text>
     </View>
   );
 }
@@ -90,28 +90,43 @@ export function ProfileSettings({ profile, setProfile }: Props) {
     { label: "减脂", value: "lose-weight" },
     { label: "保持", value: "maintain" },
   ];
+  const goalLabel = goalOptions.find((option) => option.value === profile.goal)?.label ?? "未设置目标";
 
   return (
     <Card className="overflow-hidden p-0">
-      {/* Section label */}
       <Pressable
         onPress={toggleCollapse}
-        className="flex-row items-center justify-between px-3.5 pt-2.5 pb-1.5"
+        className="gap-4 p-card-padding"
+        accessibilityRole="button"
+        accessibilityLabel={collapsed ? "展开个人资料" : "收起个人资料"}
       >
-        <Text variant="caption" className="font-semibold text-tertiary">
-          个人资料
-        </Text>
-        <Animated.View
-          key={collapsed ? "collapsed" : "expanded"}
-          entering={FadeIn.duration(150)}
-          style={{ transform: [{ rotate: collapsed ? "0deg" : "180deg" }] }}
-        >
-          <ChevronDown size={14} color={colors.textTertiary} />
-        </Animated.View>
+        <View className="flex-row items-center justify-between gap-3">
+          <View className="flex-row items-center gap-2">
+            <User size={18} color={colors.accent} />
+            <Text variant="subheading">个人资料</Text>
+          </View>
+          <Animated.View
+            key={collapsed ? "collapsed" : "expanded"}
+            entering={FadeIn.duration(150)}
+            style={{ transform: [{ rotate: collapsed ? "0deg" : "180deg" }] }}
+          >
+            <ChevronDown size={16} color={colors.textTertiary} />
+          </Animated.View>
+        </View>
+
+        <View className="flex-row items-center gap-3 rounded-lg bg-surface-elevated p-card-padding">
+          <View className="h-11 w-11 items-center justify-center rounded-md bg-accent/10">
+            <Text variant="subheading" className="text-accent">{profile.name.trim().slice(0, 1) || "N"}</Text>
+          </View>
+          <View className="min-w-0 flex-1 gap-1">
+            <Text variant="body-semibold" numberOfLines={1}>{profile.name || "健身达人"}</Text>
+            <Text variant="caption" className="text-muted-foreground">{goalLabel}</Text>
+          </View>
+        </View>
       </Pressable>
 
       {!collapsed && (
-        <Animated.View entering={FadeInDown.duration(220)} exiting={FadeOutUp.duration(160)}>
+        <Animated.View className="border-t border-border" entering={FadeInDown.duration(220)} exiting={FadeOutUp.duration(160)}>
       <SettingsRow
         label="昵称"
         icon={<User size={15} color={colors.textSecondary} strokeWidth={2} />}

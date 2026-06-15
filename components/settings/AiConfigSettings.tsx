@@ -1,256 +1,204 @@
-import { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
-import { Activity, ChevronDown, Plus, ShieldCheck, Trash2, Zap } from "lucide-react-native";
-import Animated, { FadeIn, FadeInDown, FadeOutUp } from "react-native-reanimated";
+import { useMemo, useState } from "react";
+import { Alert, ScrollView, View } from "react-native";
+import { Bot, Check, ChevronRight, Plus, ShieldCheck, Trash2, Zap } from "lucide-react-native";
 import { type UserProfileData } from "@/db/services/profile";
 import { testAIConnection } from "@/db/services/ai";
 import { useTheme } from "@/hooks/useTheme";
+import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
 import { Badge, BadgeText } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
-import { SettingsRow } from "@/components/ui/settings-row";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  profile: UserProfileData;
-  setProfile: React.Dispatch<React.SetStateAction<UserProfileData>>;
+    profile: UserProfileData;
+    setProfile: React.Dispatch<React.SetStateAction<UserProfileData>>;
 };
 
 export function AiConfigSettings({ profile, setProfile }: Props) {
-  const { colors } = useTheme();
-  const [isTestingAI, setIsTestingAI] = useState(false);
-
-  const [collapsed, setCollapsed] = useState(true);
-
-  const toggleCollapse = () => {
-    setCollapsed((p) => !p);
-  };
-
-  const handleTestAI = async () => {
-    const activeConfig = profile.aiConfigs.find(
-      (c) => c.id === profile.activeAiConfigId
+    const { colors } = useTheme();
+    const [sheetVisible, setSheetVisible] = useState(false);
+    const [testingId, setTestingId] = useState<string | null>(null);
+    const activeConfig = useMemo(
+        () => profile.aiConfigs.find((config) => config.id === profile.activeAiConfigId) ?? profile.aiConfigs[0] ?? null,
+        [profile.activeAiConfigId, profile.aiConfigs]
     );
-    if (!activeConfig || !activeConfig.apiKey) {
-      Alert.alert("测试失败", "当前激活的配置缺少 API Key");
-      return;
-    }
-    setIsTestingAI(true);
-    try {
-      await testAIConnection(
-        activeConfig.baseUrl,
-        activeConfig.apiKey,
-        activeConfig.model
-      );
-      Alert.alert("🎉 测试成功", `已成功连接到 [${activeConfig.name}]`);
-    } catch (error: any) {
-      Alert.alert("测试失败", error.message);
-    } finally {
-      setIsTestingAI(false);
-    }
-  };
 
-  const addConfig = () => {
-    const newConfig = {
-      id: `config-${Date.now()}`,
-      name: "新配置",
-      baseUrl: "",
-      apiKey: "",
-      model: "",
+    const addConfig = () => {
+        const id = `config-${Date.now()}`;
+        setProfile((current) => ({
+            ...current,
+            aiConfigs: [...current.aiConfigs, { id, name: "新配置", baseUrl: "", apiKey: "", model: "" }],
+            activeAiConfigId: current.activeAiConfigId || id,
+        }));
     };
-    setProfile((c) => ({
-      ...c,
-      aiConfigs: [...c.aiConfigs, newConfig],
-      activeAiConfigId: c.activeAiConfigId || newConfig.id,
-    }));
-  };
 
-  const deleteConfig = (id: string, name: string) => {
-    Alert.alert("删除配置", `确定删除 "${name}" 吗？`, [
-      { text: "取消", style: "cancel" },
-      {
-        text: "删除",
-        style: "destructive",
-        onPress: () => {
-          const nextConfigs = profile.aiConfigs.filter((c) => c.id !== id);
-          const nextActive =
-            profile.activeAiConfigId === id
-              ? nextConfigs[0]?.id ?? null
-              : profile.activeAiConfigId;
-          setProfile((c) => ({
-            ...c,
-            aiConfigs: nextConfigs,
-            activeAiConfigId: nextActive,
-          }));
-        },
-      },
-    ]);
-  };
+    const updateConfig = (id: string, patch: Partial<{ name: string; baseUrl: string; apiKey: string; model: string }>) => {
+        setProfile((current) => ({
+            ...current,
+            aiConfigs: current.aiConfigs.map((config) => config.id === id ? { ...config, ...patch } : config),
+        }));
+    };
 
-  const updateConfig = (
-    index: number,
-    patch: Partial<{
-      name: string;
-      baseUrl: string;
-      apiKey: string;
-      model: string;
-    }>
-  ) => {
-    const next = [...profile.aiConfigs];
-    next[index] = { ...next[index], ...patch };
-    setProfile((c) => ({ ...c, aiConfigs: next }));
-  };
+    const deleteConfig = (id: string, name: string) => {
+        Alert.alert("删除 AI 配置", `确定删除“${name}”吗？`, [
+            { text: "取消", style: "cancel" },
+            {
+                text: "删除",
+                style: "destructive",
+                onPress: () => setProfile((current) => {
+                    const nextConfigs = current.aiConfigs.filter((config) => config.id !== id);
+                    return {
+                        ...current,
+                        aiConfigs: nextConfigs,
+                        activeAiConfigId: current.activeAiConfigId === id ? nextConfigs[0]?.id ?? null : current.activeAiConfigId,
+                    };
+                }),
+            },
+        ]);
+    };
 
-  return (
-    <Card className="overflow-hidden p-0">
-      {/* Header */}
-      <Pressable
-        onPress={toggleCollapse}
-        className="flex-row items-center justify-between px-3.5 pt-2.5 pb-1.5"
-      >
-        <Text variant="caption" className="font-semibold text-tertiary">
-          AI 设置
-        </Text>
-        <View className="flex-row items-center gap-3">
-          <View className="flex-row items-center gap-4">
-            <View className="flex-row items-baseline gap-1">
-              <Text className="text-caption font-variant-numeric-tabular-nums text-foreground">
-                {profile.aiTokensToday.toLocaleString()}
-              </Text>
-              <Text variant="caption">今日</Text>
-            </View>
-            <View className="flex-row items-baseline gap-1">
-              <Text className="text-caption font-variant-numeric-tabular-nums text-foreground">
-                {profile.aiTokensTotal.toLocaleString()}
-              </Text>
-              <Text variant="caption">总计</Text>
-            </View>
-          </View>
-          <Animated.View
-            key={collapsed ? "collapsed" : "expanded"}
-            entering={FadeIn.duration(150)}
-            style={{ transform: [{ rotate: collapsed ? "0deg" : "180deg" }] }}
-          >
-            <ChevronDown size={14} color={colors.textTertiary} />
-          </Animated.View>
-        </View>
-      </Pressable>
+    const handleTest = async (id: string) => {
+        const config = profile.aiConfigs.find((item) => item.id === id);
+        if (!config?.apiKey.trim()) {
+            Alert.alert("无法测试", "请先填写 API Key。");
+            return;
+        }
+        setTestingId(id);
+        try {
+            await testAIConnection(config.baseUrl, config.apiKey, config.model);
+            Alert.alert("连接成功", `已成功连接到“${config.name}”。`);
+        } catch (cause: any) {
+            Alert.alert("连接失败", cause?.message || "请检查地址、模型和 API Key 后重试。");
+        } finally {
+            setTestingId(null);
+        }
+    };
 
-      {!collapsed && (
-        <Animated.View entering={FadeInDown.duration(220)} exiting={FadeOutUp.duration(160)}>
-      {/* Config list */}
-      {profile.aiConfigs.map((config, index) => {
-        const isActive = profile.activeAiConfigId === config.id;
-        return (
-          <View
-            key={config.id}
-            className={cn("border-t border-border", isActive && "bg-surface-elevated")}
-          >
-            {/* Name row + radio + badge + delete */}
-            <View className="flex-row items-center gap-2.5 px-3.5 py-2.5">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 shrink-0"
-                onPress={() =>
-                  setProfile((c) => ({ ...c, activeAiConfigId: config.id }))
-                }
-                accessibilityLabel={`激活配置 ${config.name || index + 1}`}
-                accessibilityRole="radio"
-                accessibilityState={{ selected: isActive }}
-              >
-                <View
-                  className={cn(
-                    "h-5 w-5 items-center justify-center rounded-pill border-2",
-                    isActive ? "border-accent" : "border-border-strong"
-                  )}
+    return (
+        <>
+            <Card className="gap-4 p-card-padding">
+                <View className="flex-row items-center justify-between gap-3">
+                    <View className="flex-row items-center gap-2">
+                        <Bot size={18} color={colors.accent} />
+                        <Text variant="subheading">AI 设置</Text>
+                    </View>
+                    <Badge variant={activeConfig?.apiKey ? "default" : "outline"}>
+                        <BadgeText variant={activeConfig?.apiKey ? "default" : "outline"}>
+                            {activeConfig?.apiKey ? "已连接" : "未配置"}
+                        </BadgeText>
+                    </Badge>
+                </View>
+
+                <View className="flex-row gap-3">
+                    <View className="min-w-0 flex-1 rounded-lg bg-surface-elevated p-card-padding">
+                        <Text variant="micro" className="text-muted-foreground">今日用量</Text>
+                        <View className="mt-2 flex-row items-baseline gap-1">
+                            <Text className="text-stat-value font-variant-numeric-tabular-nums">{profile.aiTokensToday.toLocaleString()}</Text>
+                            <Text variant="micro" className="text-muted-foreground">tokens</Text>
+                        </View>
+                    </View>
+                    <View className="min-w-0 flex-1 rounded-lg bg-surface-elevated p-card-padding">
+                        <Text variant="micro" className="text-muted-foreground">累计用量</Text>
+                        <View className="mt-2 flex-row items-baseline gap-1">
+                            <Text className="text-stat-value font-variant-numeric-tabular-nums">{profile.aiTokensTotal.toLocaleString()}</Text>
+                            <Text variant="micro" className="text-muted-foreground">tokens</Text>
+                        </View>
+                    </View>
+                </View>
+
+                <AnimatedPressable
+                    onPress={() => setSheetVisible(true)}
+                    className="flex-row items-center gap-3 rounded-lg bg-surface-elevated p-card-padding"
+                    accessibilityRole="button"
+                    accessibilityLabel="管理 AI 配置"
                 >
-                  {isActive && (
-                    <View className="h-2.5 w-2.5 rounded-pill bg-accent" />
-                  )}
+                    <View className="h-10 w-10 items-center justify-center rounded-md bg-accent/10">
+                        <Zap size={18} color={colors.accent} />
+                    </View>
+                    <View className="min-w-0 flex-1">
+                        <Text variant="body-semibold" numberOfLines={1}>{activeConfig?.name || "添加 AI 服务"}</Text>
+                        {activeConfig?.model ? <Text variant="caption" className="mt-1 text-muted-foreground" numberOfLines={1}>{activeConfig.model}</Text> : null}
+                    </View>
+                    <ChevronRight size={18} color={colors.textTertiary} />
+                </AnimatedPressable>
+            </Card>
+
+            <Sheet visible={sheetVisible} onClose={() => setSheetVisible(false)} sheetHeight="90%" avoidKeyboard>
+                <View className="mb-4 flex-row items-center justify-between">
+                    <View>
+                        <Text variant="heading">AI 配置</Text>
+                    </View>
+                    <Button variant="secondary" size="sm" onPress={addConfig}>
+                        <Plus size={16} color={colors.foreground} />
+                        <ButtonText variant="secondary">新增</ButtonText>
+                    </Button>
                 </View>
-              </Button>
 
-              <View className="flex-1">
-                <Input
-                  value={config.name}
-                  onChangeText={(v) => updateConfig(index, { name: v })}
-                  placeholder="配置名称"
-                  className="min-h-0 border-0 bg-transparent p-0 text-body-semibold text-foreground"
-                />
-                <View className="flex-row items-center gap-2 mt-1">
-                  <Input
-                    value={config.baseUrl || ""}
-                    onChangeText={(v) => updateConfig(index, { baseUrl: v })}
-                    placeholder="Base URL"
-                    autoCapitalize="none"
-                    className="min-h-0 flex-1 border-0 bg-transparent p-0 text-caption text-muted-foreground"
-                  />
-                  <Input
-                    value={config.model || ""}
-                    onChangeText={(v) => updateConfig(index, { model: v })}
-                    placeholder="Model"
-                    autoCapitalize="none"
-                    className="min-h-0 w-24 border-0 bg-transparent p-0 text-caption text-muted-foreground"
-                  />
-                </View>
-                <Input
-                  value={config.apiKey || ""}
-                  onChangeText={(v) => updateConfig(index, { apiKey: v })}
-                  placeholder="API Key"
-                  secureTextEntry
-                  autoCapitalize="none"
-                  className="min-h-0 border-0 bg-transparent p-0 text-caption text-muted-foreground mt-0.5"
-                />
-              </View>
+                <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 24, gap: 12 }} showsVerticalScrollIndicator={false}>
+                    {profile.aiConfigs.length === 0 ? (
+                        <View className="items-center justify-center rounded-lg border border-dashed border-border bg-surface-elevated py-10">
+                            <Bot size={26} color={colors.textTertiary} />
+                            <Text variant="body-semibold" className="mt-3">暂无配置</Text>
+                        </View>
+                    ) : profile.aiConfigs.map((config) => {
+                        const active = profile.activeAiConfigId === config.id;
+                        return (
+                            <Card key={config.id} className={cn("gap-4 p-card-padding", active && "border-accent/40 bg-surface-elevated")}>
+                                <View className="flex-row items-center justify-between gap-3">
+                                    <View className="min-w-0 flex-1">
+                                        <Text variant="micro" className="text-muted-foreground">配置名称</Text>
+                                        <Input
+                                            value={config.name}
+                                            onChangeText={(name) => updateConfig(config.id, { name })}
+                                            placeholder="配置名称"
+                                            className="mt-1 border-0 bg-transparent px-0 text-body-semibold"
+                                        />
+                                    </View>
+                                    {active && <Badge><BadgeText>当前</BadgeText></Badge>}
+                                    <Button variant="ghost" size="icon" className="h-10 w-10" onPress={() => deleteConfig(config.id, config.name)} accessibilityLabel={`删除 ${config.name}`}>
+                                        <Trash2 size={17} color={colors.red} />
+                                    </Button>
+                                </View>
 
-              {isActive && (
-                <Badge variant="outline" className="px-2 py-0.5">
-                  <BadgeText variant="outline" className="text-accent">
-                    当前
-                  </BadgeText>
-                </Badge>
-              )}
+                                <View className="gap-3">
+                                    <View className="gap-1.5">
+                                        <Text variant="caption" className="text-muted-foreground">Base URL</Text>
+                                        <Input value={config.baseUrl} onChangeText={(baseUrl) => updateConfig(config.id, { baseUrl })} placeholder="https://api.openai.com/v1" autoCapitalize="none" />
+                                    </View>
+                                    <View className="gap-1.5">
+                                        <Text variant="caption" className="text-muted-foreground">Model</Text>
+                                        <Input value={config.model} onChangeText={(model) => updateConfig(config.id, { model })} placeholder="gpt-4o" autoCapitalize="none" />
+                                    </View>
+                                    <View className="gap-1.5">
+                                        <Text variant="caption" className="text-muted-foreground">API Key</Text>
+                                        <Input value={config.apiKey} onChangeText={(apiKey) => updateConfig(config.id, { apiKey })} placeholder="sk-..." secureTextEntry autoCapitalize="none" />
+                                    </View>
+                                </View>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 shrink-0"
-                onPress={() => deleteConfig(config.id, config.name)}
-                accessibilityLabel={`删除配置 ${config.name || index + 1}`}
-              >
-                <Trash2 size={14} color={colors.red} />
-              </Button>
-            </View>
-          </View>
-        );
-      })}
-
-      {/* Actions */}
-      <View className="border-t border-border">
-        <SettingsRow
-          label={isTestingAI ? "测试中" : "测试连接"}
-          icon={
-            isTestingAI ? (
-              <Activity size={15} color={colors.textSecondary} />
-            ) : (
-              <ShieldCheck size={15} color={colors.textSecondary} />
-            )
-          }
-          onPress={handleTestAI}
-          disabled={isTestingAI || !profile.activeAiConfigId}
-        />
-
-        <SettingsRow
-          label="新增配置"
-          icon={<Plus size={15} color={colors.textSecondary} />}
-          onPress={addConfig}
-          isLast
-        />
-      </View>
-        </Animated.View>
-      )}
-    </Card>
-  );
+                                <View className="flex-row gap-3">
+                                    <Button
+                                        variant={active ? "outline" : "secondary"}
+                                        className="flex-1"
+                                        disabled={active}
+                                        onPress={() => setProfile((current) => ({ ...current, activeAiConfigId: config.id }))}
+                                    >
+                                        {active && <Check size={16} color={colors.accent} />}
+                                        <ButtonText variant={active ? "outline" : "secondary"}>{active ? "当前配置" : "设为当前"}</ButtonText>
+                                    </Button>
+                                    <Button variant="secondary" className="flex-1" loading={testingId === config.id} onPress={() => handleTest(config.id)}>
+                                        {testingId !== config.id && <ShieldCheck size={16} color={colors.foreground} />}
+                                        <ButtonText variant="secondary">测试连接</ButtonText>
+                                    </Button>
+                                </View>
+                            </Card>
+                        );
+                    })}
+                </ScrollView>
+            </Sheet>
+        </>
+    );
 }

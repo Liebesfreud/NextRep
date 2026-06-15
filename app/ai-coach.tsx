@@ -1,85 +1,46 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Alert, ScrollView, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Clock3, Flame, MapPin, Plus, Sparkles } from "lucide-react-native";
+import { AlertCircle } from "lucide-react-native";
 import { desc } from "drizzle-orm";
 import * as SplashScreen from "expo-splash-screen";
 
 import { db } from "@/db/client";
 import { bodyMetrics, workouts } from "@/db/schema";
 import { generateTrainingReportWithAI, type AiReportData } from "@/db/services/ai";
+import { getUserProfile } from "@/db/services/profile";
 import * as workoutService from "@/db/services/workout";
 import { useTheme } from "@/hooks/useTheme";
-import { Button, ButtonText } from "@/components/ui/button";
+import { AiCoachHeader } from "@/components/ai-coach/AiCoachHeader";
+import { CoachCheckInCard, type CheckInState, type EnergyOption } from "@/components/ai-coach/CoachCheckInCard";
+import { CoachInsightCard } from "@/components/ai-coach/CoachInsightCard";
+import { CoachPlanSection } from "@/components/ai-coach/CoachPlanSection";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-
-type EnergyOption = "high" | "medium" | "low";
-type DurationOption = "20" | "40" | "60";
-type LocationOption = "gym" | "home";
-
-type CheckInState = {
-    energy: EnergyOption;
-    duration: DurationOption;
-    location: LocationOption;
-};
 
 type CoachContextData = {
-    recentWorkouts: {
-        name: string;
-        weight: string | null;
-        sets: string | null;
-        stats: string | null;
-        createdAt: string;
-    }[];
-    recentMetrics: {
-        metricType: string;
-        dateStr: string;
-        value: number;
-    }[];
-    presets: {
-        name: string;
-        tag: string | null;
-    }[];
+    recentWorkouts: { name: string; weight: string | null; sets: string | null; stats: string | null; createdAt: string }[];
+    recentMetrics: { metricType: string; dateStr: string; value: number }[];
+    presets: { name: string; tag: string | null }[];
 };
 
-type PlanWorkoutInput = {
-    type: "strength" | "cardio";
-    name: string;
-    sets?: string;
-    stats?: string;
-};
-
-const INITIAL_CHECK_IN: CheckInState = {
-    energy: "medium",
-    duration: "40",
-    location: "gym",
-};
+const INITIAL_CHECK_IN: CheckInState = { energy: "medium", duration: "40", location: "gym" };
 
 function getTodayDateStr() {
     const now = new Date();
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, "0");
-    const dd = String(now.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
 function getCoachLine(score: number, energy: EnergyOption) {
-    if (energy === "low") return "今天以轻量训练为主。";
-    if (score >= 75 && energy === "high") return "今天可以完成完整训练。";
-    return "按计划推进即可。";
+    if (energy === "low") return "今天以轻量训练为主";
+    if (score >= 75 && energy === "high") return "状态不错，可以完整推进";
+    return "保持节奏，按计划完成";
 }
 
-function getPlanTypeLabel(type: "strength" | "cardio") {
-    return type === "strength" ? "力量训练" : "有氧训练";
-}
-
-function getAdjustedPlan(reportData: AiReportData | null, checkIn: CheckInState, useLiteMode: boolean) {
-    if (!reportData) return [];
-
-    let plan = [...reportData.todaysPlan];
+function getAdjustedPlan(report: AiReportData | null, checkIn: CheckInState, useLiteMode: boolean) {
+    if (!report) return [];
+    let plan = [...report.todaysPlan];
 
     if (checkIn.duration === "20" || useLiteMode) {
         plan = plan.slice(0, Math.min(2, plan.length)).map((item) => ({
@@ -88,14 +49,9 @@ function getAdjustedPlan(reportData: AiReportData | null, checkIn: CheckInState,
             stats: item.stats ? `${item.stats} · 轻松版` : item.stats,
         }));
     }
-
     if (checkIn.location === "home") {
-        plan = plan.map((item) => ({
-            ...item,
-            stats: item.type === "cardio" ? item.stats || "15-20 分钟" : item.stats,
-        }));
+        plan = plan.map((item) => ({ ...item, stats: item.type === "cardio" ? item.stats || "15-20 分钟" : item.stats }));
     }
-
     if (checkIn.energy === "low") {
         plan = plan.map((item) => ({
             ...item,
@@ -103,7 +59,6 @@ function getAdjustedPlan(reportData: AiReportData | null, checkIn: CheckInState,
             stats: item.stats ? `${item.stats} · 放轻松` : item.stats,
         }));
     }
-
     return plan;
 }
 
@@ -119,18 +74,13 @@ export default function AiCoachScreen() {
     const [reportData, setReportData] = useState<AiReportData | null>(null);
     const [checkIn, setCheckIn] = useState<CheckInState>(INITIAL_CHECK_IN);
     const [useLiteMode, setUseLiteMode] = useState(false);
-    const [contextData, setContextData] = useState<CoachContextData>({
-        recentWorkouts: [],
-        recentMetrics: [],
-        presets: [],
-    });
+    const [aiConfig, setAiConfig] = useState<{ configured: boolean; label: string | null }>({ configured: false, label: null });
+    const [contextData, setContextData] = useState<CoachContextData>({ recentWorkouts: [], recentMetrics: [], presets: [] });
 
-    useEffect(() => {
-        return () => {
-            mountedRef.current = false;
-            contextSeqRef.current += 1;
-            reportSeqRef.current += 1;
-        };
+    useEffect(() => () => {
+        mountedRef.current = false;
+        contextSeqRef.current += 1;
+        reportSeqRef.current += 1;
     }, []);
 
     useFocusEffect(useCallback(() => {
@@ -139,89 +89,59 @@ export default function AiCoachScreen() {
             db.select().from(workouts).orderBy(desc(workouts.createdAt)).limit(20),
             db.select().from(bodyMetrics).orderBy(desc(bodyMetrics.dateStr)).limit(5),
             workoutService.getStrengthPresets(),
-        ]).then(([workoutRows, metricRows, presetRows]) => {
+            getUserProfile(),
+        ]).then(([workoutRows, metricRows, presetRows, profile]) => {
             if (!mountedRef.current || requestId !== contextSeqRef.current) return;
+            const activeConfig = profile.aiConfigs.find((config) => config.id === profile.activeAiConfigId) ?? profile.aiConfigs[0];
+            setAiConfig({
+                configured: Boolean(activeConfig?.apiKey?.trim()),
+                label: activeConfig ? activeConfig.model || activeConfig.name : null,
+            });
             setContextData({
                 recentWorkouts: workoutRows.map((item) => ({
-                    name: item.name,
-                    weight: item.weight,
-                    sets: item.sets,
-                    stats: item.stats,
+                    name: item.name, weight: item.weight, sets: item.sets, stats: item.stats,
                     createdAt: new Date(item.createdAt).toISOString(),
                 })),
-                recentMetrics: metricRows.map((item) => ({
-                    metricType: item.metricType,
-                    dateStr: item.dateStr,
-                    value: item.value,
-                })),
+                recentMetrics: metricRows.map((item) => ({ metricType: item.metricType, dateStr: item.dateStr, value: item.value })),
                 presets: presetRows,
             });
         }).catch(console.error).finally(() => {
-            if (mountedRef.current && requestId === contextSeqRef.current) {
-                SplashScreen.hideAsync().catch(() => {});
-            }
+            if (mountedRef.current && requestId === contextSeqRef.current) SplashScreen.hideAsync().catch(() => {});
         });
-        return () => {
-            contextSeqRef.current += 1;
-        };
+        return () => { contextSeqRef.current += 1; };
     }, []));
 
-    const adjustedPlan = useMemo(
-        () => getAdjustedPlan(reportData, checkIn, useLiteMode),
-        [checkIn, reportData, useLiteMode]
-    );
-
-    const coachLine = useMemo(
-        () => getCoachLine(reportData?.intensityScore ?? 50, checkIn.energy),
-        [checkIn.energy, reportData?.intensityScore]
-    );
+    const adjustedPlan = useMemo(() => getAdjustedPlan(reportData, checkIn, useLiteMode), [checkIn, reportData, useLiteMode]);
+    const coachLine = useMemo(() => getCoachLine(reportData?.intensityScore ?? 50, checkIn.energy), [checkIn.energy, reportData?.intensityScore]);
 
     const handleGenerateReport = async () => {
-        if (isLoading) return;
+        if (isLoading || !aiConfig.configured) return;
         setError(null);
         setUseLiteMode(false);
         setIsLoading(true);
         const requestId = ++reportSeqRef.current;
-
         try {
-            const data = await generateTrainingReportWithAI(
-                contextData.recentWorkouts,
-                contextData.recentMetrics,
-                contextData.presets
-            );
-            if (!mountedRef.current || requestId !== reportSeqRef.current) return;
-            setReportData(data);
-        } catch (e: any) {
-            if (mountedRef.current && requestId === reportSeqRef.current) {
-                setError(e.message || "生成 AI 建议失败，请稍后再试。");
-            }
+            const data = await generateTrainingReportWithAI(contextData.recentWorkouts, contextData.recentMetrics, contextData.presets);
+            if (mountedRef.current && requestId === reportSeqRef.current) setReportData(data);
+        } catch (cause: any) {
+            if (mountedRef.current && requestId === reportSeqRef.current) setError(cause.message || "生成 AI 建议失败，请稍后再试。");
         } finally {
-            if (mountedRef.current && requestId === reportSeqRef.current) {
-                setIsLoading(false);
-            }
+            if (mountedRef.current && requestId === reportSeqRef.current) setIsLoading(false);
         }
     };
 
     const handleApplyTodaysPlan = async () => {
         if (isApplying || adjustedPlan.length === 0) return;
-
         setIsApplying(true);
         try {
-            const todayStr = getTodayDateStr();
-            await workoutService.addWorkouts(adjustedPlan.map((item): PlanWorkoutInput => ({
-                type: item.type,
-                name: item.name,
-                sets: item.sets,
-                stats: item.stats,
-            })), todayStr);
-
+            await workoutService.addWorkouts(adjustedPlan.map((item) => ({ type: item.type, name: item.name, sets: item.sets, stats: item.stats })), getTodayDateStr());
             if (!mountedRef.current) return;
-            Alert.alert("已添加", "今天的计划已经加入训练列表。", [
+            Alert.alert("已加入今日训练", "计划已经准备好，可以回首页开始记录。", [
                 { text: "去首页", onPress: () => router.push("/") },
                 { text: "留在这里", style: "cancel" },
             ]);
-        } catch (e: any) {
-            if (mountedRef.current) Alert.alert("应用失败", e.message || "添加计划失败，请稍后再试。");
+        } catch (cause: any) {
+            if (mountedRef.current) Alert.alert("应用失败", cause.message || "添加计划失败，请稍后再试。");
         } finally {
             if (mountedRef.current) setIsApplying(false);
         }
@@ -229,132 +149,40 @@ export default function AiCoachScreen() {
 
     return (
         <View className="flex-1 bg-transparent">
-            <View className="border-b border-border bg-transparent px-4 pb-3" style={{ paddingTop: insets.top + 16 }}>
-                <Text variant="title">AI 教练</Text>
-            </View>
-
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40 + Math.max(insets.bottom, 0) + 52, gap: 14 }}>
-                <Card>
-                    <Text variant="subheading">今日状态</Text>
-
-                    <View className="mt-4 gap-3">
-                        <FilterRow
-                            title="精力"
-                            icon={<Flame size={14} color={colors.white} />}
-                            value={checkIn.energy}
-                            options={[{ key: "high", label: "很好" }, { key: "medium", label: "一般" }, { key: "low", label: "疲劳" }]}
-                            onChange={(value) => setCheckIn((prev) => ({ ...prev, energy: value as EnergyOption }))}
-                        />
-                        <FilterRow
-                            title="时长"
-                            icon={<Clock3 size={14} color={colors.white} />}
-                            value={checkIn.duration}
-                            options={[{ key: "20", label: "20m" }, { key: "40", label: "40m" }, { key: "60", label: "60m+" }]}
-                            onChange={(value) => setCheckIn((prev) => ({ ...prev, duration: value as DurationOption }))}
-                        />
-                        <FilterRow
-                            title="地点"
-                            icon={<MapPin size={14} color={colors.white} />}
-                            value={checkIn.location}
-                            options={[{ key: "gym", label: "健身房" }, { key: "home", label: "家里" }]}
-                            onChange={(value) => setCheckIn((prev) => ({ ...prev, location: value as LocationOption }))}
-                        />
-                    </View>
-
-                    <Button onPress={handleGenerateReport} disabled={isLoading} className="mt-4 py-3.5">
-                        {isLoading ? <ActivityIndicator size="small" color={colors.primaryForeground} /> : <Sparkles size={16} color={colors.primaryForeground} strokeWidth={2.2} />}
-                        <ButtonText>{isLoading ? "生成中" : "生成建议"}</ButtonText>
-                    </Button>
-                </Card>
-
-                <Card>
-                    <View className="mt-2 flex-row items-center justify-between gap-3">
-                        <Text variant="subheading" className="flex-1">建议</Text>
-                        <View className="rounded-pill border border-border px-2.5 py-1.5">
-                            <Text className="text-xs font-medium text-foreground">{reportData?.intensityScore ?? 0} / 100</Text>
-                        </View>
-                    </View>
-
-                    <View className="mt-3.5 rounded-lg border border-border bg-background p-3.5">
-                        <Text className="text-base font-semibold">{coachLine}</Text>
-                        <Text variant="muted" className="mt-2">
-                            {reportData?.overallEvaluation || "暂无建议"}
-                        </Text>
-                    </View>
-                </Card>
-
-                <Card>
-                    <Text variant="subheading">今日计划</Text>
-
-                    {adjustedPlan.length === 0 ? (
-                        <View className="mt-3.5 rounded-lg border border-dashed border-border bg-background p-4">
-                            <Text variant="muted">暂无计划</Text>
-                        </View>
-                    ) : (
-                        <View className="mt-3.5 gap-2.5">
-                            {adjustedPlan.map((plan, index) => (
-                                <Card key={`${plan.name}-${index}`} className="rounded-lg bg-background p-3.5">
-                                    <View className="flex-row items-center justify-between gap-2.5">
-                                        <View className="flex-1">
-                                            <Text className="text-base font-semibold">{plan.name}</Text>
-                                            <Text variant="caption" className="mt-1">{getPlanTypeLabel(plan.type)}</Text>
-                                        </View>
-                                        <Text className="text-xs text-muted-foreground">{plan.sets || plan.stats || "-"}</Text>
-                                    </View>
-                                </Card>
-                            ))}
-                        </View>
-                    )}
-
-                    <View className="mt-3.5 flex-row gap-2.5">
-                        <Button
-                            onPress={() => setUseLiteMode((prev) => !prev)}
-                            disabled={!reportData}
-                            variant="outline"
-                            className="flex-1 py-3"
-                        >
-                            <ButtonText variant="outline">{useLiteMode ? "轻松版" : "切换轻松版"}</ButtonText>
-                        </Button>
-
-                        <Button onPress={handleApplyTodaysPlan} disabled={isApplying || adjustedPlan.length === 0} className="flex-1 py-3">
-                            {isApplying ? <ActivityIndicator size="small" color={colors.primaryForeground} /> : <Plus size={16} color={colors.primaryForeground} strokeWidth={2.2} />}
-                            <ButtonText>加入今日训练</ButtonText>
-                        </Button>
-                    </View>
-                </Card>
-
+            <ScrollView
+                className="flex-1"
+                contentContainerStyle={{ paddingHorizontal: 20, paddingTop: insets.top + 16, paddingBottom: 100 + Math.max(insets.bottom - 20, 0), gap: 16 }}
+                showsVerticalScrollIndicator={false}
+            >
+                <AiCoachHeader />
+                <CoachCheckInCard
+                    value={checkIn}
+                    isLoading={isLoading}
+                    isConfigured={aiConfig.configured}
+                    configLabel={aiConfig.label}
+                    onChange={setCheckIn}
+                    onGenerate={handleGenerateReport}
+                    onOpenSettings={() => router.push("/settings")}
+                />
                 {error && (
-                    <Card className="border-destructive/20 bg-destructive/10 p-3.5">
-                        <Text className="text-[13px] font-bold leading-5 text-destructive">{error}</Text>
+                    <Card className="flex-row items-start gap-3 border-destructive/20 bg-destructive/10 p-card-padding">
+                        <AlertCircle size={18} color={colors.red} className="mt-0.5" />
+                        <View className="min-w-0 flex-1 gap-1">
+                            <Text variant="body-semibold" className="text-destructive">生成失败</Text>
+                            <Text variant="caption" className="text-destructive">{error}</Text>
+                        </View>
                     </Card>
                 )}
+                <CoachInsightCard report={reportData} coachLine={coachLine} />
+                <CoachPlanSection
+                    report={reportData}
+                    plan={adjustedPlan}
+                    useLiteMode={useLiteMode}
+                    isApplying={isApplying}
+                    onToggleLite={() => setUseLiteMode((current) => !current)}
+                    onApply={handleApplyTodaysPlan}
+                />
             </ScrollView>
-        </View>
-    );
-}
-
-function FilterRow({ title, icon, options, value, onChange }: { title: string; icon: ReactNode; options: { key: string; label: string }[]; value: string; onChange: (value: string) => void; }) {
-    return (
-        <View>
-            <View className="mb-2 flex-row items-center gap-1.5">
-                {icon}
-                <Text className="text-[13px] font-medium">{title}</Text>
-            </View>
-            <ToggleGroup value={value} onValueChange={onChange}>
-                {options.map((option) => {
-                    const active = option.key === value;
-                    return (
-                        <ToggleGroupItem
-                            key={option.key}
-                            value={option.key}
-                            activeClassName="border-primary bg-background"
-                            inactiveClassName="border-border bg-background"
-                        >
-                            <Text className={active ? "text-xs font-medium text-foreground" : "text-xs text-muted-foreground"}>{option.label}</Text>
-                        </ToggleGroupItem>
-                    );
-                })}
-            </ToggleGroup>
         </View>
     );
 }

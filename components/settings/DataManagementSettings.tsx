@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
-import { ChevronDown, Download, Trash2, Upload } from "lucide-react-native";
-import Animated, { FadeIn, FadeInDown, FadeOutUp } from "react-native-reanimated";
+import { Alert, View } from "react-native";
+import { Database, Download, Trash2, Upload } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
@@ -15,12 +14,6 @@ export function DataManagementSettings() {
   const { colors } = useTheme();
   const [pendingAction, setPendingAction] = useState<"export" | "import" | "clear" | null>(null);
   const isPending = pendingAction !== null;
-
-  const [collapsed, setCollapsed] = useState(true);
-
-  const toggleCollapse = () => {
-    setCollapsed((p) => !p);
-  };
 
   const handleExport = async () => {
     if (isPending) return;
@@ -83,7 +76,7 @@ export function DataManagementSettings() {
     if (isPending) return;
     setPendingAction("clear");
     Alert.alert(
-      "⚠️ 清空数据",
+      "清空所有数据",
       "确定要清空所有数据吗？此操作无法恢复！",
       [
         { text: "取消", style: "cancel", onPress: () => setPendingAction(null) },
@@ -107,49 +100,40 @@ export function DataManagementSettings() {
   };
 
   return (
-    <Card className="overflow-hidden p-0">
-      <Pressable
-        onPress={toggleCollapse}
-        className="flex-row items-center justify-between px-3.5 pt-2.5 pb-1.5"
-      >
-        <Text variant="caption" className="font-semibold text-tertiary">
-          数据
-        </Text>
-        <Animated.View
-          key={collapsed ? "collapsed" : "expanded"}
-          entering={FadeIn.duration(150)}
-          style={{ transform: [{ rotate: collapsed ? "0deg" : "180deg" }] }}
-        >
-          <ChevronDown size={14} color={colors.textTertiary} />
-        </Animated.View>
-      </Pressable>
+    <View className="gap-3">
+      <Card className="overflow-hidden p-0">
+        <View className="flex-row items-center gap-2 p-card-padding pb-2">
+          <Database size={18} color={colors.accent} />
+          <Text variant="subheading">数据管理</Text>
+        </View>
+        <SettingsRow
+          label={pendingAction === "export" ? "正在导出" : "导出备份"}
+          icon={<Download size={16} color={colors.textSecondary} />}
+          onPress={handleExport}
+          disabled={isPending}
+        />
+        <SettingsRow
+          label={pendingAction === "import" ? "正在导入" : "导入数据"}
+          icon={<Upload size={16} color={colors.textSecondary} />}
+          onPress={handleImport}
+          disabled={isPending}
+          isLast
+        />
+      </Card>
 
-      {!collapsed && (
-        <Animated.View entering={FadeInDown.duration(220)} exiting={FadeOutUp.duration(160)}>
-      <SettingsRow
-        label="导出备份"
-        icon={<Download size={15} color={colors.textSecondary} />}
-        onPress={handleExport}
-        disabled={isPending}
-      />
-
-      <SettingsRow
-        label="导入数据"
-        icon={<Upload size={15} color={colors.textSecondary} />}
-        onPress={handleImport}
-        disabled={isPending}
-      />
-
-      <SettingsRow
-        variant="destructive"
-        label="清空所有记录"
-        desc="不可撤销"
-        onPress={handleClear}
-        disabled={isPending}
-        isLast
-      />
-        </Animated.View>
-      )}
-    </Card>
+      <Card className="overflow-hidden border-destructive/20 p-0">
+        <View className="px-3.5 pt-3">
+          <Text variant="micro" className="text-destructive">危险区域</Text>
+        </View>
+        <SettingsRow
+          variant="destructive"
+          label={pendingAction === "clear" ? "正在清空" : "清空所有记录"}
+          icon={<Trash2 size={16} color={colors.red} />}
+          onPress={handleClear}
+          disabled={isPending}
+          isLast
+        />
+      </Card>
+    </View>
   );
 }

@@ -1,62 +1,43 @@
 import { View } from "react-native";
-import { Moon, Sun } from "lucide-react-native";
+import { Monitor, Moon, Sun } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { Button, ButtonText } from "@/components/ui/button";
-import { SettingsRow } from "@/components/ui/settings-row";
 
 export function AppearanceSettings() {
-  const { colors, theme, preference, setTheme } = useTheme();
-  const isDark = theme === "dark";
-  const themeLabel =
-    preference === "system"
-      ? `系统 · ${isDark ? "深色" : "浅色"}`
-      : isDark
-        ? "深色"
-        : "浅色";
+  const { colors, preference, setTheme } = useTheme();
 
   return (
-    <Card className="overflow-hidden p-0">
-      <View className="px-3.5 pt-2.5 pb-1.5">
-        <Text variant="caption" className="font-semibold text-tertiary">
-          外观
-        </Text>
+    <Card className="gap-4 p-card-padding">
+      <View className="flex-row items-center gap-2">
+        <Moon size={18} color={colors.accent} />
+        <Text variant="subheading">外观</Text>
       </View>
 
-      <SettingsRow
-        label="深色模式"
-        desc={themeLabel}
-        icon={
-          isDark ? (
-            <Moon size={15} color={colors.textSecondary} />
-          ) : (
-            <Sun size={15} color={colors.textSecondary} />
-          )
-        }
-        value={
-          <View className="flex-row rounded-md bg-surface-elevated p-0.5">
-            {(["light", "dark", "system"] as const).map((p) => (
+      <View className="gap-3 rounded-lg bg-surface-elevated p-card-padding">
+        <Text variant="body-semibold">显示模式</Text>
+        <View className="flex-row gap-2">
+          {(["light", "dark", "system"] as const).map((mode) => {
+            const selected = preference === mode;
+            const Icon = mode === "light" ? Sun : mode === "dark" ? Moon : Monitor;
+            return (
               <Button
-                key={p}
-                onPress={() => setTheme(p)}
-                variant={preference === p ? "secondary" : "ghost"}
-                size="sm"
-                className="h-auto rounded-sm px-2.5 py-1.5"
+                key={mode}
+                onPress={() => setTheme(mode)}
+                variant={selected ? "secondary" : "ghost"}
+                className="h-12 flex-1 rounded-md px-2"
+                accessibilityLabel={`${mode === "light" ? "浅色" : mode === "dark" ? "深色" : "跟随系统"}模式`}
               >
-                <ButtonText
-                  variant={preference === p ? "secondary" : "ghost"}
-                  size="sm"
-                  className={preference === p ? "font-medium" : "text-tertiary"}
-                >
-                  {p === "light" ? "浅色" : p === "dark" ? "深色" : "系统"}
+                <Icon size={16} color={selected ? colors.foreground : colors.textSecondary} />
+                <ButtonText variant={selected ? "secondary" : "ghost"} className={selected ? "font-semibold text-foreground" : "text-muted-foreground"}>
+                  {mode === "light" ? "浅色" : mode === "dark" ? "深色" : "系统"}
                 </ButtonText>
               </Button>
-            ))}
-          </View>
-        }
-        isLast
-      />
+            );
+          })}
+        </View>
+      </View>
     </Card>
   );
 }
