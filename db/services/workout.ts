@@ -2,6 +2,7 @@ import { db } from "../client";
 import { workouts, strengthPresets, dailyCheckins } from "../schema";
 import { eq, gte, lt, and } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
+import { buildTimestampForDate, getDateBounds, getTodayDateStr, toDateStr } from "@/db/domain/dates";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -20,40 +21,8 @@ export type StrengthPresetItem = {
     tag: string | null;
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function toDateStr(date: Date): string {
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const dd = String(date.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
-}
-
-function getTodayDateStr(): string {
-    return toDateStr(new Date());
-}
-
-function getDateBounds(dateStr: string): { startOfDay: Date; endOfDay: Date } {
-    const [y, m, d] = dateStr.split("-").map(Number);
-    const startOfDay = new Date(y, m - 1, d, 0, 0, 0, 0);
-    const endOfDay = new Date(y, m - 1, d + 1, 0, 0, 0, 0);
-    return { startOfDay, endOfDay };
-}
-
 function buildWorkoutCreatedAt(forDate?: string): Date | undefined {
-    if (!forDate) return undefined;
-
-    const now = new Date();
-    const [y, m, d] = forDate.split("-").map(Number);
-    return new Date(
-        y,
-        m - 1,
-        d,
-        now.getHours(),
-        now.getMinutes(),
-        now.getSeconds(),
-        now.getMilliseconds()
-    );
+    return forDate ? buildTimestampForDate(forDate) : undefined;
 }
 
 function toWorkoutItem(row: {

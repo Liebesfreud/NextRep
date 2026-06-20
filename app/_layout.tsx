@@ -7,10 +7,10 @@ import { ThemeProvider, useTheme } from "@/hooks/useTheme";
 import { initDatabase } from "@/db/client";
 import * as SplashScreen from "expo-splash-screen";
 import { Button, ButtonText } from "@/components/ui/button";
-import { getTabBarStyle, TabBarBackground, TAB_BAR_ITEM_STYLE, useTabBarStyle } from "@/components/ui/tab-bar-background";
-import { TabIcon } from "@/components/ui/tab-icon";
+import { TabBarBackground, TAB_BAR_ITEM_STYLE, useTabBarStyle } from "@/components/chrome/tab-bar-background";
+import { TabIcon } from "@/components/chrome/tab-icon";
 import { Text } from "@/components/ui/text";
-import { DottedBackground } from "@/components/ui/dotted-background";
+import { DottedBackground } from "@/components/chrome/dotted-background";
 import { DURATION } from "@/constants/animations";
 import "../global.css";
 

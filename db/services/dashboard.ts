@@ -3,6 +3,12 @@ import { workouts, dailyCheckins, bodyMetrics, strengthPresets } from "../schema
 import { gte, lt, and, desc, eq } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
 import { getUserProfile } from "./profile";
+import { toDateStr } from "@/db/domain/dates";
+import {
+    calculateStrengthVolumeKg,
+    estimateDailyDurationMinutes,
+    summarizeWorkoutPerformance,
+} from "@/db/domain/training";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -96,19 +102,10 @@ type StrengthPresetSummaryRow = {
     tag: string | null;
 };
 
-type ParsedStrengthSet = {
-    weightKg: number;
-    reps: number;
-    isCompleted: boolean;
-};
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function normalizeDate(date: Date): string {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
+    return toDateStr(date);
 }
 
 function daysSince(dateStr: string | null): number | null {
@@ -278,79 +275,8 @@ export async function getStrengthExerciseAnalytics(): Promise<StrengthExerciseAn
 
 // ─── Dashboard Data ───────────────────────────────────────────────────────────
 
-function parseNumber(value: string | number | null | undefined): number {
-    if (typeof value === "number") return Number.isFinite(value) ? value : 0;
-    if (!value) return 0;
-    const match = value.match(/[\d.]+/);
-    if (!match) return 0;
-    const parsed = parseFloat(match[0]);
-    return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function getEffectiveSets(sets: ParsedStrengthSet[]): ParsedStrengthSet[] {
-    const meaningful = sets.filter((set) => set.weightKg > 0 || set.reps > 0);
-    const completed = meaningful.filter((set) => set.isCompleted);
-    return completed.length > 0 ? completed : meaningful;
-}
-
-function parseStrengthSets(weight: string | null, sets: string | null): ParsedStrengthSet[] {
-    const fallbackWeight = parseNumber(weight);
-    if (!sets) return fallbackWeight > 0 ? [{ weightKg: fallbackWeight, reps: 0, isCompleted: true }] : [];
-
-    try {
-        if (sets.trim().startsWith("[")) {
-            const parsed = JSON.parse(sets) as Array<{
-                weight?: number | string;
-                reps?: number | string;
-                isCompleted?: boolean;
-            }>;
-            if (Array.isArray(parsed)) {
-                return getEffectiveSets(parsed.map((set) => ({
-                    weightKg: parseNumber(set?.weight) || fallbackWeight,
-                    reps: parseNumber(set?.reps),
-                    isCompleted: !!set?.isCompleted,
-                })));
-            }
-        }
-    } catch {
-        // Fallback to legacy text parsing below.
-    }
-
-    const normalizedSets = sets.replace(/×/g, "x");
-    const parts = normalizedSets.split("x").map((s: string) => s.trim());
-    if (parts.length === 2) {
-        const setCount = parseNumber(parts[0]);
-        const reps = parseNumber(parts[1]);
-        return Array.from({ length: Math.max(0, Math.floor(setCount)) }, () => ({
-            weightKg: fallbackWeight,
-            reps,
-            isCompleted: true,
-        }));
-    }
-
-    const reps = parseNumber(parts[0]);
-    if (fallbackWeight > 0 || reps > 0) {
-        return [{ weightKg: fallbackWeight, reps, isCompleted: true }];
-    }
-    return [];
-}
-
-function summarizeWorkoutPerformance(weight: string | null, sets: string | null) {
-    const parsedSets = parseStrengthSets(weight, sets);
-    const totalReps = parsedSets.reduce((sum, set) => sum + set.reps, 0);
-    const volumeKg = parsedSets.reduce((sum, set) => sum + set.weightKg * set.reps, 0);
-    const maxWeightKg = parsedSets.reduce((max, set) => Math.max(max, set.weightKg), 0);
-
-    return {
-        setCount: parsedSets.length,
-        totalReps,
-        volumeKg,
-        maxWeightKg: maxWeightKg > 0 ? maxWeightKg : null,
-    };
-}
-
 function calculateVolume(weight: string | null, sets: string | null): number {
-    return summarizeWorkoutPerformance(weight, sets).volumeKg;
+    return calculateStrengthVolumeKg(weight, sets);
 }
 
 function sortExerciseAnalytics(a: StrengthExerciseAnalytics, b: StrengthExerciseAnalytics): number {
@@ -520,12 +446,6 @@ function getTrackedDays(periodWorkouts: Array<{ createdAt: Date }>): number {
     const end = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
 
     return Math.max(1, Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1);
-}
-
-function estimateDailyDurationMinutes(workoutCount: number, volumeKg: number): number {
-    if (workoutCount <= 0) return 0;
-    const volumeMinutes = Math.min(30, Math.floor(volumeKg / 500));
-    return workoutCount * 12 + volumeMinutes;
 }
 
 export async function getDashboardData(year: number, month: number) {

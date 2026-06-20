@@ -18,11 +18,6 @@ type Props = {
     data: DashboardData | null;
 };
 
-function formatWeight(value: number | null | undefined) {
-    if (!value) return "--";
-    return Number.isInteger(value) ? `${value} kg` : `${value.toFixed(1)} kg`;
-}
-
 function formatVolume(value: number) {
     if (!value) return "0 kg";
     if (value >= 1000) return `${(value / 1000).toFixed(1)} t`;

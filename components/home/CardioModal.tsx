@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { View, ScrollView, Keyboard } from "react-native";
-import { X, ChevronLeft, Activity, Plus, Timer, Flame, Trash2 } from "lucide-react-native";
+import { X, ChevronLeft, Plus, Timer, Flame, Trash2 } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { type WorkoutItem } from "@/db/services/workout";
 import { CARDIO_EXERCISES, getCardioExerciseVisual } from "@/constants/exerciseVisuals";

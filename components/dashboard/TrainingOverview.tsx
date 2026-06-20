@@ -13,7 +13,7 @@ import {
 } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { Button } from "@/components/ui/button";
-import { CalendarDayCell } from "@/components/ui/calendar-day-cell";
+import { CalendarDayCell } from "@/components/common/calendar-day-cell";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";

@@ -4,7 +4,7 @@ import { Plus, Dumbbell, Activity, CheckCircle, ChevronLeft, ChevronRight } from
 import { useTheme } from "@/hooks/useTheme";
 import { getCheckinsByMonth, type WorkoutItem } from "@/db/services/workout";
 import { Button, ButtonText } from "@/components/ui/button";
-import { CalendarDayCell } from "@/components/ui/calendar-day-cell";
+import { CalendarDayCell } from "@/components/common/calendar-day-cell";
 import { Card } from "@/components/ui/card";
 import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
@@ -36,7 +36,7 @@ function formatSets(setsStr: string | null) {
                 return `${count} 组`;
             }
         }
-    } catch (e) {
+    } catch {
         // ignore
     }
     return setsStr;

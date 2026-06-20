@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { type BodyMetricPoint } from "@/db/services/dashboard";
 import Svg, { Circle, Path } from "react-native-svg";
 import { Button, ButtonText } from "@/components/ui/button";
-import { CalendarDayCell } from "@/components/ui/calendar-day-cell";
+import { CalendarDayCell } from "@/components/common/calendar-day-cell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Sheet } from "@/components/ui/sheet";
@@ -154,7 +154,7 @@ export function BodyMetricModal({ visible, metricType, onClose, data, onSave }: 
             await onSave(metricType, formValue, formDate);
             if (!mountedRef.current || requestId !== saveSeqRef.current) return;
             onClose();
-        } catch (e) {
+        } catch {
             if (mountedRef.current && requestId === saveSeqRef.current) setError("保存失败，请重试");
         } finally {
             if (mountedRef.current && requestId === saveSeqRef.current) setIsSaving(false);

@@ -7,6 +7,11 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint app components constants db hooks lib scripts",
+    "test": "vitest run",
+    "check:arch": "node scripts/check-architecture.mjs",
+    "check": "npm run check:arch && npm run typecheck && npm run lint && npm run test",
     "eas-build-post-install": "node -e \"if(process.platform==='linux'){require('child_process').execSync('npm install --no-save lightningcss-linux-x64-gnu@1.27.0',{stdio:'inherit'})}\""
   },
   "dependencies": {
@@ -46,11 +51,15 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/react": "~19.2.2",
     "drizzle-kit": "^0.31.9",
+    "eslint": "^10.5.0",
     "react-refresh": "^0.18.0",
     "tailwindcss": "^3.4.19",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.61.1",
+    "vitest": "^4.1.9"
   },
   "private": true
 }

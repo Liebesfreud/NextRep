@@ -8,7 +8,7 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
-import { SettingsRow } from "@/components/ui/settings-row";
+import { SettingsRow } from "@/components/settings/settings-row";
 
 type Props = {
   profile: UserProfileData;
