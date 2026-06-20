@@ -519,12 +519,13 @@ export function StrengthModal({
                                     accessibilityLabel="删除力量训练记录"
                                     disabled={isPending}
                                     variant="destructive"
-                                    className="w-16 py-4"
+                                    size="lg"
+                                    className="w-16"
                                 >
                                     <Trash2 size={20} color={colors.red} />
                                 </Button>
                             )}
-                            <Button onPress={handleSave} disabled={isPending || !selectedExercise} className="flex-1 py-4">
+                            <Button onPress={handleSave} disabled={isPending || !selectedExercise} size="lg" className="flex-1">
                                 <ButtonText className="text-lg">
                                     {isPending ? "保存中..." : "保存记录"}
                                 </ButtonText>

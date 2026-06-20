@@ -337,7 +337,8 @@ export function TodayWorkouts({
                 <Button
                     onPress={handleCheckin}
                     disabled={isPending}
-                    className="w-full py-4"
+                    size="lg"
+                    className="w-full"
                 >
                     <CheckCircle size={18} color={colors.primaryForeground} strokeWidth={2.25} />
                     <ButtonText className="text-base font-semibold">
