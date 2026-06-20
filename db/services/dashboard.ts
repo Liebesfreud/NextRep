@@ -1,11 +1,10 @@
 import { db } from "../client";
 import { workouts, dailyCheckins, bodyMetrics, strengthPresets } from "../schema";
-import { gte, lt, and, desc, eq } from "drizzle-orm";
+import { gte, lt, and, desc, eq, sql } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
 import { getUserProfile } from "./profile";
 import { toDateStr } from "@/db/domain/dates";
 import {
-    calculateStrengthVolumeKg,
     estimateDailyDurationMinutes,
     summarizeWorkoutPerformance,
 } from "@/db/domain/training";
@@ -61,6 +60,8 @@ export type StrengthExerciseAnalytics = {
     history: ExerciseHistoryRecord[];
 };
 
+export type StrengthExerciseSummary = Omit<StrengthExerciseAnalytics, "breakthroughs" | "history">;
+
 type BodyMetricSummary = {
     latestValue: number | null;
     latestDateStr: string | null;
@@ -95,6 +96,10 @@ type WorkoutSummaryRow = {
     weight: string | null;
     sets: string | null;
     createdAt: Date;
+    volumeKg: number;
+    totalReps: number;
+    setCount: number;
+    maxWeightKg: number;
 };
 
 type StrengthPresetSummaryRow = {
@@ -250,18 +255,31 @@ export async function addBodyMetric(input: {
     });
 }
 
-export async function getStrengthExerciseAnalytics(): Promise<StrengthExerciseAnalytics[]> {
-    const [allStrengthWorkouts, presets] = await Promise.all([
+export async function getStrengthExerciseSummaries(options: {
+    includeLibraryOnly?: boolean;
+    limit?: number;
+} = {}): Promise<StrengthExerciseSummary[]> {
+    const { includeLibraryOnly = true, limit } = options;
+    const [summaryRows, presetRows] = await Promise.all([
         db.select({
             name: workouts.name,
-            type: workouts.type,
-            weight: workouts.weight,
-            sets: workouts.sets,
-            createdAt: workouts.createdAt,
+            records: sql<number>`count(*)`,
+            trainingDays: sql<number>`count(distinct date(${workouts.createdAt}, 'unixepoch', 'localtime'))`,
+            totalSets: sql<number>`coalesce(sum(${workouts.setCount}), 0)`,
+            totalReps: sql<number>`coalesce(sum(${workouts.totalReps}), 0)`,
+            totalVolumeKg: sql<number>`coalesce(sum(${workouts.volumeKg}), 0)`,
+            maxWeightKg: sql<number>`coalesce(max(${workouts.maxWeightKg}), 0)`,
+            latestDateStr: sql<string | null>`date(max(${workouts.createdAt}), 'unixepoch', 'localtime')`,
         })
             .from(workouts)
             .where(eq(workouts.type, "strength"))
-            .orderBy(workouts.createdAt),
+            .groupBy(workouts.name)
+            .orderBy(
+                desc(sql<number>`count(distinct date(${workouts.createdAt}, 'unixepoch', 'localtime'))`),
+                desc(sql<number>`count(*)`),
+                desc(sql<number>`max(${workouts.createdAt})`),
+            )
+            .limit(limit ?? 1000000),
         db.select({
             name: strengthPresets.name,
             tag: strengthPresets.tag,
@@ -270,16 +288,91 @@ export async function getStrengthExerciseAnalytics(): Promise<StrengthExerciseAn
             .orderBy(strengthPresets.createdAt),
     ]);
 
-    return buildStrengthExerciseAnalytics(allStrengthWorkouts, presets, true);
+    const presetTagMap = new Map(presetRows.map((preset) => [preset.name, preset.tag] as const));
+    const summaryMap = new Map<string, StrengthExerciseSummary>();
+
+    summaryRows.forEach((row) => {
+        const maxWeightKg = Number(row.maxWeightKg) || 0;
+        summaryMap.set(row.name, {
+            name: row.name,
+            tag: presetTagMap.get(row.name) ?? null,
+            trainingDays: Number(row.trainingDays) || 0,
+            records: Number(row.records) || 0,
+            totalSets: Number(row.totalSets) || 0,
+            totalReps: Number(row.totalReps) || 0,
+            totalVolumeKg: Number(row.totalVolumeKg) || 0,
+            maxWeightKg: maxWeightKg > 0 ? maxWeightKg : null,
+            latestDateStr: row.latestDateStr,
+            latestMaxWeightKg: maxWeightKg > 0 ? maxWeightKg : null,
+        });
+    });
+
+    if (includeLibraryOnly && !limit) {
+        presetRows.forEach((preset) => {
+            if (summaryMap.has(preset.name)) return;
+            summaryMap.set(preset.name, {
+                name: preset.name,
+                tag: preset.tag,
+                trainingDays: 0,
+                records: 0,
+                totalSets: 0,
+                totalReps: 0,
+                totalVolumeKg: 0,
+                maxWeightKg: null,
+                latestDateStr: null,
+                latestMaxWeightKg: null,
+            });
+        });
+    }
+
+    return [...summaryMap.values()].sort(sortExerciseSummary).slice(0, limit);
+}
+
+export async function getStrengthExerciseDetail(name: string): Promise<StrengthExerciseAnalytics | null> {
+    const [workoutRows, presetRows] = await Promise.all([
+        db.select({
+            name: workouts.name,
+            type: workouts.type,
+            weight: workouts.weight,
+            sets: workouts.sets,
+            createdAt: workouts.createdAt,
+            volumeKg: workouts.volumeKg,
+            totalReps: workouts.totalReps,
+            setCount: workouts.setCount,
+            maxWeightKg: workouts.maxWeightKg,
+        })
+            .from(workouts)
+            .where(and(eq(workouts.type, "strength"), eq(workouts.name, name)))
+            .orderBy(workouts.createdAt),
+        db.select({
+            name: strengthPresets.name,
+            tag: strengthPresets.tag,
+        })
+            .from(strengthPresets)
+            .where(eq(strengthPresets.name, name)),
+    ]);
+
+    const [detail] = buildStrengthExerciseAnalytics(
+        workoutRows,
+        presetRows.length > 0 ? presetRows : [{ name, tag: null }],
+        true,
+    );
+    return detail ?? null;
+}
+
+export async function getStrengthExerciseAnalytics(): Promise<StrengthExerciseAnalytics[]> {
+    const summaries = await getStrengthExerciseSummaries({ includeLibraryOnly: true });
+    const details = await Promise.all(summaries.map((summary) => getStrengthExerciseDetail(summary.name)));
+    return details.flatMap((detail) => detail ? [detail] : []);
 }
 
 // ─── Dashboard Data ───────────────────────────────────────────────────────────
 
-function calculateVolume(weight: string | null, sets: string | null): number {
-    return calculateStrengthVolumeKg(weight, sets);
+function sortExerciseAnalytics(a: StrengthExerciseAnalytics, b: StrengthExerciseAnalytics): number {
+    return sortExerciseSummary(a, b);
 }
 
-function sortExerciseAnalytics(a: StrengthExerciseAnalytics, b: StrengthExerciseAnalytics): number {
+function sortExerciseSummary(a: StrengthExerciseSummary, b: StrengthExerciseSummary): number {
     if (b.trainingDays !== a.trainingDays) return b.trainingDays - a.trainingDays;
     if (b.records !== a.records) return b.records - a.records;
     const aLatest = a.latestDateStr ?? "";
@@ -329,7 +422,13 @@ function buildStrengthExerciseAnalytics(
         .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
         .forEach((workout) => {
             const entry = ensureEntry(workout.name);
-            const performance = summarizeWorkoutPerformance(workout.weight, workout.sets);
+            const fallback = summarizeWorkoutPerformance(workout.weight, workout.sets);
+            const performance = {
+                setCount: workout.setCount ?? fallback.setCount,
+                totalReps: workout.totalReps ?? fallback.totalReps,
+                volumeKg: workout.volumeKg ?? fallback.volumeKg,
+                maxWeightKg: (workout.maxWeightKg ?? fallback.maxWeightKg) || null,
+            };
             const dateStr = normalizeDate(new Date(workout.createdAt));
             const createdAt = new Date(workout.createdAt).toISOString();
             const dateSet = dateSets.get(workout.name) ?? new Set<string>();
@@ -398,14 +497,40 @@ function buildReviewSummary(
         if (workout.type === "strength") strengthWorkouts += 1;
         if (workout.type === "cardio") cardioWorkouts += 1;
 
-        totalVolumeKg += calculateVolume(workout.weight, workout.sets);
+        totalVolumeKg += workout.volumeKg;
     }
 
     const topExercise = Object.entries(exerciseCountMap)
         .sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 
-    const workouts = periodWorkouts.length;
-    const activeDays = activeDaySet.size;
+    return buildReviewSummaryFromStats({
+        workouts: periodWorkouts.length,
+        activeDays: activeDaySet.size,
+        totalVolumeKg,
+        strengthWorkouts,
+        cardioWorkouts,
+        topExercise,
+        expectedDays,
+    });
+}
+
+function buildReviewSummaryFromStats({
+    workouts,
+    activeDays,
+    totalVolumeKg,
+    strengthWorkouts,
+    cardioWorkouts,
+    topExercise,
+    expectedDays,
+}: {
+    workouts: number;
+    activeDays: number;
+    totalVolumeKg: number;
+    strengthWorkouts: number;
+    cardioWorkouts: number;
+    topExercise: string | null;
+    expectedDays: number;
+}): ReviewPeriodSummary {
     const averageVolumePerWorkoutKg = workouts > 0 ? totalVolumeKg / workouts : 0;
     const consistencyRate = expectedDays > 0 ? activeDays / expectedDays : 0;
 
@@ -433,19 +558,51 @@ function buildReviewSummary(
     };
 }
 
-function getTrackedDays(periodWorkouts: Array<{ createdAt: Date }>): number {
-    if (periodWorkouts.length === 0) return 1;
+async function getAllTimeReviewSummary(): Promise<ReviewPeriodSummary> {
+    const [aggregateRows, topExerciseRows] = await Promise.all([
+        db.select({
+            workouts: sql<number>`count(*)`,
+            activeDays: sql<number>`count(distinct date(${workouts.createdAt}, 'unixepoch', 'localtime'))`,
+            totalVolumeKg: sql<number>`coalesce(sum(${workouts.volumeKg}), 0)`,
+            strengthWorkouts: sql<number>`coalesce(sum(case when ${workouts.type} = 'strength' then 1 else 0 end), 0)`,
+            cardioWorkouts: sql<number>`coalesce(sum(case when ${workouts.type} = 'cardio' then 1 else 0 end), 0)`,
+            firstCreatedAt: sql<number | null>`min(${workouts.createdAt})`,
+            lastCreatedAt: sql<number | null>`max(${workouts.createdAt})`,
+        }).from(workouts),
+        db.select({
+            name: workouts.name,
+            records: sql<number>`count(*)`,
+        })
+            .from(workouts)
+            .groupBy(workouts.name)
+            .orderBy(desc(sql<number>`count(*)`))
+            .limit(1),
+    ]);
 
-    const timestamps = periodWorkouts
-        .map((workout) => new Date(workout.createdAt).getTime())
-        .sort((a, b) => a - b);
+    const aggregate = aggregateRows[0];
+    const workoutCount = Number(aggregate?.workouts ?? 0);
+    const firstCreatedAt = aggregate?.firstCreatedAt ? new Date(Number(aggregate.firstCreatedAt) * 1000) : null;
+    const lastCreatedAt = aggregate?.lastCreatedAt ? new Date(Number(aggregate.lastCreatedAt) * 1000) : null;
+    const expectedDays = firstCreatedAt && lastCreatedAt
+        ? Math.max(
+            1,
+            Math.floor(
+                (new Date(lastCreatedAt.getFullYear(), lastCreatedAt.getMonth(), lastCreatedAt.getDate()).getTime()
+                    - new Date(firstCreatedAt.getFullYear(), firstCreatedAt.getMonth(), firstCreatedAt.getDate()).getTime())
+                / (1000 * 60 * 60 * 24),
+            ) + 1,
+        )
+        : 1;
 
-    const first = new Date(timestamps[0]);
-    const last = new Date(timestamps[timestamps.length - 1]);
-    const start = new Date(first.getFullYear(), first.getMonth(), first.getDate()).getTime();
-    const end = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
-
-    return Math.max(1, Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1);
+    return buildReviewSummaryFromStats({
+        workouts: workoutCount,
+        activeDays: Number(aggregate?.activeDays ?? 0),
+        totalVolumeKg: Number(aggregate?.totalVolumeKg ?? 0),
+        strengthWorkouts: Number(aggregate?.strengthWorkouts ?? 0),
+        cardioWorkouts: Number(aggregate?.cardioWorkouts ?? 0),
+        topExercise: topExerciseRows[0]?.name ?? null,
+        expectedDays,
+    });
 }
 
 export async function getDashboardData(year: number, month: number) {
@@ -468,8 +625,8 @@ export async function getDashboardData(year: number, month: number) {
         allCheckins,
         weekWorkouts,
         monthWorkouts,
-        allReviewWorkouts,
-        presets,
+        analytics,
+        allTimeReview,
         bm,
         profile,
     ] = await Promise.all([
@@ -486,6 +643,10 @@ export async function getDashboardData(year: number, month: number) {
             weight: workouts.weight,
             sets: workouts.sets,
             createdAt: workouts.createdAt,
+            volumeKg: workouts.volumeKg,
+            totalReps: workouts.totalReps,
+            setCount: workouts.setCount,
+            maxWeightKg: workouts.maxWeightKg,
         })
             .from(workouts)
             .where(gte(workouts.createdAt, startOfWeek)),
@@ -499,28 +660,19 @@ export async function getDashboardData(year: number, month: number) {
             sets: workouts.sets,
             stats: workouts.stats,
             createdAt: workouts.createdAt,
+            volumeKg: workouts.volumeKg,
+            totalReps: workouts.totalReps,
+            setCount: workouts.setCount,
+            maxWeightKg: workouts.maxWeightKg,
         })
             .from(workouts)
             .where(and(gte(workouts.createdAt, startOfMonth), lt(workouts.createdAt, endOfMonth))),
 
-        // 4. All-time review and analytics need volume parsing, so keep only required columns.
-        db.select({
-            name: workouts.name,
-            type: workouts.type,
-            weight: workouts.weight,
-            sets: workouts.sets,
-            createdAt: workouts.createdAt,
-        })
-            .from(workouts)
-            .orderBy(workouts.createdAt),
+        // 4. Top strength movements are aggregated in SQL and kept lightweight.
+        getStrengthExerciseSummaries({ includeLibraryOnly: false, limit: 5 }),
 
-        // 5. Strength presets for analytics labels.
-        db.select({
-            name: strengthPresets.name,
-            tag: strengthPresets.tag,
-        })
-            .from(strengthPresets)
-            .orderBy(strengthPresets.createdAt),
+        // 5. All-time review is aggregated in SQL to avoid loading full history.
+        getAllTimeReviewSummary(),
 
         // 6. Body Metrics
         getBodyMetricsSummary(),
@@ -561,7 +713,7 @@ export async function getDashboardData(year: number, month: number) {
                 duration: 0,
             };
         }
-        const vol = calculateVolume(w.weight, w.sets);
+        const vol = w.volumeKg;
         monthlyVolumeKg += vol;
         dailyData[day].volume += vol;
         dailyData[day].duration = estimateDailyDurationMinutes(
@@ -578,12 +730,9 @@ export async function getDashboardData(year: number, month: number) {
         });
     });
 
-    const analytics = buildStrengthExerciseAnalytics(allReviewWorkouts, presets, false).slice(0, 5);
-
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const monthlyReview = buildReviewSummary(monthWorkouts, daysInMonth);
     const weeklyReview = buildReviewSummary(weekWorkouts, 7);
-    const allTimeReview = buildReviewSummary(allReviewWorkouts, getTrackedDays(allReviewWorkouts));
 
     return {
         streak,

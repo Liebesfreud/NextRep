@@ -1,5 +1,6 @@
 import { db } from "../client";
 import { workouts, strengthPresets, dailyCheckins, bodyMetrics, userProfile } from "../schema";
+import { calculateWorkoutPerformance } from "../domain/training";
 import { getUserProfile, type AIConfigItem, type UserProfileData } from "./profile";
 import {
     CURRENT_BACKUP_VERSION,
@@ -8,6 +9,8 @@ import {
     type ExportedUserProfile,
     type ImportPayload,
 } from "@/db/domain/backupValidation";
+
+const IMPORT_BATCH_SIZE = 100;
 
 // ─── Export All Data ──────────────────────────────────────────────────────────
 
@@ -109,6 +112,14 @@ function buildImportedProfile(data: ImportPayload): UserProfileData | null {
     };
 }
 
+function chunkArray<T>(items: T[], size: number): T[][] {
+    const chunks: T[][] = [];
+    for (let index = 0; index < items.length; index += size) {
+        chunks.push(items.slice(index, index + size));
+    }
+    return chunks;
+}
+
 export async function importAllData(rawData: unknown): Promise<void> {
     const data = validateImportPayload(rawData);
     const importedProfile = buildImportedProfile(data);
@@ -120,20 +131,29 @@ export async function importAllData(rawData: unknown): Promise<void> {
         await tx.delete(bodyMetrics);
         await tx.delete(userProfile);
 
-        for (const w of data.workouts) {
-            await tx.insert(workouts).values(w);
+        for (const chunk of chunkArray(data.workouts, IMPORT_BATCH_SIZE)) {
+            await tx.insert(workouts).values(chunk.map((w) => {
+                const performance = calculateWorkoutPerformance(w);
+                return {
+                    ...w,
+                    volumeKg: performance.volumeKg,
+                    totalReps: performance.totalReps,
+                    setCount: performance.setCount,
+                    maxWeightKg: performance.maxWeightKg,
+                };
+            }));
         }
 
-        for (const p of data.strengthPresets) {
-            await tx.insert(strengthPresets).values(p);
+        for (const chunk of chunkArray(data.strengthPresets, IMPORT_BATCH_SIZE)) {
+            await tx.insert(strengthPresets).values(chunk);
         }
 
-        for (const c of data.dailyCheckins) {
-            await tx.insert(dailyCheckins).values(c);
+        for (const chunk of chunkArray(data.dailyCheckins, IMPORT_BATCH_SIZE)) {
+            await tx.insert(dailyCheckins).values(chunk);
         }
 
-        for (const m of data.bodyMetrics) {
-            await tx.insert(bodyMetrics).values(m);
+        for (const chunk of chunkArray(data.bodyMetrics, IMPORT_BATCH_SIZE)) {
+            await tx.insert(bodyMetrics).values(chunk);
         }
 
         if (importedProfile) {

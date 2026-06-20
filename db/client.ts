@@ -3,6 +3,7 @@ import { drizzle as drizzleExpo } from "drizzle-orm/expo-sqlite";
 import { drizzle as drizzleProxy } from "drizzle-orm/sqlite-proxy";
 import { Platform } from "react-native";
 import * as schema from "./schema";
+import { calculateWorkoutPerformance } from "./domain/training";
 
 const sqliteOptions = {
   enableChangeListener: true,
@@ -40,6 +41,45 @@ async function addColumnIfMissing(
 
   if (columns.some((column) => column.name === columnName)) return;
   await database.execAsync(`ALTER TABLE "${tableName}" ADD COLUMN "${columnName}" ${definition};`);
+}
+
+async function backfillWorkoutPerformance(database: SQLite.SQLiteDatabase): Promise<void> {
+  const rows = await database.getAllAsync<{
+    id: string;
+    type: string;
+    weight: string | null;
+    sets: string | null;
+    volumeKg: number | null;
+    totalReps: number | null;
+    setCount: number | null;
+    maxWeightKg: number | null;
+  }>(`
+    SELECT "id", "type", "weight", "sets", "volumeKg", "totalReps", "setCount", "maxWeightKg"
+    FROM "Workout"
+    WHERE "type" = 'strength'
+      AND (
+        "volumeKg" IS NULL OR "totalReps" IS NULL OR "setCount" IS NULL OR "maxWeightKg" IS NULL
+        OR ("volumeKg" = 0 AND "totalReps" = 0 AND "setCount" = 0 AND "maxWeightKg" = 0)
+      );
+  `);
+
+  for (const row of rows) {
+    const performance = calculateWorkoutPerformance(row);
+    await database.runAsync(
+      `
+        UPDATE "Workout"
+        SET "volumeKg" = ?, "totalReps" = ?, "setCount" = ?, "maxWeightKg" = ?
+        WHERE "id" = ?;
+      `,
+      [
+        performance.volumeKg,
+        performance.totalReps,
+        performance.setCount,
+        performance.maxWeightKg,
+        row.id,
+      ],
+    );
+  }
 }
 
 export const db: AppDatabase = (
@@ -92,6 +132,10 @@ export async function initDatabase(): Promise<void> {
       "weight"    TEXT,
       "sets"      TEXT,
       "stats"     TEXT,
+      "volumeKg"  REAL NOT NULL DEFAULT 0,
+      "totalReps" INTEGER NOT NULL DEFAULT 0,
+      "setCount"  INTEGER NOT NULL DEFAULT 0,
+      "maxWeightKg" REAL NOT NULL DEFAULT 0,
       "createdAt" INTEGER NOT NULL DEFAULT (unixepoch())
     );
 
@@ -124,6 +168,15 @@ export async function initDatabase(): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS idx_workout_name
       ON "Workout" ("name");
+
+    CREATE INDEX IF NOT EXISTS idx_workout_type_created_at
+      ON "Workout" ("type", "createdAt");
+
+    CREATE INDEX IF NOT EXISTS idx_workout_name_created_at
+      ON "Workout" ("name", "createdAt");
+
+    CREATE INDEX IF NOT EXISTS idx_workout_type_name_created_at
+      ON "Workout" ("type", "name", "createdAt");
 
     CREATE INDEX IF NOT EXISTS idx_daily_checkin_date_str
       ON "DailyCheckin" ("dateStr");
@@ -160,7 +213,24 @@ export async function initDatabase(): Promise<void> {
     ["UserProfile", "targetWeight", "REAL"],
     ["UserProfile", "targetBodyFat", "REAL"],
     ["DailyCheckin", "aiEstimatedCal", "INTEGER"],
+    ["Workout", "volumeKg", "REAL NOT NULL DEFAULT 0"],
+    ["Workout", "totalReps", "INTEGER NOT NULL DEFAULT 0"],
+    ["Workout", "setCount", "INTEGER NOT NULL DEFAULT 0"],
+    ["Workout", "maxWeightKg", "REAL NOT NULL DEFAULT 0"],
   ] as const) {
     await addColumnIfMissing(database, tableName, columnName, definition);
   }
+
+  await database.execAsync(`
+    CREATE INDEX IF NOT EXISTS idx_workout_type_created_at
+      ON "Workout" ("type", "createdAt");
+
+    CREATE INDEX IF NOT EXISTS idx_workout_name_created_at
+      ON "Workout" ("name", "createdAt");
+
+    CREATE INDEX IF NOT EXISTS idx_workout_type_name_created_at
+      ON "Workout" ("type", "name", "createdAt");
+  `);
+
+  await backfillWorkoutPerformance(database);
 }

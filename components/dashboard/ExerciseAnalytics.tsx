@@ -1,17 +1,17 @@
-import { useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { View } from "react-native";
 import { ChevronRight, Library, Target } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
 import { getStrengthCategoryVisual } from "@/constants/exerciseVisuals";
 import { ExerciseDetailModal } from "@/components/dashboard/ExerciseDetailModal";
-import { type StrengthExerciseAnalytics } from "@/db/services/dashboard";
+import { getStrengthExerciseDetail, type StrengthExerciseAnalytics, type StrengthExerciseSummary } from "@/db/services/dashboard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 
 type DashboardData = {
-    analytics?: StrengthExerciseAnalytics[];
+    analytics?: StrengthExerciseSummary[];
 };
 
 type Props = {
@@ -24,12 +24,66 @@ function formatVolume(value: number) {
     return `${Math.round(value)} kg`;
 }
 
+const ExerciseRow = React.memo(function ExerciseRow({
+    exercise,
+    index,
+    onPress,
+}: {
+    exercise: StrengthExerciseSummary;
+    index: number;
+    onPress: (exercise: StrengthExerciseSummary) => void;
+}) {
+    const { colors } = useTheme();
+    const visual = getStrengthCategoryVisual(exercise.tag, colors);
+    const Icon = visual.icon;
+
+    return (
+        <Button
+            onPress={() => onPress(exercise)}
+            variant="ghost"
+            className="h-auto justify-between rounded-lg px-2 py-3"
+        >
+            <View className="flex-row items-center gap-3 flex-1">
+                <View className="w-7 items-center">
+                    <Text className="text-body-semibold text-foreground font-variant-numeric-tabular-nums">
+                        {index + 1}
+                    </Text>
+                </View>
+                <View className="h-9 w-9 items-center justify-center rounded-md bg-surface-elevated">
+                    <Icon size={18} color={visual.accent} />
+                </View>
+                <View className="flex-1">
+                    <Text className="text-body-semibold text-foreground" numberOfLines={1}>
+                        {exercise.name}
+                    </Text>
+                </View>
+            </View>
+            <View className="items-end flex-row gap-1.5">
+                <Text variant="caption" className="text-foreground font-variant-numeric-tabular-nums">
+                    {formatVolume(exercise.totalVolumeKg)}
+                </Text>
+                <ChevronRight size={15} color={colors.gray4} />
+            </View>
+        </Button>
+    );
+});
+
 export function ExerciseAnalytics({ data }: Props) {
     const { colors } = useTheme();
     const router = useRouter();
+    const detailSeqRef = useRef(0);
     const [selectedExercise, setSelectedExercise] = useState<StrengthExerciseAnalytics | null>(null);
 
     const analytics = data?.analytics ?? [];
+    const openExerciseDetail = useCallback((exercise: StrengthExerciseSummary) => {
+        const requestId = ++detailSeqRef.current;
+        setSelectedExercise(null);
+        getStrengthExerciseDetail(exercise.name)
+            .then((detail) => {
+                if (requestId === detailSeqRef.current) setSelectedExercise(detail);
+            })
+            .catch(console.error);
+    }, []);
 
     return (
         <>
@@ -58,41 +112,14 @@ export function ExerciseAnalytics({ data }: Props) {
                                 暂无数据
                             </Text>
                         </View>
-                    ) : analytics.map((exercise, idx) => {
-                        const visual = getStrengthCategoryVisual(exercise.tag, colors);
-                        const Icon = visual.icon;
-
-                        return (
-                            <Button
-                                key={exercise.name}
-                                onPress={() => setSelectedExercise(exercise)}
-                                variant="ghost"
-                                className="h-auto justify-between rounded-lg px-2 py-3"
-                            >
-                                <View className="flex-row items-center gap-3 flex-1">
-                                    <View className="w-7 items-center">
-                                        <Text className="text-body-semibold text-foreground font-variant-numeric-tabular-nums">
-                                            {idx + 1}
-                                        </Text>
-                                    </View>
-                                    <View className="h-9 w-9 items-center justify-center rounded-md bg-surface-elevated">
-                                        <Icon size={18} color={visual.accent} />
-                                    </View>
-                                    <View className="flex-1">
-                                        <Text className="text-body-semibold text-foreground" numberOfLines={1}>
-                                            {exercise.name}
-                                        </Text>
-                                    </View>
-                                </View>
-                                <View className="items-end flex-row gap-1.5">
-                                    <Text variant="caption" className="text-foreground font-variant-numeric-tabular-nums">
-                                        {formatVolume(exercise.totalVolumeKg)}
-                                    </Text>
-                                    <ChevronRight size={15} color={colors.gray4} />
-                                </View>
-                            </Button>
-                        );
-                    })}
+                    ) : analytics.map((exercise, idx) => (
+                        <ExerciseRow
+                            key={exercise.name}
+                            exercise={exercise}
+                            index={idx}
+                            onPress={openExerciseDetail}
+                        />
+                    ))}
                 </View>
             </Card>
 

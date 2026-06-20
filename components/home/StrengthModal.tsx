@@ -239,6 +239,15 @@ export function StrengthModal({
         </View>
     );
 
+    const renderSetItem = useCallback(({ item }: { item: WorkoutSet }) => (
+        <StrengthSetRow
+            item={item}
+            onDelete={deleteSet}
+            onToggleComplete={toggleSetComplete}
+            onUpdate={updateSet}
+        />
+    ), [deleteSet, toggleSetComplete, updateSet]);
+
     return (
         <Sheet
             visible={visible}
@@ -378,23 +387,26 @@ export function StrengthModal({
                         </View>
 
                         {/* Set-by-Set Rows */}
-                        <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-                            {sets.map((set) => (
-                                <StrengthSetRow
-                                    key={set.id}
-                                    item={set}
-                                    onDelete={deleteSet}
-                                    onToggleComplete={toggleSetComplete}
-                                    onUpdate={updateSet}
-                                />
-                            ))}
-
-                            {/* Add Set Button */}
-                            <Button onPress={handleAddSet} variant="secondary" className="mt-3 w-full py-3">
-                                <ButtonText variant="secondary">+ 添加下一组</ButtonText>
-                            </Button>
-                            <View className="h-6" />
-                        </ScrollView>
+                        <FlatList
+                            data={sets}
+                            keyExtractor={(item) => item.id}
+                            renderItem={renderSetItem}
+                            showsVerticalScrollIndicator={false}
+                            keyboardShouldPersistTaps="handled"
+                            initialNumToRender={8}
+                            maxToRenderPerBatch={8}
+                            removeClippedSubviews={Platform.OS !== "web"}
+                            windowSize={7}
+                            className="flex-1"
+                            ListFooterComponent={(
+                                <>
+                                    <Button onPress={handleAddSet} variant="secondary" className="mt-3 w-full py-3">
+                                        <ButtonText variant="secondary">+ 添加下一组</ButtonText>
+                                    </Button>
+                                    <View className="h-6" />
+                                </>
+                            )}
+                        />
 
                         <View className="mt-4 flex-row gap-2 border-t pt-2" style={{ borderTopColor: `${colors.gray3}4D` }}>
                             {initialWorkout && (

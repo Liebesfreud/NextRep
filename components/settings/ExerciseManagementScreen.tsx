@@ -5,7 +5,12 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/hooks/useTheme";
 import { getStrengthPresets, addStrengthPreset, type StrengthPresetItem } from "@/db/services/workout";
-import { getStrengthExerciseAnalytics, type StrengthExerciseAnalytics } from "@/db/services/dashboard";
+import {
+    getStrengthExerciseDetail,
+    getStrengthExerciseSummaries,
+    type StrengthExerciseAnalytics,
+    type StrengthExerciseSummary,
+} from "@/db/services/dashboard";
 import { getStrengthCategoryVisual, STRENGTH_CATEGORIES } from "@/constants/exerciseVisuals";
 import { ExerciseDetailModal } from "@/components/dashboard/ExerciseDetailModal";
 import { AnimatedPressable } from "@/components/ui/AnimatedPressable";
@@ -20,7 +25,7 @@ export default function ExerciseManagementScreen() {
     const insets = useSafeAreaInsets();
 
     const [presets, setPresets] = useState<StrengthPresetItem[]>([]);
-    const [analytics, setAnalytics] = useState<StrengthExerciseAnalytics[]>([]);
+    const [analytics, setAnalytics] = useState<StrengthExerciseSummary[]>([]);
     const [selectedExercise, setSelectedExercise] = useState<StrengthExerciseAnalytics | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("全部");
@@ -28,6 +33,7 @@ export default function ExerciseManagementScreen() {
     const [newName, setNewName] = useState("");
     const [newTag, setNewTag] = useState<string | null>(null);
     const loadSeqRef = useRef(0);
+    const detailSeqRef = useRef(0);
 
     const categories = useMemo(() => ["全部", ...STRENGTH_CATEGORIES], []);
     const presetNames = useMemo(() => new Set(presets.map((preset) => preset.name)), [presets]);
@@ -39,7 +45,7 @@ export default function ExerciseManagementScreen() {
         const requestId = ++loadSeqRef.current;
         const [presetData, analyticsData] = await Promise.all([
             getStrengthPresets(),
-            getStrengthExerciseAnalytics(),
+            getStrengthExerciseSummaries({ includeLibraryOnly: true }),
         ]);
         if (requestId !== loadSeqRef.current) return;
         setPresets(presetData);
@@ -77,11 +83,21 @@ export default function ExerciseManagementScreen() {
         [analytics, normalizedSearchQuery, selectedCategory]
     );
 
-    const renderExerciseItem = useCallback(({ item }: { item: StrengthExerciseAnalytics }) => {
+    const openExerciseDetail = useCallback((item: StrengthExerciseSummary) => {
+        const requestId = ++detailSeqRef.current;
+        setSelectedExercise(null);
+        getStrengthExerciseDetail(item.name)
+            .then((detail) => {
+                if (requestId === detailSeqRef.current) setSelectedExercise(detail);
+            })
+            .catch(console.error);
+    }, []);
+
+    const renderExerciseItem = useCallback(({ item }: { item: StrengthExerciseSummary }) => {
         return (
             <Card className="mb-1.5 overflow-hidden p-0">
                 <AnimatedPressable
-                    onPress={() => setSelectedExercise(item)}
+                    onPress={() => openExerciseDetail(item)}
                     activeScale={0.99}
                     className="min-h-12 flex-row items-center gap-3 px-card-padding py-2"
                     accessibilityRole="button"
@@ -96,7 +112,7 @@ export default function ExerciseManagementScreen() {
                 </AnimatedPressable>
             </Card>
         );
-    }, []);
+    }, [openExerciseDetail]);
 
     const renderEmptyList = useCallback(() => (
         <Card className="items-center justify-center border-dashed py-12">

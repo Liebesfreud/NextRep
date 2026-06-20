@@ -12,6 +12,10 @@ export const workouts = sqliteTable("Workout", {
     weight: text("weight"),
     sets: text("sets"),
     stats: text("stats"),
+    volumeKg: real("volumeKg").notNull().default(0),
+    totalReps: integer("totalReps").notNull().default(0),
+    setCount: integer("setCount").notNull().default(0),
+    maxWeightKg: real("maxWeightKg").notNull().default(0),
     createdAt: integer("createdAt", { mode: "timestamp" })
         .notNull()
         .default(sql`(unixepoch())`),

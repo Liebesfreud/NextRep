@@ -2,6 +2,7 @@ import { db } from "../client";
 import { workouts, strengthPresets, dailyCheckins } from "../schema";
 import { eq, gte, lt, and } from "drizzle-orm";
 import * as Crypto from "expo-crypto";
+import { calculateWorkoutPerformance } from "../domain/training";
 import { buildTimestampForDate, getDateBounds, getTodayDateStr, toDateStr } from "@/db/domain/dates";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -175,6 +176,7 @@ export async function addWorkouts(items: AddWorkoutItem[], forDate?: string): Pr
 
     await db.transaction(async (tx) => {
         for (const item of items) {
+            const performance = calculateWorkoutPerformance(item);
             await tx.insert(workouts).values({
                 id: Crypto.randomUUID(),
                 type: item.type,
@@ -182,6 +184,10 @@ export async function addWorkouts(items: AddWorkoutItem[], forDate?: string): Pr
                 weight: item.weight ?? null,
                 sets: item.sets ?? null,
                 stats: item.stats ?? null,
+                volumeKg: performance.volumeKg,
+                totalReps: performance.totalReps,
+                setCount: performance.setCount,
+                maxWeightKg: performance.maxWeightKg,
                 ...(createdAt ? { createdAt } : {}),
             });
         }
@@ -204,6 +210,15 @@ async function getWorkoutDateStrById(id: string): Promise<string | null> {
     return toDateStr(new Date(rows[0].createdAt));
 }
 
+async function getWorkoutRowById(id: string) {
+    const rows = await db
+        .select()
+        .from(workouts)
+        .where(eq(workouts.id, id));
+
+    return rows[0] ?? null;
+}
+
 export async function updateWorkout(
     id: string,
     data: {
@@ -214,15 +229,29 @@ export async function updateWorkout(
         stats?: string;
     }
 ): Promise<void> {
-    const workoutDateStr = await getWorkoutDateStrById(id);
+    const existing = await getWorkoutRowById(id);
+    const workoutDateStr = existing ? toDateStr(new Date(existing.createdAt)) : null;
+    const nextType = data.type ?? (existing?.type as "strength" | "cardio" | undefined);
+    const nextWeight = data.weight !== undefined ? data.weight : existing?.weight ?? null;
+    const nextSets = data.sets !== undefined ? data.sets : existing?.sets ?? null;
+    const performance = calculateWorkoutPerformance({
+        type: nextType,
+        weight: nextWeight,
+        sets: nextSets,
+    });
 
     await db
         .update(workouts)
         .set({
+            ...(data.type && { type: data.type }),
             ...(data.name && { name: data.name }),
-            weight: data.weight ?? null,
-            sets: data.sets ?? null,
+            weight: nextWeight,
+            sets: nextSets,
             stats: data.stats ?? null,
+            volumeKg: performance.volumeKg,
+            totalReps: performance.totalReps,
+            setCount: performance.setCount,
+            maxWeightKg: performance.maxWeightKg,
         })
         .where(eq(workouts.id, id));
 

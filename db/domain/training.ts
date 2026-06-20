@@ -11,6 +11,13 @@ export type WorkoutPerformanceSummary = {
     maxWeightKg: number | null;
 };
 
+export type WorkoutPerformance = {
+    volumeKg: number;
+    totalReps: number;
+    setCount: number;
+    maxWeightKg: number;
+};
+
 export function parseNumber(value: string | number | null | undefined): number {
     if (typeof value === "number") return Number.isFinite(value) ? value : 0;
     if (!value) return 0;
@@ -88,9 +95,26 @@ export function calculateStrengthVolumeKg(weight: string | null, sets: string | 
     return summarizeWorkoutPerformance(weight, sets).volumeKg;
 }
 
+export function calculateWorkoutPerformance(input: {
+    type?: string | null;
+    weight?: string | null;
+    sets?: string | null;
+}): WorkoutPerformance {
+    if (input.type !== "strength") {
+        return { volumeKg: 0, totalReps: 0, setCount: 0, maxWeightKg: 0 };
+    }
+
+    const summary = summarizeWorkoutPerformance(input.weight ?? null, input.sets ?? null);
+    return {
+        volumeKg: summary.volumeKg,
+        totalReps: summary.totalReps,
+        setCount: summary.setCount,
+        maxWeightKg: summary.maxWeightKg ?? 0,
+    };
+}
+
 export function estimateDailyDurationMinutes(workoutCount: number, volumeKg: number): number {
     if (workoutCount <= 0) return 0;
     const volumeMinutes = Math.min(30, Math.floor(volumeKg / 500));
     return workoutCount * 12 + volumeMinutes;
 }
-
