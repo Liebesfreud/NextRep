@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon.png" width="112" height="112" alt="NextRep 应用图标" />
+  <img src="assets/readme-cover.png" width="100%" alt="NextRep 项目封面：本地优先的健身记录、数据分析与 AI 训练建议" />
 </p>
 
 <h1 align="center">NextRep</h1>
